@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verifying… — Nishi</title>
+  <title>Signing you in… — Nishi</title>
   <meta name="robots" content="noindex">
   <link rel="icon" type="image/png" href="assets/nishi_logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,17 +45,73 @@
   </nav>
 
   <main class="auth-page">
-    <div class="auth-card" style="text-align: center;">
+    <div class="auth-card" id="verify-card" style="text-align: center;">
       <div class="pulse"></div>
-      <h1 style="font-size: 26px;">Verifying your link…</h1>
-      <p class="auth-sub">You'll be signed in shortly.</p>
+      <h1 id="verify-title" style="font-size: 26px;">Signing you in…</h1>
+      <p id="verify-sub" class="auth-sub">One moment.</p>
 
-      <p class="auth-switch" style="margin-top: var(--space-lg);">
-        Stuck? <a href="signin.html">Try again</a> or <a href="forgot.html">request a new link</a>.
+      <p class="auth-switch" id="verify-actions" style="margin-top: var(--space-lg); display: none;">
+        <a href="signin.html">Try again</a> or <a href="forgot.html">request a new link</a>.
       </p>
     </div>
   </main>
 
-  <script src="scripts/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="scripts/config.js"></script>
+  <script src="scripts/auth.js"></script>
+  <script>
+    (function () {
+      const title = document.getElementById('verify-title');
+      const sub = document.getElementById('verify-sub');
+      const actions = document.getElementById('verify-actions');
+      const pulse = document.querySelector('.pulse');
+
+      function showError(msg) {
+        if (pulse) pulse.style.display = 'none';
+        title.textContent = 'That link did not work';
+        sub.textContent = msg || 'It may have expired or been used already.';
+        actions.style.display = 'block';
+      }
+
+      function goAccount() {
+        title.textContent = 'You are signed in.';
+        sub.textContent = 'Taking you to your account…';
+        setTimeout(() => { window.location.href = '/account.html'; }, 600);
+      }
+
+      // Surface any explicit error in the URL hash
+      const hash = window.location.hash || '';
+      if (hash.includes('error=')) {
+        const params = new URLSearchParams(hash.replace(/^#/, ''));
+        const desc = params.get('error_description') || params.get('error');
+        showError(desc ? decodeURIComponent(desc.replace(/\+/g, ' ')) : '');
+        return;
+      }
+
+      // Wait for Supabase to detect the session from the URL
+      const timeout = setTimeout(() => showError(), 8000);
+
+      function check() {
+        if (!window.NishiAuth) {
+          setTimeout(check, 100);
+          return;
+        }
+        window.NishiAuth.onSession((session) => {
+          if (session) {
+            clearTimeout(timeout);
+            goAccount();
+          }
+        });
+        // Also try a direct read in case the event already fired
+        window.NishiAuth.getSession().then((session) => {
+          if (session) {
+            clearTimeout(timeout);
+            goAccount();
+          }
+        });
+      }
+      check();
+    })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your account — Nishi</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="assets/nishi_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+  <style>
+    .account-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: var(--space-xl) 32px;
+    }
+    .account-greeting {
+      margin-bottom: var(--space-lg);
+    }
+    .account-greeting h1 {
+      font-size: clamp(28px, 4vw, 40px);
+      margin-bottom: 8px;
+    }
+    .account-greeting p {
+      font-size: 16px;
+    }
+    .account-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      margin-bottom: var(--space-md);
+      box-shadow: var(--shadow-sm);
+    }
+    .account-card h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .account-card .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+    }
+    .account-card .row + .row {
+      border-top: 1px solid var(--border);
+    }
+    .account-card .label {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 600;
+    }
+    .account-card .value {
+      font-size: 15px;
+      color: var(--text);
+    }
+    .account-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: var(--space-md);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo"><img src="assets/nishi_logo.png" alt="Nishi"></a>
+      <ul class="nav-links"></ul>
+      <div class="nav-cta">
+        <a href="#" class="link" data-auth="signout">Sign out</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="account-wrap">
+    <div class="account-greeting" id="account-loading">
+      <h1>Loading…</h1>
+      <p>Checking your session.</p>
+    </div>
+
+    <div id="account-content" style="display: none;">
+      <div class="account-greeting">
+        <h1 id="greeting">Welcome back.</h1>
+        <p>You're signed in to Nishi.</p>
+      </div>
+
+      <section class="account-card">
+        <h3>Profile</h3>
+        <div class="row">
+          <span class="label">Email</span>
+          <span class="value" id="account-email">—</span>
+        </div>
+        <div class="row">
+          <span class="label">Sign-in method</span>
+          <span class="value" id="account-provider">—</span>
+        </div>
+        <div class="row">
+          <span class="label">Account created</span>
+          <span class="value" id="account-created">—</span>
+        </div>
+      </section>
+
+      <section class="account-card">
+        <h3>Subscription</h3>
+        <div class="row">
+          <span class="label">Status</span>
+          <span class="value">Free tier</span>
+        </div>
+        <p style="margin-top: 12px; font-size: 14px; color: var(--text-soft);">
+          Start a 7-day free trial of Premium — no card required.
+        </p>
+        <div class="account-actions">
+          <a href="pricing.html" class="btn btn-primary">View pricing</a>
+        </div>
+      </section>
+
+      <section class="account-card">
+        <h3>Get the app</h3>
+        <p style="font-size: 14px; color: var(--text-soft);">
+          Nishi lives on your phone. Download the iOS or Android app to get the full experience.
+        </p>
+        <div class="account-actions">
+          <a href="#" class="btn btn-ghost">iOS</a>
+          <a href="#" class="btn btn-ghost">Android</a>
+        </div>
+      </section>
+
+      <p style="margin-top: var(--space-lg); text-align: center; font-size: 14px;">
+        <a href="#" data-auth="signout">Sign out</a>
+      </p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="scripts/config.js"></script>
+  <script src="scripts/auth.js"></script>
+  <script>
+    (function () {
+      const loading = document.getElementById('account-loading');
+      const content = document.getElementById('account-content');
+
+      function render(session) {
+        if (!session) {
+          window.location.href = '/signin.html';
+          return;
+        }
+        const u = session.user;
+        document.getElementById('greeting').textContent =
+          u.user_metadata?.name
+            ? `Welcome back, ${u.user_metadata.name.split(' ')[0]}.`
+            : 'Welcome back.';
+        document.getElementById('account-email').textContent = u.email || '—';
+        document.getElementById('account-provider').textContent =
+          u.app_metadata?.provider
+            ? u.app_metadata.provider.charAt(0).toUpperCase() + u.app_metadata.provider.slice(1)
+            : '—';
+        document.getElementById('account-created').textContent =
+          u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
+        loading.style.display = 'none';
+        content.style.display = 'block';
+      }
+
+      function check() {
+        if (!window.NishiAuth) {
+          setTimeout(check, 100);
+          return;
+        }
+        window.NishiAuth.getSession().then(render);
+        window.NishiAuth.onSession(render);
+      }
+      check();
+    })();
+  </script>
+</body>
+</html>

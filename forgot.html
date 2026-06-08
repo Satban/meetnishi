@@ -29,9 +29,9 @@
         <img src="assets/nishi_logo.png" alt="Nishi">
       </div>
       <h1>Get a magic link.</h1>
-      <p class="auth-sub">We'll email you a link to sign in. No password needed.</p>
+      <p class="auth-sub">We will email you a link to sign in. No password needed.</p>
 
-      <form data-stub="forgot">
+      <form data-auth="email">
         <div class="auth-input-row">
           <input type="email" class="auth-input" placeholder="you@example.com" required autocomplete="email">
         </div>
@@ -40,12 +40,17 @@
         </button>
       </form>
 
+      <p class="auth-status" style="margin-top: 14px; text-align: center; font-size: 14px;"></p>
+
       <p class="auth-switch" style="margin-top: var(--space-md);">
         Or <a href="signin.html">sign in with Apple or Google</a>.
       </p>
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="scripts/config.js"></script>
+  <script src="scripts/auth.js"></script>
   <script src="scripts/main.js"></script>
 </body>
 </html>
