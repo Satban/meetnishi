@@ -484,7 +484,7 @@ p { color: var(--text-soft); }
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: #1a1a1a;
+  background: var(--bg);
   box-shadow: var(--shadow-lg);
   position: relative;
 }
@@ -493,7 +493,8 @@ p { color: var(--text-soft); }
 .video-frame img.video-poster {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  display: block;
 }
 
 .video-play {
