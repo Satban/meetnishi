@@ -1,0 +1,32 @@
+# Nishi
+
+> Nishi is an AI nutrition companion built for life on GLP-1. It notices patterns across what is in your kitchen, what your wearables say, and how you actually feel, then helps you act on what it sees. The wedge audience is people on GLP-1 medications (Ozempic, Wegovy, Mounjaro, Zepbound); the broader audience includes anyone navigating nutrition with intention.
+
+## Key URLs
+
+- [Home](https://meetnishi.com/): the overview of what Nishi is and the live demo
+- [How it works](https://meetnishi.com/how-it-works.html): onboarding flow and the observation loop
+- [Pricing](https://meetnishi.com/pricing.html): free tier, Premium at $29.99/month or $239/year, 7-day trial
+- [Story](https://meetnishi.com/story.html): founder note and what Nishi will and will not do
+- [FAQ](https://meetnishi.com/faq.html): product, pricing, privacy, medical, technical, account
+
+## What Nishi is
+
+- A nutrition companion
+- An observation engine that notices patterns
+- A pattern finder across food, health signals, and how you feel
+- Calm tech: quiet, observant, never dramatic
+
+## What Nishi is not
+
+- A calorie tracker
+- A macro tracker
+- A meal logging app
+- A generic AI chatbot
+- A weight-loss app
+- A medical device
+
+## Contact
+
+- press@meetnishi.com for press inquiries
+- satyam@meetnishi.com for the founder

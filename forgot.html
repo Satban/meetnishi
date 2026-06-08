@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in by email — Nishi</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="assets/nishi_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo"><img src="assets/nishi_logo.png" alt="Nishi"></a>
+      <ul class="nav-links"></ul>
+      <div class="nav-cta">
+        <a href="signin.html" class="link">Sign in</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="auth-page">
+    <div class="auth-card">
+      <div class="auth-mark">
+        <img src="assets/nishi_logo.png" alt="Nishi">
+      </div>
+      <h1>Get a magic link.</h1>
+      <p class="auth-sub">We'll email you a link to sign in. No password needed.</p>
+
+      <form data-stub="forgot">
+        <div class="auth-input-row">
+          <input type="email" class="auth-input" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <button type="submit" class="auth-btn" style="background: var(--accent); color: white; border-color: var(--accent);">
+          Email me a link
+        </button>
+      </form>
+
+      <p class="auth-switch" style="margin-top: var(--space-md);">
+        Or <a href="signin.html">sign in with Apple or Google</a>.
+      </p>
+    </div>
+  </main>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>

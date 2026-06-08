@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nishi — Your nutrition companion, built for life on GLP-1</title>
+  <meta name="description" content="Nishi connects what's in your kitchen, what your wearables say, and how you actually feel. It helps you eat well, quietly, every day.">
+  <link rel="canonical" href="https://meetnishi.com/">
+  <meta property="og:title" content="Nishi — Your nutrition companion">
+  <meta property="og:description" content="Built for life on GLP-1. Knows your kitchen, your biology, and how you feel.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://meetnishi.com/">
+  <meta property="og:image" content="https://meetnishi.com/assets/nishi_logo.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="assets/nishi_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo" aria-label="Nishi home">
+        <img src="assets/nishi_logo.png" alt="Nishi">
+      </a>
+      <ul class="nav-links">
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="story.html">Story</a></li>
+        <li><a href="faq.html">FAQ</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="signin.html" class="link">Sign in</a>
+        <a href="signup.html" class="btn btn-primary">Get started</a>
+      </div>
+      <button class="nav-toggle" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="nav-drawer" aria-hidden="true">
+    <ul>
+      <li><a href="how-it-works.html">How it works</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="story.html">Story</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="signin.html">Sign in</a></li>
+    </ul>
+    <a href="signup.html" class="btn btn-primary">Get started</a>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <span class="eyebrow">Built for life on GLP-1</span>
+        <h1>Your nutrition companion.</h1>
+        <p class="lead">Nishi connects what's in your kitchen, what your wearables say, and how you actually feel. It helps you eat well, quietly, every day.</p>
+        <div class="hero-cta">
+          <a href="signup.html" class="btn btn-primary">Get started</a>
+          <a href="#demo" class="btn-text">Watch the demo <span class="chev">⌄</span></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mt-xl" id="demo">
+      <div class="video-frame reveal">
+        <video id="hero-video" controls autoplay muted loop playsinline poster="assets/hero-poster.jpg" preload="metadata">
+          <source src="videos/demo.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="hero-trust">
+        <span>Apple Health</span><span class="dot"></span>
+        <span>Health Connect</span><span class="dot"></span>
+        <span>Private by design</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ THREE STREAMS (Venn) ============ -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">What Nishi sees</span>
+        <h2>Three streams of context.</h2>
+        <p class="lead">Nishi reads your kitchen, your wearables, and how you feel. It connects them so nothing falls through the cracks.</p>
+      </div>
+
+      <img class="venn-img reveal" src="assets/nishi_venn.png" alt="Three input streams — food and groceries, wearables, and goals plus how you feel — converging on Nishi at the center.">
+
+      <div class="streams">
+        <div class="stream-col food reveal">
+          <div class="swatch"></div>
+          <h3>Food &amp; Groceries</h3>
+          <p>Nishi knows what's in your kitchen, what you've been eating, and what you want to cook. Track by voice, by photo, or by scanning your grocery receipt.</p>
+        </div>
+        <div class="stream-col wearables reveal">
+          <div class="swatch"></div>
+          <h3>Wearables</h3>
+          <p>Connect your watch, your CGM, your sleep tracker. Activity, sleep, heart rate. Nishi reads them and uses them to shape what you eat and when.</p>
+        </div>
+        <div class="stream-col feel reveal">
+          <div class="swatch"></div>
+          <h3>Goals &amp; How You Feel</h3>
+          <p>Tell Nishi what matters: protein, A1C, weight, energy. And how you feel: nausea, mood, ease. Share medications and labs when you want.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHAT CHANGES (Sarah's beats) ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">What changes when Nishi notices</span>
+        <h2>It notices. Then it helps.</h2>
+        <p class="lead">Three moments from a real day, with Nishi closing the loop from observation to action.</p>
+      </div>
+
+      <div class="cards-grid">
+        <article class="obs-card win reveal">
+          <span class="eyebrow-text sage">★ Habit win</span>
+          <p class="obs-text">You hit your protein target <em>4 days running</em>. Highest streak yet.</p>
+          <div class="obs-actions">
+            <span class="chip primary">Plan tomorrow</span>
+            <span class="chip">See the days</span>
+          </div>
+        </article>
+
+        <article class="obs-card hero reveal">
+          <span class="eyebrow-text">Nishi noticed</span>
+          <p class="obs-text">Protein so far: <em>28g</em>. You usually feel best when you hit 60g by 3pm.</p>
+          <div class="obs-actions">
+            <span class="chip primary">Suggest a snack</span>
+            <span class="chip">Show what I have</span>
+          </div>
+        </article>
+
+        <article class="obs-card hero reveal">
+          <span class="eyebrow-text">Nishi noticed</span>
+          <p class="obs-text">You bought salmon Sunday. Broccoli is already in the fridge. <em>Dinner is mostly here.</em></p>
+          <div class="obs-actions">
+            <span class="chip primary">Plan around it</span>
+            <span class="chip">Show recipe</span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BUILT FOR THE GLP-1 JOURNEY ============ -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">For the GLP-1 reality</span>
+        <h2>Built for smaller portions, changing hunger, and protein that has to do more.</h2>
+        <p class="lead">Calorie counting and "eat less of everything" were not built for this. Nishi is.</p>
+      </div>
+
+      <div class="story-mock reveal" style="margin: 0 auto; max-width: 540px;">
+        <div class="premium-tag">Premium</div>
+        <span class="eyebrow-text">For your next visit</span>
+        <h3>Doctor visit summary</h3>
+        <div class="meta">Week 12 · Dr. Chen · endocrinology</div>
+        <div class="body">
+          Wegovy 1.0 mg. Weight down <em>12.3 lbs</em>. A1C trending <em>6.4 → 5.9</em>. Average daily protein 88g, fiber 21g. Mild nausea twice this week, no missed meals.
+        </div>
+        <div class="share-pill">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="17"/></svg>
+          Share with Dr. Chen
+        </div>
+      </div>
+
+      <p class="text-center reveal" style="max-width: 580px; margin: var(--space-md) auto 0; font-size: 15px; color: var(--text-soft);">
+        Not on a GLP-1? Nishi works for anyone navigating nutrition with intention — pre-diabetes, metabolic health, longevity, or just trying to eat well in the real world.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ TRUST BAND ============ -->
+  <div class="trust-band">
+    <div class="container">
+      <p><strong>Built with care, not claims.</strong> Nishi is a wellness companion, not a medical service. We don't diagnose or prescribe. We don't sell your individual data. We work with a clinical advisory board.</p>
+    </div>
+  </div>
+
+  <!-- ============ CLOSING CTA ============ -->
+  <section class="closing-cta">
+    <div class="container">
+      <h2 class="reveal">Start with one thing.</h2>
+      <p class="reveal">Free to try. No card needed. Cancel any premium plan anytime.</p>
+      <a href="signup.html" class="btn btn-primary reveal">Get started</a>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <img class="footer-mark" src="assets/nishi_logo.png" alt="Nishi">
+          <p class="footer-tagline">Your nutrition companion, built for life on GLP-1.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="how-it-works.html">How it works</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="story.html">Story</a></li>
+            <li><a href="mailto:satyam@meetnishi.com">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Nishi</span>
+        <span><a href="mailto:satyam@meetnishi.com">satyam@meetnishi.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>
