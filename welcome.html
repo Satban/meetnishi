@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Nishi</title>
+  <meta name="description" content="You're in. Here's what happens next.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="assets/nishi_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+  <style>
+    .welcome-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: var(--space-xl) 32px var(--space-2xl);
+    }
+    .welcome-hero {
+      text-align: center;
+      padding: var(--space-xl) 0 var(--space-md);
+    }
+    .welcome-hero .checkmark {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto var(--space-md);
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .welcome-hero .checkmark svg {
+      width: 30px;
+      height: 30px;
+    }
+    .welcome-hero h1 {
+      font-size: clamp(36px, 5vw, 48px);
+      margin-bottom: 12px;
+    }
+    .welcome-hero p {
+      font-size: 18px;
+      max-width: 460px;
+      margin: 0 auto;
+    }
+    .sub-summary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: var(--space-md);
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+    .sub-summary .pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-weight: 500;
+    }
+    .sub-summary .pill.sage {
+      background: var(--sage-soft);
+      color: var(--sage);
+      border-color: var(--sage-soft);
+    }
+    .welcome-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md) var(--space-lg) var(--space-lg);
+      margin-top: var(--space-md);
+      box-shadow: var(--shadow-sm);
+    }
+    .welcome-card h2 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .welcome-card p {
+      font-size: 16px;
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+    .welcome-card p:last-child { margin-bottom: 0; }
+    .week-list {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0;
+    }
+    .week-list li {
+      display: flex;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .week-list li:last-child { border-bottom: none; }
+    .week-list .day {
+      flex-shrink: 0;
+      width: 60px;
+      font-family: var(--font-serif);
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .week-list .moment {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .download-row {
+      display: flex;
+      gap: 12px;
+      margin-top: var(--space-sm);
+      flex-wrap: wrap;
+    }
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      background: var(--bg-warm);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-soft);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .download-btn .badge {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: var(--accent-tint);
+      color: var(--accent-dark);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .founder-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .founder-mini {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--bg-dark), var(--sage));
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 600;
+    }
+    .founder-mini-meta h3 {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      margin: 0 0 2px;
+    }
+    .founder-mini-meta div {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .footer-links {
+      margin-top: var(--space-lg);
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+    .footer-links a { font-weight: 500; }
+    .footer-links span { margin: 0 10px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo"><img src="assets/nishi_logo.png" alt="Nishi"></a>
+      <ul class="nav-links"></ul>
+      <div class="nav-cta">
+        <a href="account.html" class="link">Your account</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="welcome-wrap" id="welcome-loading">
+    <div class="welcome-hero">
+      <h1>Loading…</h1>
+      <p>One moment.</p>
+    </div>
+  </main>
+
+  <main class="welcome-wrap" id="welcome-content" style="display: none;">
+    <div class="welcome-hero">
+      <div class="checkmark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h1 id="welcome-title">You're in.</h1>
+      <p id="welcome-sub">Welcome to Nishi. We'll take it from here.</p>
+
+      <div class="sub-summary" id="sub-summary"></div>
+    </div>
+
+    <section class="welcome-card">
+      <h2>What happens next</h2>
+      <p>Nishi's iOS and Android apps are in the final stretch before public launch. As an early-access member, you'll get a private link to install both, before anyone else. We'll email you the moment they're ready.</p>
+      <p style="color: var(--text-soft); font-size: 14px;">Until then, your trial is paused — we won't bill you a cent until you've had real time with the product. The 7-day clock starts when the app lands in your hands.</p>
+
+      <h3 style="font-family: var(--font-serif); font-size: 17px; margin-top: var(--space-md); margin-bottom: 8px;">Get the app</h3>
+      <div class="download-row">
+        <div class="download-btn">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          iOS <span class="badge">Coming soon</span>
+        </div>
+        <div class="download-btn">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>
+          Android <span class="badge">Coming soon</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="welcome-card">
+      <h2>Your first week with Nishi</h2>
+      <p style="color: var(--text-soft);">A glimpse of the rhythm once the app is in your hands.</p>
+      <ul class="week-list">
+        <li>
+          <div class="day">Day 1</div>
+          <div class="moment">You connect Apple Health (or Health Connect on Android) and Nishi starts noticing what your day already looks like.</div>
+        </li>
+        <li>
+          <div class="day">Day 2</div>
+          <div class="moment">First observation: something specific about you that Nishi picked up from your sleep, your activity, and what you ate yesterday.</div>
+        </li>
+        <li>
+          <div class="day">Day 3–4</div>
+          <div class="moment">Patterns start forming. Nishi suggests a meal using what's in your kitchen and how you've been feeling.</div>
+        </li>
+        <li>
+          <div class="day">Day 7</div>
+          <div class="moment">Your first weekly recap, ready to share with your doctor or just keep for yourself. This is what Premium quietly produces in the background.</div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="welcome-card">
+      <h2>This is a small early-access group</h2>
+      <div class="founder-row">
+        <div class="founder-mini">S</div>
+        <div class="founder-mini-meta">
+          <h3>Satyam</h3>
+          <div>Founder · Nishi</div>
+        </div>
+      </div>
+      <p>Reply to any email from us and you'll get me — not a support queue. Tell me what's working, what isn't, what you want Nishi to notice that she's not yet. The first 500 users shape what this becomes.</p>
+      <p style="font-size: 14px; color: var(--text-soft);">
+        Direct line: <a href="mailto:satyam@meetnishi.com">satyam@meetnishi.com</a>
+      </p>
+    </section>
+
+    <section class="welcome-card">
+      <h2>Receipt &amp; subscription</h2>
+      <p>You'll get a receipt by email from Stripe within a few minutes. Manage your subscription anytime — cancel before the trial ends and you won't be charged.</p>
+      <div class="account-actions" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: var(--space-sm);">
+        <a href="account.html" class="btn btn-primary">Go to my account</a>
+        <a href="mailto:satyam@meetnishi.com?subject=Nishi%20subscription" class="btn btn-ghost">Cancel or get help</a>
+      </div>
+    </section>
+
+    <div class="footer-links">
+      <a href="/">Home</a><span>·</span>
+      <a href="story.html">Story</a><span>·</span>
+      <a href="faq.html">FAQ</a><span>·</span>
+      <a href="#" data-auth="signout">Sign out</a>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="scripts/config.js"></script>
+  <script src="scripts/auth.js"></script>
+  <script>
+    (function () {
+      const loading = document.getElementById('welcome-loading');
+      const content = document.getElementById('welcome-content');
+
+      function fmtDate(s) {
+        if (!s) return null;
+        try { return new Date(s).toLocaleDateString(); } catch (_) { return null; }
+      }
+
+      async function loadSubscription() {
+        const client = window.NishiAuth?.client;
+        if (!client) return null;
+        const { data, error } = await client
+          .from('subscriptions')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (error) {
+          console.warn('subscription load error', error);
+          return null;
+        }
+        return data;
+      }
+
+      function renderSubSummary(sub) {
+        const summary = document.getElementById('sub-summary');
+        if (!summary) return;
+
+        const pills = [];
+        if (!sub) {
+          pills.push(`<span class="pill">Setting up your subscription…</span>`);
+        } else {
+          const planLabel = sub.plan === 'annual'
+            ? 'Annual · $79.99/yr'
+            : 'Monthly · $9.99/mo';
+          pills.push(`<span class="pill">${planLabel}</span>`);
+          if (sub.status === 'trialing' && sub.trial_end) {
+            pills.push(`<span class="pill sage">Trial through ${fmtDate(sub.trial_end)}</span>`);
+          } else if (sub.status === 'active' && sub.current_period_end) {
+            pills.push(`<span class="pill sage">Renews ${fmtDate(sub.current_period_end)}</span>`);
+          }
+        }
+
+        summary.innerHTML = pills.join('');
+      }
+
+      async function render(session) {
+        if (!session) {
+          window.location.href = '/signin.html';
+          return;
+        }
+
+        const u = session.user;
+        const firstName = u.user_metadata?.name?.split(' ')[0] || '';
+        if (firstName) {
+          document.getElementById('welcome-title').textContent = `You're in, ${firstName}.`;
+        }
+
+        loading.style.display = 'none';
+        content.style.display = 'block';
+
+        // Initial render; webhook may not have fired yet
+        let sub = await loadSubscription();
+        renderSubSummary(sub);
+
+        // Poll a few times if subscription hasn't landed yet
+        if (!sub) {
+          let tries = 0;
+          const poll = setInterval(async () => {
+            tries += 1;
+            sub = await loadSubscription();
+            if (sub || tries >= 6) {
+              clearInterval(poll);
+              renderSubSummary(sub);
+            }
+          }, 1500);
+        }
+
+        // Tidy the URL so refreshes don't re-fire checkout=success
+        try {
+          const url = new URL(window.location.href);
+          if (url.searchParams.has('checkout')) {
+            url.searchParams.delete('checkout');
+            window.history.replaceState(null, '', url.toString());
+          }
+        } catch (_) {}
+      }
+
+      function check() {
+        if (!window.NishiAuth) {
+          setTimeout(check, 100);
+          return;
+        }
+        window.NishiAuth.getSession().then(render);
+      }
+      check();
+    })();
+  </script>
+</body>
+</html>
