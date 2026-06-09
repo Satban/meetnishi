@@ -107,16 +107,24 @@
         </div>
       </section>
 
-      <section class="account-card">
+      <section class="account-card" id="subscription-card">
         <h3>Subscription</h3>
         <div class="row">
           <span class="label">Status</span>
-          <span class="value">Free tier</span>
+          <span class="value" id="sub-status">Free tier</span>
         </div>
-        <p style="margin-top: 12px; font-size: 14px; color: var(--text-soft);">
+        <div class="row" id="sub-plan-row" style="display:none;">
+          <span class="label">Plan</span>
+          <span class="value" id="sub-plan">—</span>
+        </div>
+        <div class="row" id="sub-renews-row" style="display:none;">
+          <span class="label" id="sub-renews-label">Renews</span>
+          <span class="value" id="sub-renews">—</span>
+        </div>
+        <p id="sub-note" style="margin-top: 12px; font-size: 14px; color: var(--text-soft);">
           Start a 7-day free trial of Premium — no card required.
         </p>
-        <div class="account-actions">
+        <div class="account-actions" id="sub-actions">
           <a href="pricing.html" class="btn btn-primary">View pricing</a>
         </div>
       </section>
@@ -141,16 +149,123 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="scripts/config.js"></script>
   <script src="scripts/auth.js"></script>
+  <script src="scripts/checkout.js"></script>
   <script>
     (function () {
       const loading = document.getElementById('account-loading');
       const content = document.getElementById('account-content');
+
+      const STATUS_LABELS = {
+        trialing: 'Trial active',
+        active: 'Premium · Active',
+        past_due: 'Premium · Payment overdue',
+        canceled: 'Free tier',
+        unpaid: 'Premium · Payment failed',
+        incomplete: 'Premium · Setup incomplete',
+        incomplete_expired: 'Free tier',
+        paused: 'Premium · Paused',
+      };
+
+      function fmtDate(s) {
+        if (!s) return '—';
+        try { return new Date(s).toLocaleDateString(); } catch (_) { return '—'; }
+      }
+
+      async function loadSubscription() {
+        const client = window.NishiAuth?.client;
+        if (!client) return;
+        const { data, error } = await client
+          .from('subscriptions')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (error) {
+          console.warn('subscription load error', error);
+          return;
+        }
+        if (!data) return;
+
+        document.getElementById('sub-status').textContent =
+          STATUS_LABELS[data.status] || data.status;
+
+        const isPremium = ['trialing', 'active', 'past_due', 'paused'].includes(data.status);
+        if (isPremium) {
+          document.getElementById('sub-plan-row').style.display = '';
+          document.getElementById('sub-plan').textContent =
+            data.plan === 'annual' ? 'Annual ($79.99/yr)' : 'Monthly ($9.99/mo)';
+
+          document.getElementById('sub-renews-row').style.display = '';
+          if (data.status === 'trialing' && data.trial_end) {
+            document.getElementById('sub-renews-label').textContent = 'Trial ends';
+            document.getElementById('sub-renews').textContent = fmtDate(data.trial_end);
+          } else if (data.cancel_at_period_end) {
+            document.getElementById('sub-renews-label').textContent = 'Ends';
+            document.getElementById('sub-renews').textContent = fmtDate(data.current_period_end);
+          } else {
+            document.getElementById('sub-renews-label').textContent = 'Renews';
+            document.getElementById('sub-renews').textContent = fmtDate(data.current_period_end);
+          }
+
+          document.getElementById('sub-note').textContent =
+            data.cancel_at_period_end
+              ? 'Your subscription is cancelled and ends at the date above. You will return to the free tier automatically.'
+              : 'Premium is active. Manage in your billing portal.';
+
+          // Swap CTA: viewing pricing isn't useful when already on Premium.
+          document.getElementById('sub-actions').innerHTML =
+            '<a href="mailto:satyam@meetnishi.com?subject=Nishi%20subscription" class="btn btn-ghost">Contact support</a>';
+        }
+      }
+
+      function maybeResumeCheckout(session) {
+        if (!session) return false;
+        let plan = null;
+        try { plan = sessionStorage.getItem('pending_checkout_plan'); } catch (_) {}
+        if (plan === 'monthly' || plan === 'annual') {
+          try { sessionStorage.removeItem('pending_checkout_plan'); } catch (_) {}
+          if (window.NishiCheckout) {
+            window.NishiCheckout.startCheckout(plan);
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function handleCheckoutReturn() {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('checkout');
+        if (!status) return;
+
+        const note = document.getElementById('sub-note');
+        if (status === 'success') {
+          if (note) {
+            note.textContent = 'Setting up your subscription… this can take a few seconds.';
+            note.style.color = 'var(--sage)';
+          }
+          // Webhook fires asynchronously; poll the table once after a short delay.
+          setTimeout(loadSubscription, 2500);
+        }
+
+        // Tidy the URL so refreshes don't re-fire this.
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('checkout');
+          window.history.replaceState(null, '', url.toString());
+        } catch (_) {}
+      }
 
       function render(session) {
         if (!session) {
           window.location.href = '/signin.html';
           return;
         }
+
+        if (maybeResumeCheckout(session)) {
+          // We are redirecting to Stripe; don't render the page.
+          return;
+        }
+
         const u = session.user;
         document.getElementById('greeting').textContent =
           u.user_metadata?.name
@@ -163,8 +278,12 @@
             : '—';
         document.getElementById('account-created').textContent =
           u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
+
         loading.style.display = 'none';
         content.style.display = 'block';
+
+        loadSubscription();
+        handleCheckoutReturn();
       }
 
       function check() {

@@ -66,5 +66,15 @@
   <script src="scripts/config.js"></script>
   <script src="scripts/auth.js"></script>
   <script src="scripts/main.js"></script>
+  <script>
+    // Stash the pending plan (if any) so account.html can auto-resume checkout after auth.
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const plan = params.get('plan');
+      if (plan === 'monthly' || plan === 'annual') {
+        sessionStorage.setItem('pending_checkout_plan', plan);
+      }
+    } catch (_) {}
+  </script>
 </body>
 </html>
