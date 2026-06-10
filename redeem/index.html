@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <title>Redeem Premium · Nishi</title>
+  <meta name="description" content="Redeem your Nishi Premium promo code">
+  <link rel="icon" type="image/png" href="/assets/nishi_logo.png">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #DD6C59 0%, #C75A48 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #333;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    .logo {
+      height: 36px;
+      width: auto;
+      margin-bottom: 18px;
+      border-radius: 18px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .code-display {
+      background: #fff8f3;
+      border: 2px solid #DD6C59;
+      border-radius: 12px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 24px;
+      font-weight: 700;
+      color: #DD6C59;
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+    }
+
+    .duration-badge {
+      display: inline-block;
+      background: #4A7C59;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #DD6C59;
+    }
+
+    .help-text {
+      font-size: 13px;
+      color: #888;
+      margin-top: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #DD6C59;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #b34a00;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-message {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    /* States */
+    .state {
+      display: none;
+    }
+
+    .state.active {
+      display: block;
+    }
+
+    /* Loading spinner */
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #DD6C59;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Success state */
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: #4A7C59;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .success-icon svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    .success-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    .success-message {
+      color: #666;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .app-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .app-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .app-button.ios {
+      background: #000;
+      color: white;
+    }
+
+    .app-button.android {
+      background: #3ddc84;
+      color: #000;
+    }
+
+    .app-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .app-button svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Error states */
+    .error-icon {
+      width: 80px;
+      height: 80px;
+      background: #dc2626;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .error-icon svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    /* Manual code entry */
+    .enter-code-link {
+      color: #DD6C59;
+      text-decoration: none;
+      font-size: 14px;
+      margin-top: 16px;
+      display: inline-block;
+    }
+
+    .enter-code-link:hover {
+      text-decoration: underline;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      color: #999;
+      font-size: 14px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #ddd;
+    }
+
+    .divider span {
+      padding: 0 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <!-- Loading State -->
+    <div id="state-loading" class="state active">
+      <img src="/assets/nishi_logo.png" alt="Nishi" class="logo">
+      <h1>Validating Code...</h1>
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Enter Code State (when no code in URL) -->
+    <div id="state-enter-code" class="state">
+      <img src="/assets/nishi_logo.png" alt="Nishi" class="logo">
+      <h1>Redeem Premium</h1>
+      <p class="subtitle">Enter your promo code to claim free Premium access</p>
+
+      <form id="code-form">
+        <div class="form-group">
+          <label for="promo-code">Promo Code</label>
+          <input type="text" id="promo-code" placeholder="e.g., NISHI123ABC" required
+                 style="text-transform: uppercase; letter-spacing: 2px; font-family: monospace;">
+        </div>
+        <div id="code-error" class="error-message" style="display: none;"></div>
+        <button type="submit" class="btn-primary" id="validate-btn">Continue</button>
+      </form>
+    </div>
+
+    <!-- Valid Code - Email Form State -->
+    <div id="state-email-form" class="state">
+      <img src="/assets/nishi_logo.png" alt="Nishi" class="logo">
+      <h1>Claim Your Premium</h1>
+
+      <div class="code-display" id="display-code">-</div>
+      <div class="duration-badge" id="display-duration">-</div>
+
+      <form id="email-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" required>
+          <p class="help-text">Use the same email when you sign up in the app</p>
+        </div>
+        <div id="email-error" class="error-message" style="display: none;"></div>
+        <button type="submit" class="btn-primary" id="redeem-btn">Claim Premium</button>
+      </form>
+
+      <a href="#" class="enter-code-link" onclick="showEnterCode(); return false;">Use a different code</a>
+    </div>
+
+    <!-- Success State -->
+    <div id="state-success" class="state">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      </div>
+      <h2 class="success-title">Premium Reserved!</h2>
+      <p class="success-message">
+        Your <strong id="success-duration">-</strong> of free Premium has been reserved for <strong id="success-email">-</strong>.
+      </p>
+      <p class="success-message">
+        Download Nishi and sign up with this email to activate your Premium access.
+      </p>
+
+      <div class="app-buttons">
+        <a href="https://apps.apple.com/app/id6759352471" class="app-button ios">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Download for iOS
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.getfoil.app" class="app-button android">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.59.34-1.11.84-1.35L13.69 12l-9.85 9.85c-.5-.24-.84-.76-.84-1.35zm13.81-5.38L6.05 21.34l8.49-8.49 2.27 2.27zm1.57-.93l-2.27-2.27 2.27-2.27 2.64 1.52c.48.28.75.77.75 1.27 0 .5-.27.99-.75 1.27l-2.64 1.48zm-1.57-6.31L6.05 2.66l10.76 6.22-2.27 2.27-.73-.07z"/></svg>
+          Download for Android
+        </a>
+      </div>
+    </div>
+
+    <!-- Already Reserved State -->
+    <div id="state-already-reserved" class="state">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      </div>
+      <h2 class="success-title">Already Reserved</h2>
+      <p class="success-message">
+        Good news! This email already has Premium reserved. Download the app and sign up to activate it.
+      </p>
+
+      <div class="app-buttons">
+        <a href="https://apps.apple.com/app/id6759352471" class="app-button ios">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Download for iOS
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.getfoil.app" class="app-button android">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.59.34-1.11.84-1.35L13.69 12l-9.85 9.85c-.5-.24-.84-.76-.84-1.35zm13.81-5.38L6.05 21.34l8.49-8.49 2.27 2.27zm1.57-.93l-2.27-2.27 2.27-2.27 2.64 1.52c.48.28.75.77.75 1.27 0 .5-.27.99-.75 1.27l-2.64 1.48zm-1.57-6.31L6.05 2.66l10.76 6.22-2.27 2.27-.73-.07z"/></svg>
+          Download for Android
+        </a>
+      </div>
+    </div>
+
+    <!-- Invalid Code State -->
+    <div id="state-invalid" class="state">
+      <div class="error-icon">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </div>
+      <h2 class="success-title">Invalid Code</h2>
+      <p class="success-message" id="invalid-message">
+        This promo code is not valid. Please check the code and try again.
+      </p>
+      <button class="btn-primary" onclick="showEnterCode()">Try Another Code</button>
+    </div>
+
+    <!-- Expired Code State -->
+    <div id="state-expired" class="state">
+      <div class="error-icon">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+      </div>
+      <h2 class="success-title">Code Expired</h2>
+      <p class="success-message">
+        Sorry, this promo code has expired and is no longer valid.
+      </p>
+      <button class="btn-primary" onclick="showEnterCode()">Try Another Code</button>
+    </div>
+
+    <!-- Exhausted Code State -->
+    <div id="state-exhausted" class="state">
+      <div class="error-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <h2 class="success-title">Code Fully Redeemed</h2>
+      <p class="success-message">
+        This promo code has reached its redemption limit and is no longer available.
+      </p>
+      <button class="btn-primary" onclick="showEnterCode()">Try Another Code</button>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://aqdapnwrsvyjrpiwtwip.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxZGFwbndyc3Z5anJwaXd0d2lwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxMTQ2MjAsImV4cCI6MjA4NDY5MDYyMH0.OkkiXODLlfbSEfLEYzO7sFBTZks2_7gKaKeSd22yV2M';
+
+    let currentCode = null;
+    let codeDuration = null;
+
+    // Helper to call Supabase RPC via fetch
+    async function rpc(functionName, params) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${functionName}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params)
+      });
+      if (!response.ok) {
+        throw new Error(`RPC error: ${response.status}`);
+      }
+      return response.json();
+    }
+
+    // State management
+    function showState(stateId) {
+      document.querySelectorAll('.state').forEach(s => s.classList.remove('active'));
+      document.getElementById(stateId).classList.add('active');
+    }
+
+    function showEnterCode() {
+      currentCode = null;
+      codeDuration = null;
+      document.getElementById('promo-code').value = '';
+      document.getElementById('code-error').style.display = 'none';
+      showState('state-enter-code');
+
+      // Update URL to remove code param
+      const url = new URL(window.location);
+      url.searchParams.delete('code');
+      window.history.replaceState({}, '', url);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+
+      if (code) {
+        await validateCode(code);
+      } else {
+        showState('state-enter-code');
+      }
+    });
+
+    // Validate code
+    async function validateCode(code) {
+      showState('state-loading');
+
+      try {
+        const data = await rpc('validate_promo_code', {
+          p_code: code.trim().toUpperCase()
+        });
+
+        if (!data.valid) {
+          if (data.error_type === 'expired') {
+            showState('state-expired');
+          } else if (data.error_type === 'exhausted') {
+            showState('state-exhausted');
+          } else {
+            showState('state-invalid');
+          }
+          return;
+        }
+
+        // Valid code - show email form
+        currentCode = code.trim().toUpperCase();
+        codeDuration = data.duration_months;
+
+        document.getElementById('display-code').textContent = currentCode;
+        document.getElementById('display-duration').textContent =
+          `${codeDuration} month${codeDuration > 1 ? 's' : ''} FREE Premium`;
+
+        showState('state-email-form');
+      } catch (err) {
+        console.error('Validation error:', err);
+        document.getElementById('invalid-message').textContent =
+          'An error occurred while validating the code. Please try again.';
+        showState('state-invalid');
+      }
+    }
+
+    // Code form submission
+    document.getElementById('code-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = document.getElementById('promo-code').value;
+      const errorEl = document.getElementById('code-error');
+      const btn = document.getElementById('validate-btn');
+
+      errorEl.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Validating...';
+
+      // Update URL with code
+      const url = new URL(window.location);
+      url.searchParams.set('code', code.toUpperCase());
+      window.history.replaceState({}, '', url);
+
+      await validateCode(code);
+
+      btn.disabled = false;
+      btn.textContent = 'Continue';
+    });
+
+    // Email form submission - uses rate-limited edge function
+    document.getElementById('email-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const errorEl = document.getElementById('email-error');
+      const btn = document.getElementById('redeem-btn');
+
+      errorEl.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Claiming...';
+
+      try {
+        // Call rate-limited edge function instead of direct RPC
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/web-redeem`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            code: currentCode,
+            email: email.trim()
+          })
+        });
+
+        const data = await response.json();
+
+        // Handle rate limiting
+        if (response.status === 429) {
+          errorEl.textContent = data.error || 'Too many requests. Please wait a minute.';
+          errorEl.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Claim Premium';
+          return;
+        }
+
+        if (!data.success) {
+          if (data.error_type === 'expired') {
+            showState('state-expired');
+          } else if (data.error_type === 'exhausted') {
+            showState('state-exhausted');
+          } else if (data.error_type === 'invalid_email') {
+            errorEl.textContent = 'Please enter a valid email address.';
+            errorEl.style.display = 'block';
+          } else {
+            errorEl.textContent = data.error || 'An error occurred. Please try again.';
+            errorEl.style.display = 'block';
+          }
+          btn.disabled = false;
+          btn.textContent = 'Claim Premium';
+          return;
+        }
+
+        // Success
+        if (data.already_reserved) {
+          showState('state-already-reserved');
+        } else {
+          document.getElementById('success-duration').textContent =
+            `${data.duration_months} month${data.duration_months > 1 ? 's' : ''}`;
+          document.getElementById('success-email').textContent = data.email;
+          showState('state-success');
+        }
+      } catch (err) {
+        console.error('Redemption error:', err);
+        errorEl.textContent = 'An error occurred. Please try again.';
+        errorEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Claim Premium';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nishi Admin · Promo Codes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: #fff;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #DD6C59;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-email {
+      font-size: 14px;
+      color: #666;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #DD6C59;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #b34a00;
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+
+    .btn-danger {
+      background: #A63D40;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #8c3335;
+    }
+
+    .btn-success {
+      background: #4A7C59;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #3d6649;
+    }
+
+    /* Login Form */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #DD6C59 0%, #C75A48 100%);
+    }
+
+    .login-box {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-box h2 {
+      margin-bottom: 24px;
+      text-align: center;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #DD6C59;
+    }
+
+    .error-message {
+      color: #A63D40;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      display: none;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .stat-card h3 {
+      font-size: 32px;
+      color: #DD6C59;
+    }
+
+    .stat-card p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .card-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filters select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      font-weight: 600;
+      color: #666;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-available {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .badge-redeemed {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .badge-expired {
+      background: #fbe9e7;
+      color: #bf360c;
+    }
+
+    .badge-exhausted {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .badge-pending {
+      background: #fff8e1;
+      color: #f57f17;
+    }
+
+    .badge-claimed {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .badge-revoked {
+      background: #fce4ec;
+      color: #c2185b;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 16px 24px;
+      border: none;
+      background: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab:hover {
+      background: #f5f5f5;
+    }
+
+    .tab.active {
+      color: #DD6C59;
+      border-bottom-color: #DD6C59;
+      background: #fff8f3;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Usage display */
+    .usage-cell {
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    /* Copy link button */
+    .btn-link {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .btn-link:hover {
+      background: #bbdefb;
+    }
+
+    /* Textarea for bulk emails */
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #DD6C59;
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .code-cell {
+      font-family: monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: #DD6C59;
+    }
+
+    .actions-cell {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h3 {
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #DD6C59;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Screen -->
+  <div id="login-screen" class="login-container">
+    <div class="login-box">
+      <h2>Nishi Admin</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="admin@example.com">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required placeholder="Password">
+        </div>
+        <div id="login-error" class="error-message" style="display: none;"></div>
+        <button type="submit" id="login-btn" class="btn-primary" style="width: 100%; margin-top: 12px;">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="dashboard">
+    <header>
+      <h1>Nishi Admin</h1>
+      <div class="user-info">
+        <span class="user-email" id="user-email"></span>
+        <button class="btn-secondary" onclick="logout()">Sign Out</button>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('codes')">Promo Codes</button>
+        <button class="tab" onclick="switchTab('grants')">Email Grants</button>
+      </div>
+
+      <!-- Promo Codes Tab -->
+      <div id="codes-tab" class="tab-content active">
+        <!-- Stats -->
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card">
+            <h3 id="stat-total">-</h3>
+            <p>Total Codes</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="stat-available">-</h3>
+            <p>Available</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="stat-exhausted">-</h3>
+            <p>Exhausted</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="stat-expired">-</h3>
+            <p>Expired</p>
+          </div>
+        </div>
+
+        <!-- Promo Codes Table -->
+        <div class="card">
+        <div class="card-header">
+          <h2>Promo Codes</h2>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <div class="filters">
+              <select id="filter-campaign">
+                <option value="">All Campaigns</option>
+              </select>
+              <select id="filter-status">
+                <option value="">All Status</option>
+                <option value="available">Available</option>
+                <option value="exhausted">Exhausted</option>
+                <option value="expired">Expired</option>
+              </select>
+            </div>
+            <button class="btn-secondary" onclick="exportCSV()">Export CSV</button>
+            <button class="btn-primary" onclick="showCreateModal()">Generate Codes</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="codes-loading" class="loading">
+            <div class="spinner"></div>
+          </div>
+          <div id="codes-empty" class="empty-state" style="display: none;">
+            No promo codes found. Click "Generate Codes" to create some.
+          </div>
+          <table id="codes-table" style="display: none;">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Duration</th>
+                <th>Usage</th>
+                <th>Campaign</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="codes-tbody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </div><!-- End codes-tab -->
+
+      <!-- Email Grants Tab -->
+      <div id="grants-tab" class="tab-content">
+        <!-- Grants Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3 id="grant-stat-total">-</h3>
+            <p>Total Grants</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="grant-stat-pending">-</h3>
+            <p>Pending</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="grant-stat-claimed">-</h3>
+            <p>Claimed</p>
+          </div>
+          <div class="stat-card">
+            <h3 id="grant-stat-revoked">-</h3>
+            <p>Revoked</p>
+          </div>
+        </div>
+
+        <!-- Email Grants Table -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Email Grants</h2>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <div class="filters">
+                <select id="grant-filter-campaign">
+                  <option value="">All Campaigns</option>
+                </select>
+                <select id="grant-filter-status">
+                  <option value="">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="claimed">Claimed</option>
+                  <option value="revoked">Revoked</option>
+                </select>
+              </div>
+              <button class="btn-secondary" onclick="exportGrantsCSV()">Export CSV</button>
+              <button class="btn-secondary" onclick="showBulkGrantModal()">Bulk Upload</button>
+              <button class="btn-primary" onclick="showGrantModal()">Add Grant</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="grants-loading" class="loading">
+              <div class="spinner"></div>
+            </div>
+            <div id="grants-empty" class="empty-state" style="display: none;">
+              No email grants found. Click "Add Grant" to create one.
+            </div>
+            <table id="grants-table" style="display: none;">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Duration</th>
+                  <th>Campaign</th>
+                  <th>Source</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="grants-tbody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- End grants-tab -->
+
+    </div>
+  </div>
+
+  <!-- Create Promo Code Modal -->
+  <div id="create-modal" class="modal-overlay">
+    <div class="modal">
+      <h3>Generate Promo Codes</h3>
+      <form id="create-form">
+        <div class="form-group">
+          <label for="create-count">Number of Codes</label>
+          <input type="number" id="create-count" min="1" max="100" value="1" required>
+        </div>
+        <div class="form-group">
+          <label for="create-duration">Duration (months)</label>
+          <select id="create-duration" required>
+            <option value="1">1 month</option>
+            <option value="2">2 months</option>
+            <option value="3">3 months</option>
+            <option value="6">6 months</option>
+            <option value="12" selected>12 months</option>
+            <option value="24">24 months</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="create-max-uses">Max Uses</label>
+          <select id="create-max-uses">
+            <option value="1">Single use (1)</option>
+            <option value="10">10 uses</option>
+            <option value="50">50 uses</option>
+            <option value="100">100 uses</option>
+            <option value="500">500 uses</option>
+            <option value="">Unlimited</option>
+          </select>
+          <p class="help-text">How many times this code can be redeemed</p>
+        </div>
+        <div class="form-group">
+          <label for="create-campaign">Campaign (optional)</label>
+          <input type="text" id="create-campaign" placeholder="e.g., Influencer May 2026">
+        </div>
+        <div class="form-group">
+          <label for="create-notes">Notes (optional)</label>
+          <input type="text" id="create-notes" placeholder="e.g., For TikTok creators">
+        </div>
+        <div class="form-group">
+          <label for="create-prefix">Code Prefix</label>
+          <input type="text" id="create-prefix" value="FOIL" maxlength="8" placeholder="FOIL">
+        </div>
+        <div class="form-group">
+          <label for="create-expires">Code Expires (optional)</label>
+          <input type="date" id="create-expires">
+        </div>
+        <div id="create-error" class="error-message" style="display: none;"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="hideCreateModal()">Cancel</button>
+          <button type="submit" class="btn-success">Generate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Email Grant Modal -->
+  <div id="grant-modal" class="modal-overlay">
+    <div class="modal">
+      <h3>Add Email Grant</h3>
+      <form id="grant-form">
+        <div class="form-group">
+          <label for="grant-email">Email Address</label>
+          <input type="email" id="grant-email" required placeholder="user@example.com">
+        </div>
+        <div class="form-group">
+          <label for="grant-duration">Duration (months)</label>
+          <select id="grant-duration" required>
+            <option value="1">1 month</option>
+            <option value="2">2 months</option>
+            <option value="3">3 months</option>
+            <option value="6">6 months</option>
+            <option value="12" selected>12 months</option>
+            <option value="24">24 months</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="grant-campaign">Campaign (optional)</label>
+          <input type="text" id="grant-campaign" placeholder="e.g., Beta Testers">
+        </div>
+        <div class="form-group">
+          <label for="grant-notes">Notes (optional)</label>
+          <input type="text" id="grant-notes" placeholder="e.g., Early supporter">
+        </div>
+        <div id="grant-error" class="error-message" style="display: none;"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="hideGrantModal()">Cancel</button>
+          <button type="submit" class="btn-success">Create Grant</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bulk Email Grant Modal -->
+  <div id="bulk-grant-modal" class="modal-overlay">
+    <div class="modal">
+      <h3>Bulk Upload Email Grants</h3>
+      <form id="bulk-grant-form">
+        <div class="form-group">
+          <label for="bulk-grant-emails">Email Addresses</label>
+          <textarea id="bulk-grant-emails" required placeholder="Enter one email per line, or paste from CSV"></textarea>
+          <p class="help-text">One email per line. Maximum 500 emails per batch.</p>
+        </div>
+        <div class="form-group">
+          <label for="bulk-grant-duration">Duration (months)</label>
+          <select id="bulk-grant-duration" required>
+            <option value="1">1 month</option>
+            <option value="2">2 months</option>
+            <option value="3">3 months</option>
+            <option value="6">6 months</option>
+            <option value="12" selected>12 months</option>
+            <option value="24">24 months</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bulk-grant-campaign">Campaign (optional)</label>
+          <input type="text" id="bulk-grant-campaign" placeholder="e.g., Conference Attendees">
+        </div>
+        <div class="form-group">
+          <label for="bulk-grant-notes">Notes (optional)</label>
+          <input type="text" id="bulk-grant-notes" placeholder="e.g., Tech Summit 2026">
+        </div>
+        <div id="bulk-grant-error" class="error-message" style="display: none;"></div>
+        <div id="bulk-grant-result" style="display: none; padding: 12px; background: #e8f5e9; border-radius: 8px; margin-top: 12px;"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="hideBulkGrantModal()">Cancel</button>
+          <button type="submit" class="btn-success">Upload Grants</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Redemptions Modal -->
+  <div id="redemptions-modal" class="modal-overlay">
+    <div class="modal">
+      <h3>Code Redemptions</h3>
+      <div id="redemptions-content">
+        <div id="redemptions-loading" class="loading">
+          <div class="spinner"></div>
+        </div>
+        <div id="redemptions-empty" class="empty-state" style="display: none;">
+          No redemptions yet.
+        </div>
+        <table id="redemptions-table" style="display: none; width: 100%;">
+          <thead>
+            <tr>
+              <th>User Email</th>
+              <th>Premium Until</th>
+              <th>Redeemed At</th>
+            </tr>
+          </thead>
+          <tbody id="redemptions-tbody">
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="hideRedemptionsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Supabase configuration
+    const SUPABASE_URL = 'https://aqdapnwrsvyjrpiwtwip.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxZGFwbndyc3Z5anJwaXd0d2lwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxMTQ2MjAsImV4cCI6MjA4NDY5MDYyMH0.OkkiXODLlfbSEfLEYzO7sFBTZks2_7gKaKeSd22yV2M';
+
+    // Check if Supabase library loaded
+    if (!window.supabase) {
+      document.body.innerHTML = '<div style="padding: 40px; text-align: center;"><h2>Error</h2><p>Failed to load Supabase library. Please refresh the page.</p></div>';
+      throw new Error('Supabase library not loaded');
+    }
+
+    console.log('Supabase library loaded, creating client...');
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Supabase client created');
+
+    let currentUser = null;
+    let allCodes = [];
+    let allGrants = [];
+    let currentTab = 'codes';
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check for existing session
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) {
+        currentUser = session.user;
+        showDashboard();
+      }
+
+      // Listen for auth changes
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (session) {
+          currentUser = session.user;
+          showDashboard();
+        } else {
+          currentUser = null;
+          showLogin();
+        }
+      });
+    });
+
+    // Login
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('login-error');
+      const loginBtn = document.getElementById('login-btn');
+
+      errorEl.style.display = 'none';
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Signing in...';
+
+      try {
+        console.log('Attempting login for:', email);
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          console.error('Login error:', error);
+          errorEl.textContent = error.message;
+          errorEl.style.display = 'block';
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Sign In';
+          return;
+        }
+
+        console.log('Login successful:', data.user?.email);
+        currentUser = data.user;
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In';
+        showDashboard();
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        errorEl.textContent = 'An unexpected error occurred. Check console for details.';
+        errorEl.style.display = 'block';
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In';
+      }
+    });
+
+    // Logout
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      showLogin();
+    }
+
+    // Show/Hide screens
+    function showLogin() {
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('dashboard').style.display = 'none';
+    }
+
+    function showDashboard() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('user-email').textContent = currentUser?.email || '';
+      loadCodes();
+      loadCampaigns();
+      loadGrants();
+      loadGrantCampaigns();
+    }
+
+    // Tab switching
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      if (tab === 'codes') {
+        document.querySelector('.tab:first-child').classList.add('active');
+        document.getElementById('codes-tab').classList.add('active');
+      } else {
+        document.querySelector('.tab:last-child').classList.add('active');
+        document.getElementById('grants-tab').classList.add('active');
+      }
+    }
+
+    // API helpers
+    async function apiCall(action, method = 'GET', body = null) {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const url = `${SUPABASE_URL}/functions/v1/admin-promo-codes?action=${action}`;
+      const options = {
+        method,
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        }
+      };
+
+      if (body) {
+        options.body = JSON.stringify(body);
+      }
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Unknown error');
+      }
+
+      return data;
+    }
+
+    // Load codes
+    async function loadCodes() {
+      const loadingEl = document.getElementById('codes-loading');
+      const emptyEl = document.getElementById('codes-empty');
+      const tableEl = document.getElementById('codes-table');
+
+      loadingEl.style.display = 'flex';
+      emptyEl.style.display = 'none';
+      tableEl.style.display = 'none';
+
+      try {
+        console.log('Loading codes...');
+        const data = await apiCall('list');
+        console.log('Codes loaded:', data.codes?.length);
+        allCodes = data.codes || [];
+
+        // Update stats
+        document.getElementById('stat-total').textContent = data.stats?.total || 0;
+        document.getElementById('stat-available').textContent = data.stats?.available || 0;
+        document.getElementById('stat-exhausted').textContent = data.stats?.exhausted || 0;
+        document.getElementById('stat-expired').textContent = data.stats?.expired || 0;
+
+        renderCodes();
+      } catch (error) {
+        console.error('Error loading codes:', error);
+        // If unauthorized, log out and show error
+        if (error.message.includes('Unauthorized') || error.message.includes('Admin')) {
+          alert('Access denied: ' + error.message + '\n\nYou will be logged out.');
+          logout();
+          return;
+        }
+        alert('Error loading codes: ' + error.message);
+      } finally {
+        loadingEl.style.display = 'none';
+      }
+    }
+
+    // Load campaigns for filter
+    async function loadCampaigns() {
+      try {
+        const data = await apiCall('campaigns');
+        const select = document.getElementById('filter-campaign');
+        select.innerHTML = '<option value="">All Campaigns</option>';
+        (data.campaigns || []).forEach(campaign => {
+          const option = document.createElement('option');
+          option.value = campaign;
+          option.textContent = campaign;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading campaigns:', error);
+      }
+    }
+
+    // Render codes table
+    function renderCodes() {
+      const campaignFilter = document.getElementById('filter-campaign').value;
+      const statusFilter = document.getElementById('filter-status').value;
+
+      let filteredCodes = allCodes;
+
+      if (campaignFilter) {
+        filteredCodes = filteredCodes.filter(c => c.campaign === campaignFilter);
+      }
+
+      if (statusFilter) {
+        filteredCodes = filteredCodes.filter(c => c.status === statusFilter);
+      }
+
+      const emptyEl = document.getElementById('codes-empty');
+      const tableEl = document.getElementById('codes-table');
+      const tbody = document.getElementById('codes-tbody');
+
+      if (filteredCodes.length === 0) {
+        emptyEl.style.display = 'block';
+        tableEl.style.display = 'none';
+        return;
+      }
+
+      emptyEl.style.display = 'none';
+      tableEl.style.display = 'table';
+
+      tbody.innerHTML = filteredCodes.map(code => `
+        <tr>
+          <td class="code-cell">${code.code}</td>
+          <td>${code.duration_months} month${code.duration_months > 1 ? 's' : ''}</td>
+          <td class="usage-cell">${code.usage_display || '0/1'}</td>
+          <td>${code.campaign || '-'}</td>
+          <td><span class="badge badge-${code.status}">${code.status}</span></td>
+          <td>${new Date(code.created_at).toLocaleDateString()}</td>
+          <td class="actions-cell">
+            <button class="btn-link btn-icon" onclick="copyRedemptionLink('${code.id}')" title="Copy Link">
+              Link
+            </button>
+            <button class="btn-secondary btn-icon" onclick="copyCode('${code.code}')" title="Copy Code">
+              Code
+            </button>
+            ${code.current_uses > 0 ? `
+              <button class="btn-secondary btn-icon" onclick="showRedemptions('${code.id}')" title="View Redemptions">
+                ${code.current_uses}x
+              </button>
+            ` : ''}
+            ${code.status === 'available' && code.current_uses === 0 ? `
+              <button class="btn-danger btn-icon" onclick="deleteCode('${code.id}')" title="Delete">
+                Del
+              </button>
+            ` : ''}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Filter handlers
+    document.getElementById('filter-campaign').addEventListener('change', renderCodes);
+    document.getElementById('filter-status').addEventListener('change', renderCodes);
+
+    // Copy code
+    function copyCode(code) {
+      navigator.clipboard.writeText(code);
+      alert('Code copied: ' + code);
+    }
+
+    // Delete code
+    async function deleteCode(id) {
+      if (!confirm('Are you sure you want to delete this code?')) return;
+
+      try {
+        await apiCall('delete', 'DELETE', { id });
+        loadCodes();
+      } catch (error) {
+        alert('Error deleting code: ' + error.message);
+      }
+    }
+
+    // Create modal
+    function showCreateModal() {
+      document.getElementById('create-modal').style.display = 'flex';
+      document.getElementById('create-error').style.display = 'none';
+    }
+
+    function hideCreateModal() {
+      document.getElementById('create-modal').style.display = 'none';
+      document.getElementById('create-form').reset();
+      document.getElementById('create-prefix').value = 'FOIL';
+    }
+
+    // Create codes
+    document.getElementById('create-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById('create-error');
+      errorEl.style.display = 'none';
+
+      const count = parseInt(document.getElementById('create-count').value);
+      const duration_months = parseInt(document.getElementById('create-duration').value);
+      const maxUsesVal = document.getElementById('create-max-uses').value;
+      const max_uses = maxUsesVal === '' ? null : parseInt(maxUsesVal);
+      const campaign = document.getElementById('create-campaign').value || null;
+      const notes = document.getElementById('create-notes').value || null;
+      const prefix = document.getElementById('create-prefix').value || 'FOIL';
+      const expiresInput = document.getElementById('create-expires').value;
+      const code_expires_at = expiresInput ? new Date(expiresInput).toISOString() : null;
+
+      try {
+        const data = await apiCall('create', 'POST', {
+          count,
+          duration_months,
+          max_uses,
+          campaign,
+          notes,
+          prefix,
+          code_expires_at
+        });
+
+        hideCreateModal();
+        loadCodes();
+        loadCampaigns();
+
+        alert(`Successfully created ${data.count} promo code${data.count > 1 ? 's' : ''}`);
+      } catch (error) {
+        errorEl.textContent = error.message;
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // Copy redemption link
+    async function copyRedemptionLink(codeId) {
+      try {
+        const data = await apiCall(`redemption_link&code_id=${codeId}`);
+        navigator.clipboard.writeText(data.link);
+        alert('Redemption link copied:\n' + data.link);
+      } catch (error) {
+        alert('Error getting link: ' + error.message);
+      }
+    }
+
+    // Show redemptions modal
+    async function showRedemptions(codeId) {
+      document.getElementById('redemptions-modal').style.display = 'flex';
+      document.getElementById('redemptions-loading').style.display = 'flex';
+      document.getElementById('redemptions-empty').style.display = 'none';
+      document.getElementById('redemptions-table').style.display = 'none';
+
+      try {
+        const data = await apiCall(`redemptions&code_id=${codeId}`);
+        const redemptions = data.redemptions || [];
+
+        if (redemptions.length === 0) {
+          document.getElementById('redemptions-empty').style.display = 'block';
+        } else {
+          const tbody = document.getElementById('redemptions-tbody');
+          tbody.innerHTML = redemptions.map(r => `
+            <tr>
+              <td>${r.user_email}</td>
+              <td>${new Date(r.premium_granted_until).toLocaleDateString()}</td>
+              <td>${new Date(r.redeemed_at).toLocaleDateString()}</td>
+            </tr>
+          `).join('');
+          document.getElementById('redemptions-table').style.display = 'table';
+        }
+      } catch (error) {
+        alert('Error loading redemptions: ' + error.message);
+        hideRedemptionsModal();
+      } finally {
+        document.getElementById('redemptions-loading').style.display = 'none';
+      }
+    }
+
+    function hideRedemptionsModal() {
+      document.getElementById('redemptions-modal').style.display = 'none';
+    }
+
+    // Export CSV
+    function exportCSV() {
+      const campaignFilter = document.getElementById('filter-campaign').value;
+      const statusFilter = document.getElementById('filter-status').value;
+
+      let filteredCodes = allCodes;
+
+      if (campaignFilter) {
+        filteredCodes = filteredCodes.filter(c => c.campaign === campaignFilter);
+      }
+
+      if (statusFilter) {
+        filteredCodes = filteredCodes.filter(c => c.status === statusFilter);
+      }
+
+      const headers = ['Code', 'Duration (months)', 'Campaign', 'Notes', 'Status', 'Redeemed By', 'Redeemed At', 'Created At'];
+      const rows = filteredCodes.map(code => [
+        code.code,
+        code.duration_months,
+        code.campaign || '',
+        code.notes || '',
+        code.status,
+        code.redeemed_by_email || '',
+        code.redeemed_at ? new Date(code.redeemed_at).toISOString() : '',
+        new Date(code.created_at).toISOString()
+      ]);
+
+      const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `promo-codes-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // =============================================
+    // EMAIL GRANTS FUNCTIONS
+    // =============================================
+
+    // Load email grants
+    async function loadGrants() {
+      const loadingEl = document.getElementById('grants-loading');
+      const emptyEl = document.getElementById('grants-empty');
+      const tableEl = document.getElementById('grants-table');
+
+      loadingEl.style.display = 'flex';
+      emptyEl.style.display = 'none';
+      tableEl.style.display = 'none';
+
+      try {
+        const data = await apiCall('list_grants');
+        allGrants = data.grants || [];
+
+        // Update stats
+        document.getElementById('grant-stat-total').textContent = data.stats?.total || 0;
+        document.getElementById('grant-stat-pending').textContent = data.stats?.pending || 0;
+        document.getElementById('grant-stat-claimed').textContent = data.stats?.claimed || 0;
+        document.getElementById('grant-stat-revoked').textContent = data.stats?.revoked || 0;
+
+        renderGrants();
+      } catch (error) {
+        console.error('Error loading grants:', error);
+        alert('Error loading grants: ' + error.message);
+      } finally {
+        loadingEl.style.display = 'none';
+      }
+    }
+
+    // Load grant campaigns for filter
+    async function loadGrantCampaigns() {
+      try {
+        const data = await apiCall('grant_campaigns');
+        const select = document.getElementById('grant-filter-campaign');
+        select.innerHTML = '<option value="">All Campaigns</option>';
+        (data.campaigns || []).forEach(campaign => {
+          const option = document.createElement('option');
+          option.value = campaign;
+          option.textContent = campaign;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading grant campaigns:', error);
+      }
+    }
+
+    // Render grants table
+    function renderGrants() {
+      const campaignFilter = document.getElementById('grant-filter-campaign').value;
+      const statusFilter = document.getElementById('grant-filter-status').value;
+
+      let filteredGrants = allGrants;
+
+      if (campaignFilter) {
+        filteredGrants = filteredGrants.filter(g => g.campaign === campaignFilter);
+      }
+
+      if (statusFilter) {
+        filteredGrants = filteredGrants.filter(g => g.status === statusFilter);
+      }
+
+      const emptyEl = document.getElementById('grants-empty');
+      const tableEl = document.getElementById('grants-table');
+      const tbody = document.getElementById('grants-tbody');
+
+      if (filteredGrants.length === 0) {
+        emptyEl.style.display = 'block';
+        tableEl.style.display = 'none';
+        return;
+      }
+
+      emptyEl.style.display = 'none';
+      tableEl.style.display = 'table';
+
+      tbody.innerHTML = filteredGrants.map(grant => `
+        <tr>
+          <td>${grant.email}</td>
+          <td>${grant.duration_months} month${grant.duration_months > 1 ? 's' : ''}</td>
+          <td>${grant.campaign || '-'}</td>
+          <td>${grant.source === 'admin' ? 'Admin' : 'Web'}</td>
+          <td><span class="badge badge-${grant.status}">${grant.status}</span></td>
+          <td>${new Date(grant.created_at).toLocaleDateString()}</td>
+          <td class="actions-cell">
+            ${grant.status === 'pending' ? `
+              <button class="btn-secondary btn-icon" onclick="revokeGrant('${grant.id}')" title="Revoke">
+                Revoke
+              </button>
+              <button class="btn-danger btn-icon" onclick="deleteGrant('${grant.id}')" title="Delete">
+                Del
+              </button>
+            ` : ''}
+            ${grant.status === 'claimed' ? `
+              <span style="font-size: 12px; color: #666;">
+                ${grant.premium_until ? 'Until ' + new Date(grant.premium_until).toLocaleDateString() : ''}
+              </span>
+            ` : ''}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Filter handlers for grants
+    document.getElementById('grant-filter-campaign').addEventListener('change', renderGrants);
+    document.getElementById('grant-filter-status').addEventListener('change', renderGrants);
+
+    // Grant modal functions
+    function showGrantModal() {
+      document.getElementById('grant-modal').style.display = 'flex';
+      document.getElementById('grant-error').style.display = 'none';
+    }
+
+    function hideGrantModal() {
+      document.getElementById('grant-modal').style.display = 'none';
+      document.getElementById('grant-form').reset();
+    }
+
+    // Create single grant
+    document.getElementById('grant-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById('grant-error');
+      errorEl.style.display = 'none';
+
+      const email = document.getElementById('grant-email').value;
+      const duration_months = parseInt(document.getElementById('grant-duration').value);
+      const campaign = document.getElementById('grant-campaign').value || null;
+      const notes = document.getElementById('grant-notes').value || null;
+
+      try {
+        await apiCall('create_grant', 'POST', {
+          email,
+          duration_months,
+          campaign,
+          notes
+        });
+
+        hideGrantModal();
+        loadGrants();
+        loadGrantCampaigns();
+
+        alert('Email grant created successfully');
+      } catch (error) {
+        errorEl.textContent = error.message;
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // Bulk grant modal functions
+    function showBulkGrantModal() {
+      document.getElementById('bulk-grant-modal').style.display = 'flex';
+      document.getElementById('bulk-grant-error').style.display = 'none';
+      document.getElementById('bulk-grant-result').style.display = 'none';
+    }
+
+    function hideBulkGrantModal() {
+      document.getElementById('bulk-grant-modal').style.display = 'none';
+      document.getElementById('bulk-grant-form').reset();
+    }
+
+    // Create bulk grants
+    document.getElementById('bulk-grant-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById('bulk-grant-error');
+      const resultEl = document.getElementById('bulk-grant-result');
+      errorEl.style.display = 'none';
+      resultEl.style.display = 'none';
+
+      const emailsText = document.getElementById('bulk-grant-emails').value;
+      const emails = emailsText.split(/[\n,]/).map(e => e.trim()).filter(e => e);
+      const duration_months = parseInt(document.getElementById('bulk-grant-duration').value);
+      const campaign = document.getElementById('bulk-grant-campaign').value || null;
+      const notes = document.getElementById('bulk-grant-notes').value || null;
+
+      if (emails.length === 0) {
+        errorEl.textContent = 'Please enter at least one email address';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      if (emails.length > 500) {
+        errorEl.textContent = 'Maximum 500 emails per batch. You entered ' + emails.length;
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        const data = await apiCall('bulk_create_grants', 'POST', {
+          emails,
+          duration_months,
+          campaign,
+          notes
+        });
+
+        const results = data.results;
+        let message = `Created: ${results.created}`;
+        if (results.skipped > 0) message += `, Skipped (duplicates): ${results.skipped}`;
+        if (results.invalid.length > 0) message += `, Invalid: ${results.invalid.length}`;
+
+        resultEl.innerHTML = `<strong>Results:</strong><br>${message}`;
+        if (results.invalid.length > 0) {
+          resultEl.innerHTML += `<br><small>Invalid emails: ${results.invalid.slice(0, 5).join(', ')}${results.invalid.length > 5 ? '...' : ''}</small>`;
+        }
+        resultEl.style.display = 'block';
+
+        loadGrants();
+        loadGrantCampaigns();
+
+        // Clear form but keep modal open to show results
+        document.getElementById('bulk-grant-emails').value = '';
+      } catch (error) {
+        errorEl.textContent = error.message;
+        errorEl.style.display = 'block';
+      }
+    });
+
+    // Revoke grant
+    async function revokeGrant(id) {
+      if (!confirm('Are you sure you want to revoke this grant? The user will not be able to claim it.')) return;
+
+      try {
+        await apiCall('revoke_grant', 'POST', { id });
+        loadGrants();
+      } catch (error) {
+        alert('Error revoking grant: ' + error.message);
+      }
+    }
+
+    // Delete grant
+    async function deleteGrant(id) {
+      if (!confirm('Are you sure you want to delete this grant?')) return;
+
+      try {
+        await apiCall('delete_grant', 'DELETE', { id });
+        loadGrants();
+      } catch (error) {
+        alert('Error deleting grant: ' + error.message);
+      }
+    }
+
+    // Export grants CSV
+    function exportGrantsCSV() {
+      const campaignFilter = document.getElementById('grant-filter-campaign').value;
+      const statusFilter = document.getElementById('grant-filter-status').value;
+
+      let filteredGrants = allGrants;
+
+      if (campaignFilter) {
+        filteredGrants = filteredGrants.filter(g => g.campaign === campaignFilter);
+      }
+
+      if (statusFilter) {
+        filteredGrants = filteredGrants.filter(g => g.status === statusFilter);
+      }
+
+      const headers = ['Email', 'Duration (months)', 'Campaign', 'Notes', 'Source', 'Status', 'Claimed At', 'Premium Until', 'Created At'];
+      const rows = filteredGrants.map(grant => [
+        grant.email,
+        grant.duration_months,
+        grant.campaign || '',
+        grant.notes || '',
+        grant.source,
+        grant.status,
+        grant.claimed_at ? new Date(grant.claimed_at).toISOString() : '',
+        grant.premium_until ? new Date(grant.premium_until).toISOString() : '',
+        new Date(grant.created_at).toISOString()
+      ]);
+
+      const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `email-grants-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
