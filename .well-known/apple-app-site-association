@@ -1,0 +1,22 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["CR462Z4VB3.com.getfoil.app"],
+        "components": [
+          {
+            "/": "/redeem*",
+            "comment": "Promo code redemption — deeplinks open Nishi at the promo screen with the code prefilled"
+          },
+          {
+            "/": "/share/*",
+            "comment": "Future: shareable observation/recipe deep links"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["CR462Z4VB3.com.getfoil.app"]
+  }
+}
