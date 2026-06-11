@@ -1,0 +1,10 @@
+include:
+  - .well-known
+
+# Force served MIME type for AASA — extensionless file would
+# otherwise be served as application/octet-stream by Jekyll.
+defaults:
+  - scope:
+      path: ".well-known/apple-app-site-association"
+    values:
+      content_type: "application/json"
