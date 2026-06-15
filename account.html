@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your account — Nishi</title>
+  <title>Your account | Nishi</title>
   <meta name="robots" content="noindex">
   <link rel="icon" type="image/png" href="assets/nishi_logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -95,15 +95,15 @@
         <h3>Profile</h3>
         <div class="row">
           <span class="label">Email</span>
-          <span class="value" id="account-email">—</span>
+          <span class="value" id="account-email">Not set</span>
         </div>
         <div class="row">
           <span class="label">Sign-in method</span>
-          <span class="value" id="account-provider">—</span>
+          <span class="value" id="account-provider">Not set</span>
         </div>
         <div class="row">
           <span class="label">Account created</span>
-          <span class="value" id="account-created">—</span>
+          <span class="value" id="account-created">Not set</span>
         </div>
       </section>
 
@@ -115,14 +115,14 @@
         </div>
         <div class="row" id="sub-plan-row" style="display:none;">
           <span class="label">Plan</span>
-          <span class="value" id="sub-plan">—</span>
+          <span class="value" id="sub-plan">Not set</span>
         </div>
         <div class="row" id="sub-renews-row" style="display:none;">
           <span class="label" id="sub-renews-label">Renews</span>
-          <span class="value" id="sub-renews">—</span>
+          <span class="value" id="sub-renews">Not set</span>
         </div>
         <p id="sub-note" style="margin-top: 12px; font-size: 14px; color: var(--text-soft);">
-          Start a 7-day free trial of Premium — no card required.
+          Start a 7-day free trial of Premium. No card required.
         </p>
         <div class="account-actions" id="sub-actions">
           <a href="pricing.html" class="btn btn-primary">View pricing</a>
@@ -163,8 +163,8 @@
       };
 
       function fmtDate(s) {
-        if (!s) return '—';
-        try { return new Date(s).toLocaleDateString(); } catch (_) { return '—'; }
+        if (!s) return 'Not set';
+        try { return new Date(s).toLocaleDateString(); } catch (_) { return 'Not set'; }
       }
 
       async function loadSubscription() {
@@ -267,13 +267,13 @@
           u.user_metadata?.name
             ? `Welcome back, ${u.user_metadata.name.split(' ')[0]}.`
             : 'Welcome back.';
-        document.getElementById('account-email').textContent = u.email || '—';
+        document.getElementById('account-email').textContent = u.email || 'Not set';
         document.getElementById('account-provider').textContent =
           u.app_metadata?.provider
             ? u.app_metadata.provider.charAt(0).toUpperCase() + u.app_metadata.provider.slice(1)
-            : '—';
+            : 'Not set';
         document.getElementById('account-created').textContent =
-          u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
+          u.created_at ? new Date(u.created_at).toLocaleDateString() : 'Not set';
 
         loading.style.display = 'none';
         content.style.display = 'block';
