@@ -13,10 +13,10 @@ const root = resolve(__dirname, '..');
 const outDir = resolve(root, 'assets/og');
 const tmpDir = resolve(root, '.og-build');
 const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const logoPath = resolve(root, 'assets/nishi_logo.png');
+const badgePath = resolve(root, 'assets/og/nishi_badge.png');
 
 const cards = [
-  { slug: 'home',          eyebrow: 'Built for life on GLP-1', title: 'Your nutrition companion.',            sub: 'It connects your kitchen, your wearables, and how you feel.' },
+  { slug: 'home',          eyebrow: '',                        title: 'Your nutrition companion.',            sub: 'It connects your kitchen, your wearables, and how you feel.' },
   { slug: 'how-it-works',  eyebrow: 'How it works',            title: 'It notices. Then it helps.',           sub: 'Observation, action, outcome. Not another blank prompt.' },
   { slug: 'pricing',       eyebrow: 'Early access',            title: 'Free to start. Premium when it earns it.', sub: '7-day trial. No card. Free tier never expires.' },
   { slug: 'story',         eyebrow: 'Our story',               title: 'Why Nishi exists.',                    sub: 'Built for the question GLP-1 leaves behind: what do I eat now?' },
@@ -37,7 +37,7 @@ const html = (c) => `<!DOCTYPE html><html><head><meta charset="utf-8">
     overflow:hidden;
   }
   body::before { content:""; position:absolute; left:0; top:0; bottom:0; width:10px; background:#DD6C59; }
-  .wordmark { font-family:'Inter',sans-serif; font-weight:700; font-size:42px; color:#DD6C59; letter-spacing:-0.5px; }
+  .badge { height:104px; width:104px; display:block; align-self:flex-start; flex:0 0 auto; }
   .mid { margin-top:auto; margin-bottom:auto; max-width:1000px; }
   .eyebrow {
     display:inline-block; font-size:21px; font-weight:600; letter-spacing:2.4px;
@@ -51,9 +51,9 @@ const html = (c) => `<!DOCTYPE html><html><head><meta charset="utf-8">
   .foot { font-size:22px; color:#94897C; font-weight:500; letter-spacing:0.3px; }
 </style></head>
 <body>
-  <span class="wordmark">nishi</span>
+  <img class="badge" src="file://${badgePath}" alt="Nishi">
   <div class="mid">
-    <span class="eyebrow">${esc(c.eyebrow)}</span>
+    ${c.eyebrow ? `<span class="eyebrow">${esc(c.eyebrow)}</span>` : ''}
     <h1>${esc(c.title)}</h1>
     <div class="sub">${esc(c.sub)}</div>
   </div>
