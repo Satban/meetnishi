@@ -1,10 +1,61 @@
+# ============================================================
+# Nishi — site config
+# ============================================================
+url: "https://meetnishi.com"
+
 include:
   - .well-known
 
-# Force served MIME type for AASA — extensionless file would
-# otherwise be served as application/octet-stream by Jekyll.
+# Blog posts live in a custom collection (NOT built-in _posts) so each
+# post is front matter + body only and keeps an explicit per-post permalink.
+collections:
+  blog_posts:
+    output: true
+
 defaults:
+  # AASA MIME type — extensionless file would otherwise be served as
+  # application/octet-stream by Jekyll.
   - scope:
       path: ".well-known/apple-app-site-association"
     values:
       content_type: "application/json"
+  # Every blog post renders through the shared post layout.
+  - scope:
+      path: ""
+      type: blog_posts
+    values:
+      layout: post
+      og_type: article
+  # Keep non-public / utility pages out of the sitemap (jekyll-sitemap
+  # otherwise lists every static .html). Mirrors the old curated sitemap.
+  - scope: { path: "admin" }
+    values: { sitemap: false }
+  - scope: { path: "redeem" }
+    values: { sitemap: false }
+  - scope: { path: "account.html" }
+    values: { sitemap: false }
+  - scope: { path: "delete-account.html" }
+    values: { sitemap: false }
+  - scope: { path: "forgot.html" }
+    values: { sitemap: false }
+  - scope: { path: "signin.html" }
+    values: { sitemap: false }
+  - scope: { path: "signup.html" }
+    values: { sitemap: false }
+  - scope: { path: "verify.html" }
+    values: { sitemap: false }
+  - scope: { path: "welcome.html" }
+    values: { sitemap: false }
+  - scope: { path: "googledc497674017db1b5.html" }
+    values: { sitemap: false }
+
+plugins:
+  - jekyll-sitemap
+
+# Keep build tooling out of the generated site.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - README.md
+  - .well-known/README.md
