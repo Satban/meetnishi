@@ -53,6 +53,13 @@ defaults:
   # Unpublished post previews staged by the blog agent: never index.
   - scope: { path: "drafts" }
     values: { sitemap: false }
+  # Blog-approval landing pages (reached only from the approval email).
+  - scope: { path: "approved.html" }
+    values: { sitemap: false }
+  - scope: { path: "rejected.html" }
+    values: { sitemap: false }
+  - scope: { path: "feedback.html" }
+    values: { sitemap: false }
 
 plugins:
   - jekyll-sitemap
