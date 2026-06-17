@@ -50,6 +50,9 @@ defaults:
     values: { sitemap: false }
   - scope: { path: "googledc497674017db1b5.html" }
     values: { sitemap: false }
+  # Unpublished post previews staged by the blog agent: never index.
+  - scope: { path: "drafts" }
+    values: { sitemap: false }
 
 plugins:
   - jekyll-sitemap
