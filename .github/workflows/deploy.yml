@@ -29,6 +29,15 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: true
       - uses: actions/configure-pages@v5
+      # Fail closed: reject any Liquid delimiters in post bodies before build.
+      # render_with_liquid:false already neutralizes them; this catches them
+      # so a future agent-authored post can't silently smuggle Liquid in.
+      - name: Guard against Liquid in post bodies
+        run: |
+          if grep -rlE '\{\{|\{%|%\}' _blog_posts; then
+            echo "::error::Liquid delimiters found in _blog_posts (fail-closed)"
+            exit 1
+          fi
       # Build gate: --strict_front_matter fails the run on bad front matter
       # before anything deploys.
       - name: Build with Jekyll

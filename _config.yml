@@ -26,6 +26,8 @@ defaults:
     values:
       layout: post
       og_type: article
+      # Fail closed: never interpret post body as Liquid (P0 safety).
+      render_with_liquid: false
   # Keep non-public / utility pages out of the sitemap (jekyll-sitemap
   # otherwise lists every static .html). Mirrors the old curated sitemap.
   - scope: { path: "admin" }
@@ -59,3 +61,4 @@ exclude:
   - vendor
   - README.md
   - .well-known/README.md
+  - scripts/migrate_blog.py  # one-time migration tool, not site content

@@ -17,8 +17,8 @@ permalink: /blog/
       {%- if post.image -%}<img src="{{ post.image }}" alt="" class="blog-card-image">{%- endif -%}
       <div class="blog-card-content">
         <div class="blog-card-meta">{{ post.date | date: "%B %d, %Y" }}</div>
-        <h3>{{ post.title }}</h3>
-        <p>{{ post.excerpt | default: post.description | strip_html }}</p>
+        <h3>{{ post.title | escape }}</h3>
+        <p>{{ post.excerpt | default: post.description | strip_html | escape }}</p>
       </div>
     </a>
     {%- endfor -%}
