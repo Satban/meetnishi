@@ -1042,6 +1042,16 @@ p { color: var(--text-soft); }
   color: var(--accent-dark);
 }
 
+.footer-legal {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-md);
+  margin-bottom: var(--space-md);
+  max-width: 760px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
 .footer-bottom {
   border-top: 1px solid var(--border);
   padding-top: var(--space-md);
