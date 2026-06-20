@@ -172,41 +172,89 @@
       async function loadSubscription() {
         const client = window.NishiAuth?.client;
         if (!client) return;
-        const { data, error } = await client
-          .from('user_subscriptions')
-          .select('is_premium, product_identifier, expires_date')
-          .maybeSingle();
-        if (error) {
-          console.warn('subscription load error', error);
-          return;
+
+        const session = await window.NishiAuth.getSession();
+        const uid = session?.user?.id;
+        if (!uid) return;
+
+        // Authoritative check, mirrors the mobile app: get_effective_premium_status
+        // covers the user's own subscription AND household-shared premium. The RPC
+        // returns a table, so supabase-js gives back an array of rows.
+        let effective = null;
+        try {
+          const { data, error } = await client
+            .rpc('get_effective_premium_status', { check_user_id: uid });
+          if (error) throw error;
+          effective = Array.isArray(data) ? data[0] : data;
+        } catch (e) {
+          console.warn('premium rpc error', e);
         }
-        if (!data) return; // No record → free tier (the default already shown).
 
-        const expiresMs = data.expires_date ? new Date(data.expires_date).getTime() : null;
-        const active = !!data.is_premium && (expiresMs === null || expiresMs > Date.now());
+        // Read the row for plan/expiry detail and promo-granted premium
+        // (promo_premium_until is a separate path the RPC does not cover).
+        let sub = null;
+        try {
+          const { data } = await client
+            .from('user_subscriptions')
+            .select('is_premium, product_identifier, expires_date, promo_premium_until')
+            .maybeSingle();
+          sub = data;
+        } catch (_) {}
 
-        if (!active) {
+        const now = Date.now();
+        const promoMs = sub?.promo_premium_until ? new Date(sub.promo_premium_until).getTime() : null;
+        const promoActive = promoMs !== null && promoMs > now;
+        const rpcPremium = !!effective?.is_premium;
+        const source = effective?.source || null; // 'self' | 'household' | null
+
+        if (!rpcPremium && !promoActive) {
           document.getElementById('sub-status').textContent = 'Free tier';
           return;
         }
 
-        document.getElementById('sub-status').textContent = 'Premium · Active';
+        // Status label
+        let statusLabel = 'Premium · Active';
+        if (source === 'household') {
+          statusLabel = effective.household_name
+            ? `Premium · via ${effective.household_name}`
+            : 'Premium · via household';
+        } else if (promoActive && !rpcPremium) {
+          statusLabel = 'Premium · Promo';
+        }
+        document.getElementById('sub-status').textContent = statusLabel;
 
-        const pid = (data.product_identifier || '').toLowerCase();
-        const isAnnual = /annual|year|yr/.test(pid);
-        document.getElementById('sub-plan-row').style.display = '';
-        document.getElementById('sub-plan').textContent =
-          isAnnual ? 'Annual ($79.99/yr)' : (pid ? 'Monthly ($9.99/mo)' : 'Premium');
-
-        if (data.expires_date) {
-          document.getElementById('sub-renews-row').style.display = '';
-          document.getElementById('sub-renews-label').textContent = 'Renews or expires';
-          document.getElementById('sub-renews').textContent = fmtDate(data.expires_date);
+        // Plan label only meaningful for the user's own paid subscription
+        if (source === 'self') {
+          const pid = (sub?.product_identifier || '').toLowerCase();
+          document.getElementById('sub-plan-row').style.display = '';
+          document.getElementById('sub-plan').textContent = /annual|year|yr/.test(pid)
+            ? 'Annual ($79.99/yr)'
+            : (pid ? 'Monthly ($9.99/mo)' : 'Premium');
         }
 
-        document.getElementById('sub-note').textContent =
-          'Premium is active. You manage or cancel your subscription in the store where you bought it.';
-        document.getElementById('sub-actions').innerHTML = manageLinksHtml();
+        // Expiry: own sub uses expires_date; promo uses promo_premium_until
+        const expiry = source === 'self' ? sub?.expires_date : (promoActive ? sub?.promo_premium_until : null);
+        if (expiry) {
+          document.getElementById('sub-renews-row').style.display = '';
+          document.getElementById('sub-renews-label').textContent =
+            source === 'self' ? 'Renews or expires' : 'Premium until';
+          document.getElementById('sub-renews').textContent = fmtDate(expiry);
+        }
+
+        // Note + manage links. Household members manage nothing here; the payer does.
+        if (source === 'household') {
+          document.getElementById('sub-note').textContent =
+            'Premium is active through your household.';
+          document.getElementById('sub-actions').innerHTML = '';
+        } else if (promoActive && !rpcPremium) {
+          document.getElementById('sub-note').textContent =
+            'Premium is active from a redeemed code.';
+          document.getElementById('sub-actions').innerHTML = '';
+        } else {
+          document.getElementById('sub-note').textContent =
+            'Premium is active. You manage or cancel your subscription in the store where you bought it.';
+          document.getElementById('sub-actions').innerHTML = manageLinksHtml();
+        }
       }
 
       function maybeResumeCheckout(session) {
