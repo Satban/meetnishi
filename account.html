@@ -155,67 +155,58 @@
       const loading = document.getElementById('account-loading');
       const content = document.getElementById('account-content');
 
-      const STATUS_LABELS = {
-        trialing: 'Trial active',
-        active: 'Premium · Active',
-        past_due: 'Premium · Payment overdue',
-        canceled: 'Free tier',
-        unpaid: 'Premium · Payment failed',
-        incomplete: 'Premium · Setup incomplete',
-        incomplete_expired: 'Free tier',
-        paused: 'Premium · Paused',
-      };
-
       function fmtDate(s) {
         if (!s) return 'Not set';
         try { return new Date(s).toLocaleDateString(); } catch (_) { return 'Not set'; }
+      }
+
+      // Subscriptions are purchased in-app (Apple/Google) and synced here by the
+      // RevenueCat webhook. The web reads the same user_subscriptions table the
+      // mobile apps write to. When a Stripe web rail is added later, it writes to
+      // this same table, so this card needs no changes.
+      function manageLinksHtml() {
+        return '<a href="https://apps.apple.com/account/subscriptions" target="_blank" rel="noopener" class="btn btn-ghost">Manage on App Store</a>' +
+               '<a href="https://play.google.com/store/account/subscriptions" target="_blank" rel="noopener" class="btn btn-ghost">Manage on Google Play</a>';
       }
 
       async function loadSubscription() {
         const client = window.NishiAuth?.client;
         if (!client) return;
         const { data, error } = await client
-          .from('subscriptions')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(1)
+          .from('user_subscriptions')
+          .select('is_premium, product_identifier, expires_date')
           .maybeSingle();
         if (error) {
           console.warn('subscription load error', error);
           return;
         }
-        if (!data) return;
+        if (!data) return; // No record → free tier (the default already shown).
 
-        document.getElementById('sub-status').textContent =
-          STATUS_LABELS[data.status] || data.status;
+        const expiresMs = data.expires_date ? new Date(data.expires_date).getTime() : null;
+        const active = !!data.is_premium && (expiresMs === null || expiresMs > Date.now());
 
-        const isPremium = ['trialing', 'active', 'past_due', 'paused'].includes(data.status);
-        if (isPremium) {
-          document.getElementById('sub-plan-row').style.display = '';
-          document.getElementById('sub-plan').textContent =
-            data.plan === 'annual' ? 'Annual ($79.99/yr)' : 'Monthly ($9.99/mo)';
-
-          document.getElementById('sub-renews-row').style.display = '';
-          if (data.status === 'trialing' && data.trial_end) {
-            document.getElementById('sub-renews-label').textContent = 'Trial ends';
-            document.getElementById('sub-renews').textContent = fmtDate(data.trial_end);
-          } else if (data.cancel_at_period_end) {
-            document.getElementById('sub-renews-label').textContent = 'Ends';
-            document.getElementById('sub-renews').textContent = fmtDate(data.current_period_end);
-          } else {
-            document.getElementById('sub-renews-label').textContent = 'Renews';
-            document.getElementById('sub-renews').textContent = fmtDate(data.current_period_end);
-          }
-
-          document.getElementById('sub-note').textContent =
-            data.cancel_at_period_end
-              ? 'Your subscription is cancelled and ends at the date above. You will return to the free tier automatically.'
-              : 'Premium is active. Manage in your billing portal.';
-
-          // Swap CTA: viewing pricing isn't useful when already on Premium.
-          document.getElementById('sub-actions').innerHTML =
-            '<a href="mailto:support@meetnishi.com?subject=Nishi%20subscription" class="btn btn-ghost">Contact support</a>';
+        if (!active) {
+          document.getElementById('sub-status').textContent = 'Free tier';
+          return;
         }
+
+        document.getElementById('sub-status').textContent = 'Premium · Active';
+
+        const pid = (data.product_identifier || '').toLowerCase();
+        const isAnnual = /annual|year|yr/.test(pid);
+        document.getElementById('sub-plan-row').style.display = '';
+        document.getElementById('sub-plan').textContent =
+          isAnnual ? 'Annual ($79.99/yr)' : (pid ? 'Monthly ($9.99/mo)' : 'Premium');
+
+        if (data.expires_date) {
+          document.getElementById('sub-renews-row').style.display = '';
+          document.getElementById('sub-renews-label').textContent = 'Renews or expires';
+          document.getElementById('sub-renews').textContent = fmtDate(data.expires_date);
+        }
+
+        document.getElementById('sub-note').textContent =
+          'Premium is active. You manage or cancel your subscription in the store where you bought it.';
+        document.getElementById('sub-actions').innerHTML = manageLinksHtml();
       }
 
       function maybeResumeCheckout(session) {

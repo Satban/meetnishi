@@ -318,10 +318,8 @@
         const client = window.NishiAuth?.client;
         if (!client) return null;
         const { data, error } = await client
-          .from('subscriptions')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(1)
+          .from('user_subscriptions')
+          .select('is_premium, product_identifier, expires_date')
           .maybeSingle();
         if (error) {
           console.warn('subscription load error', error);
@@ -335,17 +333,19 @@
         if (!summary) return;
 
         const pills = [];
-        if (!sub) {
+        const expiresMs = sub && sub.expires_date ? new Date(sub.expires_date).getTime() : null;
+        const active = sub && !!sub.is_premium && (expiresMs === null || expiresMs > Date.now());
+
+        if (!active) {
           pills.push(`<span class="pill">Setting up your subscription…</span>`);
         } else {
-          const planLabel = sub.plan === 'annual'
+          const pid = (sub.product_identifier || '').toLowerCase();
+          const planLabel = /annual|year|yr/.test(pid)
             ? 'Annual · $79.99/yr'
-            : 'Monthly · $9.99/mo';
+            : (pid ? 'Monthly · $9.99/mo' : 'Premium');
           pills.push(`<span class="pill">${planLabel}</span>`);
-          if (sub.status === 'trialing' && sub.trial_end) {
-            pills.push(`<span class="pill sage">Trial through ${fmtDate(sub.trial_end)}</span>`);
-          } else if (sub.status === 'active' && sub.current_period_end) {
-            pills.push(`<span class="pill sage">Renews ${fmtDate(sub.current_period_end)}</span>`);
+          if (sub.expires_date) {
+            pills.push(`<span class="pill sage">Renews ${fmtDate(sub.expires_date)}</span>`);
           }
         }
 
