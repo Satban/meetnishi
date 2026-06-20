@@ -314,18 +314,58 @@
         try { return new Date(s).toLocaleDateString(); } catch (_) { return null; }
       }
 
+      // Mirrors the app's premium check: get_effective_premium_status (own sub +
+      // household) plus the promo_premium_until path. Returns null until premium
+      // is actually active so the caller keeps polling after a fresh redeem.
       async function loadSubscription() {
         const client = window.NishiAuth?.client;
         if (!client) return null;
-        const { data, error } = await client
-          .from('user_subscriptions')
-          .select('is_premium, product_identifier, expires_date')
-          .maybeSingle();
-        if (error) {
-          console.warn('subscription load error', error);
-          return null;
+        const session = await window.NishiAuth.getSession();
+        const uid = session?.user?.id;
+        if (!uid) return null;
+
+        let effective = null;
+        try {
+          const { data } = await client
+            .rpc('get_effective_premium_status', { check_user_id: uid });
+          effective = Array.isArray(data) ? data[0] : data;
+        } catch (e) {
+          console.warn('premium rpc error', e);
         }
-        return data;
+
+        let row = null;
+        try {
+          const { data } = await client
+            .from('user_subscriptions')
+            .select('is_premium, product_identifier, expires_date, promo_premium_until')
+            .maybeSingle();
+          row = data;
+        } catch (_) {}
+
+        const now = Date.now();
+        const promoMs = row?.promo_premium_until ? new Date(row.promo_premium_until).getTime() : null;
+        const promoActive = promoMs !== null && promoMs > now;
+        const rpcPremium = !!effective?.is_premium;
+        if (!rpcPremium && !promoActive) return null; // not active yet → keep polling
+
+        const source = effective?.source || (promoActive ? 'promo' : null); // self | household | promo
+        const pid = (row?.product_identifier || '').toLowerCase();
+
+        let planLabel;
+        if (source === 'household') {
+          planLabel = effective.household_name
+            ? `Premium · via ${effective.household_name}`
+            : 'Premium · via household';
+        } else if (source === 'promo') {
+          planLabel = 'Premium · Promo';
+        } else {
+          planLabel = /annual|year|yr/.test(pid)
+            ? 'Annual · $79.99/yr'
+            : (pid ? 'Monthly · $9.99/mo' : 'Premium');
+        }
+
+        const expiry = source === 'self' ? row?.expires_date : (promoActive ? row?.promo_premium_until : null);
+        return { source, planLabel, expiry };
       }
 
       function renderSubSummary(sub) {
@@ -333,19 +373,13 @@
         if (!summary) return;
 
         const pills = [];
-        const expiresMs = sub && sub.expires_date ? new Date(sub.expires_date).getTime() : null;
-        const active = sub && !!sub.is_premium && (expiresMs === null || expiresMs > Date.now());
-
-        if (!active) {
+        if (!sub) {
           pills.push(`<span class="pill">Setting up your subscription…</span>`);
         } else {
-          const pid = (sub.product_identifier || '').toLowerCase();
-          const planLabel = /annual|year|yr/.test(pid)
-            ? 'Annual · $79.99/yr'
-            : (pid ? 'Monthly · $9.99/mo' : 'Premium');
-          pills.push(`<span class="pill">${planLabel}</span>`);
-          if (sub.expires_date) {
-            pills.push(`<span class="pill sage">Renews ${fmtDate(sub.expires_date)}</span>`);
+          pills.push(`<span class="pill">${sub.planLabel}</span>`);
+          if (sub.expiry) {
+            const label = sub.source === 'self' ? 'Renews' : 'Premium until';
+            pills.push(`<span class="pill sage">${label} ${fmtDate(sub.expiry)}</span>`);
           }
         }
 
