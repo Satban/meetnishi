@@ -118,6 +118,21 @@
     });
   }
 
+  // ----- Smart store links (serve Google Play to Android) -----
+  // iOS and desktop keep the App Store link (the safe default). Android phones
+  // and tablets get redirected to Google Play so the CTA never dead-ends.
+  // Scoped to the long-form App Store URL used by the standard nav/hero CTAs,
+  // so the dual-badge pages (welcome, redeem) that already show both are untouched.
+  function initSmartStoreLinks() {
+    const ua = navigator.userAgent || navigator.vendor || '';
+    if (!/android/i.test(ua)) return;
+    const PLAY = 'https://play.google.com/store/apps/details?id=com.getfoil.app';
+    document.querySelectorAll('a[href*="apps.apple.com/us/app/nishi"]').forEach(a => {
+      a.setAttribute('href', PLAY);
+      if (/app store/i.test(a.textContent)) a.textContent = 'Get it on Google Play';
+    });
+  }
+
   // ----- Smooth scroll for in-page anchors -----
   function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]:not([href="#"])').forEach(a => {
@@ -140,6 +155,7 @@
     initVideo();
     initFormStubs();
     initSmoothScroll();
+    initSmartStoreLinks();
   }
 
   if (document.readyState === 'loading') {
