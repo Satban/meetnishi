@@ -1,0 +1,150 @@
+/* ============================================================
+   MOTION LAYER — energetic, choreographed, prototype only
+   Calm persona, energetic experience. Built on top of the
+   existing .reveal IntersectionObserver system.
+   ============================================================ */
+
+:root {
+  /* energetic easings */
+  --ease-pop:   cubic-bezier(.34, 1.56, .64, 1);   /* overshoot for entrances */
+  --ease-snap:  cubic-bezier(.22, .9, .25, 1);      /* decisive, forward */
+}
+
+/* energetic reveal: more travel + snappier curve than the calm default */
+.reveal { transform: translateY(34px); transition:
+  opacity 700ms var(--ease-snap), transform 700ms var(--ease-snap); }
+
+/* staggered groups — children arrive in sequence */
+.stagger > * { transition-delay: 0ms; }
+.stagger.visible > *:nth-child(1) { transition-delay: 60ms; }
+.stagger.visible > *:nth-child(2) { transition-delay: 150ms; }
+.stagger.visible > *:nth-child(3) { transition-delay: 240ms; }
+.stagger > * { opacity: 0; transform: translateY(34px);
+  transition: opacity 700ms var(--ease-snap), transform 700ms var(--ease-snap); }
+.stagger.visible > * { opacity: 1; transform: translateY(0); }
+
+/* ---------- Ken Burns: slow ambient drift+zoom ---------- */
+.kenburns { overflow: hidden; }
+.kenburns > img, img.kb {
+  animation: kenburns 18s ease-in-out infinite alternate;
+  transform-origin: 50% 40%;
+}
+@keyframes kenburns {
+  from { transform: scale(1.0); }
+  to   { transform: scale(1.09); }
+}
+
+/* ---------- floating hero cards: entrance pop + ambient float ----------
+   Entrance is transition-based; the ambient float keyframes carry the FULL
+   resting transform (incl. scale(1)) so handing off from entrance to float
+   never snaps the card back to its pre-pop scale. */
+.float-card {
+  opacity: 0; transform: translateY(20px) scale(.92);
+  transition: opacity 480ms var(--ease-snap), transform 560ms var(--ease-pop);
+}
+.hero-photo.in .float-card { opacity: 1; transform: translateY(0) scale(1); }
+.hero-photo.in .float-card.a { transition-delay: 360ms; }
+.hero-photo.in .float-card.b { transition-delay: 520ms; }
+/* gentle perpetual float, started only after the entrance has settled */
+.hero-photo.floated .float-card.a { animation: floatA 5.8s ease-in-out infinite; }
+.hero-photo.floated .float-card.b { animation: floatB 6.6s ease-in-out infinite; }
+@keyframes floatA { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1); } }
+@keyframes floatB { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-5px) scale(1); } }
+
+/* ---------- hover micro-lifts (desktop pointer only) ---------- */
+@media (hover: hover) {
+  .stream-photo, .proof-grid figure .photo-frame {
+    transition: transform 320ms var(--ease-snap), box-shadow 320ms var(--ease-snap);
+  }
+  .stream-col:hover .stream-photo,
+  .proof-grid figure:hover .photo-frame {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+/* ---------- count-up numbers hold their box so layout doesn't jump ---------- */
+.count { font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   CODED VENN — three independent circles that fly in
+   ============================================================ */
+.venn-live {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto var(--space-lg);
+}
+
+/* blended discs live in their own isolation context so mix-blend
+   only blends the circles against each other, not the page */
+.venn-discs { position: absolute; inset: 0; isolation: isolate; }
+.disc {
+  position: absolute;
+  width: 64%; height: 64%;
+  border-radius: 50%;
+  border: 2px solid;
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transition: transform 900ms var(--ease-pop), opacity 600ms ease;
+  will-change: transform, opacity;
+}
+.disc.d-wear { left: 18%; top: 2%;  background: rgba(221,108,89,.14);  border-color: #E26A3C; transform: translateY(-120px) scale(.5); }
+.disc.d-food { left: 2%;  top: 34%; background: rgba(78,154,78,.14);   border-color: #4E9A4E; transform: translate(-120px,90px) scale(.5); }
+.disc.d-feel { left: 34%; top: 34%; background: rgba(74,157,216,.14);  border-color: #4A9DD8; transform: translate(120px,90px) scale(.5); }
+
+.venn-live.in .disc { opacity: 1; transform: translate(0,0) scale(1); }
+.venn-live.in .disc.d-wear { transition-delay: 0ms; }
+.venn-live.in .disc.d-food { transition-delay: 130ms; }
+.venn-live.in .disc.d-feel { transition-delay: 260ms; }
+
+/* center nishi lens — the real coral wordmark, pops last */
+.venn-core {
+  position: absolute; left: 50%; top: 52%; transform: translate(-50%,-50%) scale(0);
+  width: 150px; height: auto; z-index: 3;
+  filter: drop-shadow(0 8px 22px rgba(199,90,72,.45));
+  transition: transform 560ms var(--ease-pop) 620ms;
+}
+.venn-live.in .venn-core { transform: translate(-50%,-50%) scale(1); }
+
+/* labels — fade up after the circles land */
+/* each label is centered on its circle's center so the lines stay inside the
+   clear (non-overlapping) part of the lobe and never cross the arcs */
+/* each label sits in its circle's EXCLUSIVE lobe (top / lower-left / lower-right),
+   shifted outward from the center overlap, at the circle's wide vertical band */
+.venn-lbl {
+  position: absolute; text-align: center; z-index: 2;
+  font-family: var(--font-sans); width: 35%;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 500ms ease, transform 500ms var(--ease-snap);
+}
+.venn-live.in .venn-lbl { opacity: 1; transform: translateY(0); }
+.venn-live.in .l-wear { transition-delay: 760ms; }
+.venn-live.in .l-food { transition-delay: 860ms; }
+.venn-live.in .l-feel { transition-delay: 960ms; }
+.l-wear { left: 32.5%; top: 11%; }   /* top lobe, centered x=50% */
+.l-food { left: 5%;  top: 56%; }     /* lower-left lobe, centered x≈22.5% */
+.l-feel { left: 60%; top: 56%; }     /* lower-right lobe, centered x≈77.5% */
+.venn-lbl .ic { width: 26px; height: 26px; margin: 0 auto 4px; display: block; }
+.venn-lbl strong { display: block; font-size: 13.5px; font-weight: 700; letter-spacing: -.2px; }
+.venn-lbl span { display: block; font-size: 10px; font-weight: 600; color: var(--text); line-height: 1.5; margin-top: 3px; }
+.l-wear strong { color: #C75A38; } .l-food strong { color: #3E8A3E; } .l-feel strong { color: #2F86C4; }
+
+@media (max-width: 560px) {
+  .venn-core { width: 104px; }
+  .venn-lbl { width: 40%; }
+  .l-food { left: 1%; } .l-feel { left: 59%; }
+  .venn-lbl strong { font-size: 11px; }
+  .venn-lbl span { font-size: 8.5px; }
+}
+
+/* reduced motion: everything lands in final state, no movement */
+@media (prefers-reduced-motion: reduce) {
+  .disc, .venn-core, .venn-lbl { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .disc.d-wear { transform: translate(0,0) !important; }
+  .venn-core { transform: translate(-50%,-50%) scale(1) !important; }
+  .float-card { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .stagger > * { opacity: 1 !important; transform: none !important; }
+  .kb, .kenburns > img { animation: none !important; }
+}

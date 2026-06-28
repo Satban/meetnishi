@@ -26,6 +26,8 @@ render_with_liquid: false
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/render.css">
+  <link rel="stylesheet" href="styles/motion.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -99,14 +101,35 @@ render_with_liquid: false
   </div>
 
   <!-- ============ HERO ============ -->
-  <header class="hero">
+  <header class="hero hero-v2">
     <div class="container">
-      <div class="hero-inner">
-        <h1>Your nutrition companion.</h1>
-        <p class="lead">Nishi connects what's in your kitchen, what your wearables say, and how you actually feel. It helps you eat well, quietly, every day.</p>
-        <div class="hero-cta">
-          <a href="signup.html" class="btn btn-primary">Get started</a>
-          <a href="#demo" class="btn-text">Watch the demo <span class="chev">⌄</span></a>
+      <div class="hero-grid">
+        <div class="hero-copy reveal">
+          <h1>Your nutrition companion.</h1>
+          <p class="lead">Nishi connects what's in your kitchen, what your wearables say, and how you actually feel. It helps you eat well, quietly, every day.</p>
+          <div class="hero-cta">
+            <a href="signup.html" class="btn btn-primary">Get started</a>
+            <a href="#demo" class="btn-text">Watch the demo <span class="chev">⌄</span></a>
+          </div>
+          <div class="hero-trust" style="justify-content:flex-start">
+            <span>Apple Health</span><span class="dot"></span>
+            <span>Health Connect</span><span class="dot"></span>
+            <span>Private by design</span>
+          </div>
+        </div>
+
+        <div class="hero-photo">
+          <div class="photo-frame kenburns" style="height:100%">
+            <img class="kb" src="assets/lifestyle/smoothie-watch.jpg" alt="Woman with a smoothie bowl, a smartwatch on her wrist">
+          </div>
+          <div class="float-card a">
+            <div class="fc-head"><span class="dot">◆</span> Nishi noticed</div>
+            <div class="fc-body">You slept <em>7h 12m</em> and recovery's up. Good morning to hit protein early.</div>
+          </div>
+          <div class="float-card b" style="top:auto; bottom:84px; right:-24px;">
+            <div class="fc-head"><span class="dot">★</span> Habit win</div>
+            <div class="fc-body"><em><span class="count" data-count="4" data-suffix=" days">0 days</span></em> hitting your protein target. Highest streak yet.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -125,7 +148,7 @@ render_with_liquid: false
     </div>
   </header>
 
-  <!-- ============ THREE STREAMS (Venn) ============ -->
+  <!-- ============ THREE STREAMS + CODED VENN ============ -->
   <section class="section section-warm">
     <div class="container">
       <div class="section-header reveal">
@@ -134,21 +157,45 @@ render_with_liquid: false
         <p class="lead">Nishi reads your kitchen, your wearables, and how you feel. It connects them so nothing falls through the cracks.</p>
       </div>
 
-      <img class="venn-img reveal" src="assets/nishi_venn.png" alt="Three input streams (food and groceries, wearables, and goals plus how you feel) converging on Nishi at the center.">
+      <!-- coded, animatable Venn -->
+      <div class="venn-live" role="img" aria-label="Food and groceries, wearables, and goals plus how you feel converge on Nishi.">
+        <div class="venn-discs">
+          <span class="disc d-wear"></span>
+          <span class="disc d-food"></span>
+          <span class="disc d-feel"></span>
+        </div>
+        <img class="venn-core" src="assets/nishi_wordmark.png" alt="Nishi">
 
-      <div class="streams">
-        <div class="stream-col food reveal">
-          <div class="swatch"></div>
+        <div class="venn-lbl l-wear">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#E26A3C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="7" width="12" height="10" rx="3"/><path d="M9 7l1-3h4l1 3M9 17l1 3h4l1-3"/><path d="M12 10.5l1.2 1.2L15 10"/></svg>
+          <strong>Wearables</strong>
+          <span>Activity · Sleep · Heart rate<br>Steps · Body metrics</span>
+        </div>
+        <div class="venn-lbl l-food">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#4E9A4E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16l-1.5 9.5a2 2 0 0 1-2 1.5H7.5a2 2 0 0 1-2-1.5L4 9z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>
+          <strong>Food &amp; Groceries</strong>
+          <span>Meals · Ingredients<br>Nutrition · Preferences</span>
+        </div>
+        <div class="venn-lbl l-feel">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#2F86C4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>
+          <strong>Goals &amp; How You Feel</strong>
+          <span>Protein · Weight · A1C<br>Symptoms · Energy · Mood<br>Meds · Labs · Notes</span>
+        </div>
+      </div>
+
+      <div class="streams streams-v2 stagger">
+        <div class="stream-col food">
+          <div class="stream-photo"><img src="assets/lifestyle/salmon-bowl.jpg" alt="A balanced meal with a Nishi insight card"><span class="tag"><span class="sw" style="background:#6BA572"></span> Food &amp; Groceries</span></div>
           <h3>Food &amp; Groceries</h3>
           <p>Nishi knows what's in your kitchen, what you've been eating, and what you want to cook. Track by voice, by photo, or by scanning your grocery receipt.</p>
         </div>
-        <div class="stream-col wearables reveal">
-          <div class="swatch"></div>
+        <div class="stream-col wearables">
+          <div class="stream-photo"><img src="assets/lifestyle/man-check-watch.jpg" alt="Man glancing at his smartwatch"><span class="tag"><span class="sw" style="background:#E36C3F"></span> Wearables</span></div>
           <h3>Wearables</h3>
           <p>Connect your watch, your CGM, your sleep tracker. Activity, sleep, heart rate. Nishi reads them and uses them to shape what you eat and when.</p>
         </div>
-        <div class="stream-col feel reveal">
-          <div class="swatch"></div>
+        <div class="stream-col feel">
+          <div class="stream-photo"><img src="assets/lifestyle/older-couch.jpg" alt="Woman relaxed on the couch with a warm drink"><span class="tag"><span class="sw" style="background:#4A9DD8"></span> Goals &amp; How You Feel</span></div>
           <h3>Goals &amp; How You Feel</h3>
           <p>Tell Nishi what matters: protein, A1C, weight, energy. And how you feel: nausea, mood, ease. Share medications and labs when you want.</p>
         </div>
@@ -156,53 +203,29 @@ render_with_liquid: false
     </div>
   </section>
 
-  <!-- ============ PULL QUOTE: observation-first ============ -->
-  <section class="section section-tight">
+  <!-- ============ FULL-BLEED PARALLAX BAND ============ -->
+  <section class="photo-band">
+    <img class="bg" data-parallax="55" src="assets/lifestyle/couple-couch.jpg" alt="Two people looking at the Nishi app together">
     <div class="container">
-      <blockquote class="reveal" style="max-width: 820px; margin: 0 auto; text-align: center; font-family: var(--font-serif); font-size: clamp(28px, 3.5vw, 40px); font-weight: 500; line-height: 1.25; letter-spacing: -0.4px; color: var(--text);">
-        <span style="display: block; font-size: 12px; font-family: var(--font-sans); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 20px;">The difference</span>
-        Most AI tools open with a blank prompt.<br>
-        <span style="color: var(--accent-dark);">Nishi opens with something it noticed.</span>
-      </blockquote>
+      <div class="band-copy reveal">
+        <span class="eyebrow-text">The difference</span>
+        <h2 style="font-size:clamp(28px,3.5vw,44px); line-height:1.2; letter-spacing:-.4px; margin:14px 0 0;">Most AI tools open with a blank prompt. Nishi opens with something it noticed.</h2>
+      </div>
     </div>
   </section>
 
-  <!-- ============ WHAT CHANGES (Sarah's beats) ============ -->
+  <!-- ============ PROOF TRIO ============ -->
   <section class="section">
     <div class="container">
       <div class="section-header reveal">
         <span class="eyebrow-text">What changes when Nishi notices</span>
         <h2>It notices. Then it helps.</h2>
-        <p class="lead">Three moments from a real day, with Nishi closing the loop from observation to action.</p>
+        <p class="lead">Real moments, with Nishi closing the loop from observation to action.</p>
       </div>
-
-      <div class="cards-grid">
-        <article class="obs-card win reveal">
-          <span class="eyebrow-text sage">★ Habit win</span>
-          <p class="obs-text">You hit your protein target <em>4 days running</em>. Highest streak yet.</p>
-          <div class="obs-actions">
-            <span class="chip primary">Plan tomorrow</span>
-            <span class="chip">See the days</span>
-          </div>
-        </article>
-
-        <article class="obs-card hero reveal">
-          <span class="eyebrow-text">Nishi noticed</span>
-          <p class="obs-text">Protein so far: <em>28g</em>. You usually feel best when you hit 60g by 3pm.</p>
-          <div class="obs-actions">
-            <span class="chip primary">Suggest a snack</span>
-            <span class="chip">Show what I have</span>
-          </div>
-        </article>
-
-        <article class="obs-card hero reveal">
-          <span class="eyebrow-text">Nishi noticed</span>
-          <p class="obs-text">You bought salmon Sunday. Broccoli is already in the fridge. <em>Dinner is mostly here.</em></p>
-          <div class="obs-actions">
-            <span class="chip primary">Plan around it</span>
-            <span class="chip">Show recipe</span>
-          </div>
-        </article>
+      <div class="proof-grid stagger">
+        <figure><div class="photo-frame"><img src="assets/lifestyle/phone-recovery.jpg" alt="Checking today's recovery in the Nishi app"></div><figcaption>A glance tells you what kind of day to plan.</figcaption></figure>
+        <figure><div class="photo-frame"><img src="assets/lifestyle/woman-salad.jpg" alt="Woman enjoying a fresh meal"></div><figcaption>Eat well, without counting every gram.</figcaption></figure>
+        <figure><div class="photo-frame"><img src="assets/lifestyle/woman-lacing.jpg" alt="Woman lacing up to get moving"></div><figcaption>Nishi nudges when the moment's right.</figcaption></figure>
       </div>
     </div>
   </section>
@@ -215,18 +238,18 @@ render_with_liquid: false
         <h2>Built for smaller portions, changing hunger, and protein that has to do more.</h2>
         <p class="lead">Calorie counting and "eat less of everything" were not built for this. Nishi is.</p>
       </div>
-
-      <div class="story-mock reveal" style="margin: 0 auto; max-width: 540px;">
-        <div class="premium-tag">Premium</div>
-        <span class="eyebrow-text">For your next visit</span>
-        <h3>Doctor visit summary</h3>
-        <div class="meta">Week 12 · Dr. Chen · endocrinology</div>
-        <div class="body">
-          Wegovy 1.0 mg. Weight down <em>12.3 lbs</em>. A1C trending <em>6.4 → 5.9</em>. Average daily protein 88g, fiber 21g. Mild nausea twice this week, no missed meals.
-        </div>
-        <div class="share-pill">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="17"/></svg>
-          Share with Dr. Chen
+      <div class="glp-grid reveal">
+        <div class="photo-frame"><img src="assets/lifestyle/silver-hair.jpg" alt="Woman enjoying the outdoors, comfortable and at ease"></div>
+        <div class="story-mock" style="margin:0;">
+          <div class="premium-tag">Premium</div>
+          <span class="eyebrow-text">For your next visit</span>
+          <h3>Visit summary</h3>
+          <div class="meta">Week 12 · endocrinology</div>
+          <div class="body">Wegovy 1.0 mg. Weight down <em><span class="count" data-count="12.3" data-suffix=" lbs">0 lbs</span></em>. A1C trending <em>6.4 → 5.9</em>. Average daily protein <em><span class="count" data-count="88" data-suffix="g">0g</span></em>, fiber 21g. Mild nausea twice this week, no missed meals.</div>
+          <div class="share-pill">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="17"/></svg>
+            Share with your clinician
+          </div>
         </div>
       </div>
 
@@ -244,7 +267,8 @@ render_with_liquid: false
   </div>
 
   <!-- ============ CLOSING CTA ============ -->
-  <section class="closing-cta">
+  <section class="closing-cta closing-v2">
+    <img class="bg" data-parallax="45" src="assets/lifestyle/hiking.jpg" alt="Woman out on a hike">
     <div class="container">
       <h2 class="reveal">Start with one thing.</h2>
       <p class="reveal">Free to try. No card needed. Cancel any premium plan anytime.</p>
@@ -293,5 +317,6 @@ render_with_liquid: false
   </footer>
 
   <script src="scripts/main.js"></script>
+  <script src="scripts/motion.js"></script>
 </body>
 </html>
