@@ -26,6 +26,8 @@ render_with_liquid: false
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/render.css">
+  <link rel="stylesheet" href="styles/motion.css">
 </head>
 <body>
 
@@ -80,18 +82,18 @@ render_with_liquid: false
         <p class="lead">Onboarding is three screens, about 45 seconds. We don't ask anything we can pull from Apple Health or your account.</p>
       </div>
 
-      <div class="cards-grid" style="max-width: 980px;">
-        <article class="obs-card reveal">
+      <div class="cards-grid stagger" style="max-width: 980px;">
+        <article class="obs-card">
           <span class="eyebrow-text muted">Screen 1</span>
           <h3 style="font-size: 18px; margin: 6px 0 10px;">Hello</h3>
           <p style="font-size: 14px; line-height: 1.55; color: var(--text-soft);">Brand, one CTA. No swipeable feature carousel. No fake value props before you've felt anything.</p>
         </article>
-        <article class="obs-card reveal">
+        <article class="obs-card">
           <span class="eyebrow-text muted">Screen 2</span>
           <h3 style="font-size: 18px; margin: 6px 0 10px;">Apple Health</h3>
           <p style="font-size: 14px; line-height: 1.55; color: var(--text-soft);">One permission unlocks weeks of biometric history, your date of birth, and biological sex. Skippable, but most people say yes.</p>
         </article>
-        <article class="obs-card reveal">
+        <article class="obs-card">
           <span class="eyebrow-text muted">Screen 3</span>
           <h3 style="font-size: 18px; margin: 6px 0 10px;">Sign in</h3>
           <p style="font-size: 14px; line-height: 1.55; color: var(--text-soft);">Apple, Google, or email. Name and email come from there. No password to create.</p>
@@ -215,21 +217,24 @@ render_with_liquid: false
         <p class="lead">Every week Nishi pulls together your protein, your weight trend, your symptoms, your medication context. One tap to share with your doctor.</p>
       </div>
 
-      <div class="story-mock reveal" style="margin: 0 auto; max-width: 540px;">
-        <div class="premium-tag">Premium</div>
-        <span class="eyebrow-text">For your next visit</span>
-        <h3>Doctor visit summary</h3>
-        <div class="meta">Week 12 · Dr. Chen · endocrinology</div>
-        <div class="body">
-          Wegovy 1.0 mg. Weight down <em>12.3 lbs</em>. A1C trending <em>6.4 → 5.9</em>. Average daily protein 88g, fiber 21g. Mild nausea twice this week, no missed meals.
+      <div class="glp-grid reveal">
+        <div class="photo-frame"><img src="assets/lifestyle/coffee-woman.jpg" alt="Person reviewing their week over a coffee"></div>
+        <div class="story-mock" style="margin: 0;">
+          <div class="premium-tag">Premium</div>
+          <span class="eyebrow-text">For your next visit</span>
+          <h3>Visit summary</h3>
+          <div class="meta">Week 12 · endocrinology</div>
+          <div class="body">
+            Wegovy 1.0 mg. Weight down <em>12.3 lbs</em>. A1C trending <em>6.4 → 5.9</em>. Average daily protein 88g, fiber 21g. Mild nausea twice this week, no missed meals.
+          </div>
+          <div class="share-pill">Share with your clinician</div>
         </div>
-        <div class="share-pill">Share with Dr. Chen</div>
       </div>
     </div>
   </section>
 
   <!-- ============ CLOSING CTA ============ -->
-  <section class="closing-cta">
+  <section class="closing-cta closing-v2 solid">
     <div class="container">
       <h2 class="reveal">Try Nishi free for 7 days.</h2>
       <p class="reveal">No card needed. Free tier never expires.</p>
@@ -277,5 +282,6 @@ render_with_liquid: false
   </footer>
 
   <script src="scripts/main.js"></script>
+  <script src="scripts/motion.js"></script>
 </body>
 </html>

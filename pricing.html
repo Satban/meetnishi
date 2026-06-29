@@ -26,12 +26,14 @@ render_with_liquid: false
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/render.css">
+  <link rel="stylesheet" href="styles/motion.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": "Nishi Premium",
-    "description": "Nishi Premium unlocks unlimited daily observations, multi-day pattern recognition, CGM integration, receipt-scan pantry, the full voice agent, and a shareable doctor visit summary.",
+    "description": "Nishi Premium unlocks unlimited daily observations, multi-day pattern recognition, CGM integration, receipt-scan pantry, the full voice agent, and a shareable visit summary.",
     "brand": { "@type": "Brand", "name": "Nishi" },
     "offers": [
       { "@type": "Offer", "name": "Monthly", "price": "9.99", "priceCurrency": "USD", "url": "https://meetnishi.com/pricing.html", "availability": "https://schema.org/InStock" },
@@ -128,15 +130,18 @@ render_with_liquid: false
         <p class="lead">The Story tab is one of the things Premium unlocks. Print it, share it, walk into your endocrinologist's office with an answer.</p>
       </div>
 
-      <div class="story-mock reveal" style="margin: 0 auto; max-width: 540px;">
-        <div class="premium-tag">Premium</div>
-        <span class="eyebrow-text">For your next visit</span>
-        <h3>Doctor visit summary</h3>
-        <div class="meta">Week 12 · Dr. Chen · endocrinology</div>
-        <div class="body">
-          Wegovy 1.0 mg. Weight down <em>12.3 lbs</em>. A1C trending <em>6.4 → 5.9</em>. Average daily protein 88g, fiber 21g. Mild nausea twice this week, no missed meals.
+      <div class="glp-grid reveal">
+        <div class="photo-frame"><img src="assets/lifestyle/man-table-phone.jpg" alt="Person reviewing their summary on their phone"></div>
+        <div class="story-mock" style="margin: 0;">
+          <div class="premium-tag">Premium</div>
+          <span class="eyebrow-text">For your next visit</span>
+          <h3>Visit summary</h3>
+          <div class="meta">Week 12 · endocrinology</div>
+          <div class="body">
+            Wegovy 1.0 mg. Weight down <em>12.3 lbs</em>. A1C trending <em>6.4 → 5.9</em>. Average daily protein 88g, fiber 21g. Mild nausea twice this week, no missed meals.
+          </div>
+          <div class="share-pill">Share with your clinician</div>
         </div>
-        <div class="share-pill">Share with Dr. Chen</div>
       </div>
     </div>
   </section>
@@ -205,7 +210,7 @@ render_with_liquid: false
               <td class="cell-yes">Full</td>
             </tr>
             <tr>
-              <td class="row-head">Doctor visit summary (PDF)</td>
+              <td class="row-head">Visit summary (PDF)</td>
               <td class="cell-no">Not included</td>
               <td class="cell-yes">Included</td>
             </tr>
@@ -291,7 +296,7 @@ render_with_liquid: false
     </div>
   </section>
 
-  <section class="closing-cta sage">
+  <section class="closing-cta closing-v2 solid">
     <div class="container">
       <h2 class="reveal">Start with one thing.</h2>
       <p class="reveal">7 days of Premium, free. No card.</p>
@@ -343,5 +348,6 @@ render_with_liquid: false
   <script src="scripts/auth.js"></script>
   <script src="scripts/checkout.js"></script>
   <script src="scripts/main.js"></script>
+  <script src="scripts/motion.js"></script>
 </body>
 </html>

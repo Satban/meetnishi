@@ -141,3 +141,8 @@ body { overflow-x: hidden; }
 .closing-v2 h2 { color: #fff; }
 .closing-v2 p { color: rgba(255,255,255,.92); }
 .closing-v2 .btn-primary { background: #fff; color: var(--accent-dark); }
+
+/* ---------- solid bands (no photo) — clean deep-green editorial blocks ---------- */
+.photo-band.solid { background: linear-gradient(160deg, #33503F 0%, #223A2D 100%); min-height: 380px; }
+.photo-band.solid::before { display: none; }
+.closing-v2.solid::before { background: linear-gradient(160deg, #33503F 0%, #223A2D 100%); }

@@ -26,6 +26,8 @@ render_with_liquid: false
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/render.css">
+  <link rel="stylesheet" href="styles/motion.css">
 </head>
 <body>
 
@@ -103,6 +105,16 @@ render_with_liquid: false
     </div>
   </section>
 
+  <!-- ============ PULL-QUOTE BAND ============ -->
+  <section class="photo-band solid">
+    <div class="container">
+      <div class="band-copy reveal">
+        <span class="eyebrow-text">Why it exists</span>
+        <h2 style="font-size:clamp(28px,3.5vw,44px); line-height:1.2; letter-spacing:-.4px; margin:14px 0 0;">The wedge is GLP-1. The companion is for everyone trying to notice what their body has been telling them all along.</h2>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ ADVISORY BOARD (placeholder) ============ -->
   <section class="section section-warm">
     <div class="container">
@@ -129,16 +141,16 @@ render_with_liquid: false
         <h2>Built with care, not claims.</h2>
       </div>
 
-      <div class="cards-grid">
-        <article class="obs-card reveal">
+      <div class="cards-grid stagger">
+        <article class="obs-card">
           <span class="eyebrow-text">Wellness, not medical</span>
           <p class="obs-text" style="font-size: 16px;">Nishi is a wellness companion, not a medical service. We don't diagnose, prescribe, or replace your doctor.</p>
         </article>
-        <article class="obs-card reveal">
+        <article class="obs-card">
           <span class="eyebrow-text">Your data is yours</span>
           <p class="obs-text" style="font-size: 16px;">Your individual data is never sold. We don't have advertising relationships with healthcare companies.</p>
         </article>
-        <article class="obs-card reveal">
+        <article class="obs-card">
           <span class="eyebrow-text">Calm tech</span>
           <p class="obs-text" style="font-size: 16px;">No nag, no shame, no manipulation. Nishi shows up when she has something useful to say.</p>
         </article>
@@ -146,7 +158,7 @@ render_with_liquid: false
     </div>
   </section>
 
-  <section class="closing-cta">
+  <section class="closing-cta closing-v2 solid">
     <div class="container">
       <h2 class="reveal">Start with one thing.</h2>
       <p class="reveal">7 days of Premium, free. No card.</p>
@@ -194,5 +206,6 @@ render_with_liquid: false
   </footer>
 
   <script src="scripts/main.js"></script>
+  <script src="scripts/motion.js"></script>
 </body>
 </html>

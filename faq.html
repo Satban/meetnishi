@@ -26,6 +26,8 @@ render_with_liquid: false
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/render.css">
+  <link rel="stylesheet" href="styles/motion.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -33,7 +35,7 @@ render_with_liquid: false
     "mainEntity": [
       { "@type": "Question", "name": "What is Nishi?", "acceptedAnswer": { "@type": "Answer", "text": "Nishi is a nutrition companion for metabolic health and mindful nutrition, including life on GLP-1. It notices patterns across what's in your kitchen, what your wearables are saying, and how you feel, then helps you act on what it sees." } },
       { "@type": "Question", "name": "What is Nishi not?", "acceptedAnswer": { "@type": "Answer", "text": "Not a calorie tracker. Not a meal logging app. Not a generic AI chatbot. Not a weight-loss app. Not a medical device. If you want any of those, there are better options." } },
-      { "@type": "Question", "name": "Do I need a GLP-1 prescription to use Nishi?", "acceptedAnswer": { "@type": "Answer", "text": "No. Nishi is built for the GLP-1 reality, but the work is the same whether you're on a GLP-1, navigating pre-diabetes, focused on metabolic health, working on longevity, or just trying to eat better. The Premium features around CGM integration, doctor visit summaries, and medication-aware suggestions are most useful to people on GLP-1, but everyone benefits from the observation loop." } },
+      { "@type": "Question", "name": "Do I need a GLP-1 prescription to use Nishi?", "acceptedAnswer": { "@type": "Answer", "text": "No. Nishi is built for the GLP-1 reality, but the work is the same whether you're on a GLP-1, navigating pre-diabetes, focused on metabolic health, working on longevity, or just trying to eat better. The Premium features around CGM integration, visit summaries, and medication-aware suggestions are most useful to people on GLP-1, but everyone benefits from the observation loop." } },
       { "@type": "Question", "name": "What does observation-first mean?", "acceptedAnswer": { "@type": "Answer", "text": "Most AI tools open with a blank prompt. Nishi opens with something it noticed about you. The home surface is a feed of observations: patterns Nishi found across your food, biometrics, and how you've been feeling. The chat is there when you want to ask, not as the main entry point." } },
       { "@type": "Question", "name": "How is this different from Noom?", "acceptedAnswer": { "@type": "Answer", "text": "Noom is a behavior-change program with daily lessons and human coaches. Nishi is an interpretation layer. It notices patterns and helps you act. Different jobs." } },
       { "@type": "Question", "name": "How is this different from MyFitnessPal?", "acceptedAnswer": { "@type": "Answer", "text": "MyFitnessPal is a food log. Logging is the cost; the value is supposed to be the insight. Nishi flips it. Observations are the value, and we keep logging optional and minimal." } },
@@ -52,7 +54,7 @@ render_with_liquid: false
       { "@type": "Question", "name": "Does the voice agent work offline?", "acceptedAnswer": { "@type": "Answer", "text": "No. Voice runs through Nishi's cloud-side AI service. It works wherever you have a connection." } },
       { "@type": "Question", "name": "Is Nishi a medical service?", "acceptedAnswer": { "@type": "Answer", "text": "No. Nishi is a wellness companion. We don't diagnose, prescribe, or replace your doctor or dietitian." } },
       { "@type": "Question", "name": "Can Nishi advise on medication dosing?", "acceptedAnswer": { "@type": "Answer", "text": "No. Anything dose-related, side-effect related, or symptomatic gets routed to your prescribing clinician. Nishi is explicit about this." } },
-      { "@type": "Question", "name": "Can I share my doctor visit summary with my doctor?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Story tab generates a clean PDF you can print or share. It's designed to make the visit easier: clearer patterns, less guesswork, and a summary you can bring with you." } },
+      { "@type": "Question", "name": "Can I share my visit summary with my clinician?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Story tab generates a clean PDF you can print or share. It's designed to make the visit easier: clearer patterns, less guesswork, and a summary you can bring with you." } },
       { "@type": "Question", "name": "Why don't you ask for my age and gender?", "acceptedAnswer": { "@type": "Answer", "text": "We pull date of birth and biological sex from Apple Health (or Google Health Connect) if you've shared them there. If you haven't, Nishi asks later in chat, when she actually needs to know." } },
       { "@type": "Question", "name": "Can I have a family or household account?", "acceptedAnswer": { "@type": "Answer", "text": "Not yet. Multi-user households are on the post-launch roadmap." } },
       { "@type": "Question", "name": "What if I forget my password?", "acceptedAnswer": { "@type": "Answer", "text": "We don't use passwords. Sign in with Apple or Google." } }
@@ -120,7 +122,7 @@ render_with_liquid: false
         </details>
         <details class="faq-item">
           <summary>Do I need a GLP-1 prescription to use Nishi?</summary>
-          <p class="faq-answer">No. Nishi is built for the GLP-1 reality, but the work is the same whether you're on a GLP-1, navigating pre-diabetes, focused on metabolic health, working on longevity, or just trying to eat better. The Premium features around CGM integration, doctor visit summaries, and medication-aware suggestions are most useful to people on GLP-1, but everyone benefits from the observation loop.</p>
+          <p class="faq-answer">No. Nishi is built for the GLP-1 reality, but the work is the same whether you're on a GLP-1, navigating pre-diabetes, focused on metabolic health, working on longevity, or just trying to eat better. The Premium features around CGM integration, visit summaries, and medication-aware suggestions are most useful to people on GLP-1, but everyone benefits from the observation loop.</p>
         </details>
         <details class="faq-item">
           <summary>What does "observation-first" mean?</summary>
@@ -215,7 +217,7 @@ render_with_liquid: false
           <p class="faq-answer">No. Anything dose-related, side-effect related, or symptomatic gets routed to your prescribing clinician. Nishi is explicit about this.</p>
         </details>
         <details class="faq-item">
-          <summary>Can I share my doctor visit summary with my doctor?</summary>
+          <summary>Can I share my visit summary with my clinician?</summary>
           <p class="faq-answer">Yes. The Story tab generates a clean PDF you can print or share. It's designed to make the visit easier: clearer patterns, less guesswork, and a summary you can bring with you.</p>
         </details>
       </div>
@@ -240,7 +242,7 @@ render_with_liquid: false
     </div>
   </section>
 
-  <section class="closing-cta">
+  <section class="closing-cta closing-v2 solid">
     <div class="container">
       <h2 class="reveal">Try Nishi free for 7 days.</h2>
       <p class="reveal">No card needed. Free tier never expires.</p>
@@ -288,5 +290,6 @@ render_with_liquid: false
   </footer>
 
   <script src="scripts/main.js"></script>
+  <script src="scripts/motion.js"></script>
 </body>
 </html>
