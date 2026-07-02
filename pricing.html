@@ -28,6 +28,13 @@ render_with_liquid: false
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/render.css">
   <link rel="stylesheet" href="styles/motion.css">
+  <style>
+    .cur-toggle { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin: 0 auto var(--space-sm); }
+    .cur-btn { font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--text-soft); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 6px 15px; cursor: pointer; transition: all var(--duration-fast) var(--ease); }
+    .cur-btn:hover { border-color: var(--border-strong); }
+    .cur-btn.is-active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    #regionNote { display: inline-block; margin-top: 4px; color: var(--text-muted); }
+  </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -102,22 +109,28 @@ render_with_liquid: false
     </div>
 
     <div class="container mt-lg">
+      <div class="cur-toggle" role="group" aria-label="Choose your region">
+        <button type="button" class="cur-btn is-active" data-region="US">US</button>
+        <button type="button" class="cur-btn" data-region="UK">UK</button>
+        <button type="button" class="cur-btn" data-region="AU">AU</button>
+        <button type="button" class="cur-btn" data-region="NZ">NZ</button>
+      </div>
       <div class="plan-card reveal">
         <div class="plan-head">
           <div class="plan-label">Annual</div>
-          <span class="save-pill">Save 63%</span>
+          <span class="save-pill" id="savePill">Save 63%</span>
         </div>
         <div class="plan-price-row">
-          <span class="plan-price">$39.99</span>
-          <span class="plan-per">/ year · ~$3.33/mo</span>
+          <span class="plan-price" id="planPrice">$39.99</span>
+          <span class="plan-per" id="planPer">/ year · ~$3.33/mo</span>
         </div>
-        <div class="plan-strike">~$107.88 if paid monthly</div>
+        <div class="plan-strike" id="planStrike">~$107.88 if paid monthly</div>
         <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" class="btn btn-primary btn-block" target="_blank" rel="noopener">Start your free trial</a>
         <div class="plan-monthly-link">
-          <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" target="_blank" rel="noopener">Or monthly, $8.99/mo, no commitment</a>
+          <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" target="_blank" rel="noopener" id="monthlyLink">Or monthly, $8.99/mo, no commitment</a>
         </div>
       </div>
-      <p class="plan-trust">Cancel anytime in Settings. No charge if you cancel before day 7.</p>
+      <p class="plan-trust">Cancel anytime in Settings. No charge if you cancel before day 7.<br><span id="regionNote">Prices shown in USD. Billed in your local currency by the App Store or Google Play.</span></p>
     </div>
   </header>
 
@@ -217,17 +230,17 @@ render_with_liquid: false
             <tr>
               <td class="row-head">Community signal (cohort comparison)</td>
               <td class="cell-no">Not included</td>
-              <td class="cell-yes">Included</td>
+              <td class="cell-detail">Coming soon</td>
             </tr>
             <tr>
               <td class="row-head">Memory depth (pattern recognition)</td>
               <td class="cell-detail">30-day window</td>
-              <td class="cell-yes">12-month rolling</td>
+              <td class="cell-detail">Coming soon</td>
             </tr>
             <tr>
               <td class="row-head">Grocery list → Instacart automation</td>
               <td class="cell-no">Not included</td>
-              <td class="cell-yes">Included</td>
+              <td class="cell-detail">Coming soon</td>
             </tr>
             <tr>
               <td class="row-head">Proactive observations and nudges</td>
@@ -349,5 +362,49 @@ render_with_liquid: false
   <script src="scripts/checkout.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/motion.js"></script>
+  <script>
+    // Region-aware pricing display. Store still charges the local price; this is indicative.
+    (function () {
+      var P = {
+        US: { cur: '$',   an: '39.99', mo: '8.99',  per: '3.33', strike: '107.88', save: 63, note: 'Prices shown in USD.' },
+        UK: { cur: '£',   an: '29.99', mo: '7.99',  per: '2.50', strike: '95.88',  save: 69, note: 'Prices shown in GBP.' },
+        AU: { cur: 'A$',  an: '59.99', mo: '14.99', per: '5.00', strike: '179.88', save: 67, note: 'Prices shown in AUD.' },
+        NZ: { cur: 'NZ$', an: '64.99', mo: '14.99', per: '5.42', strike: '179.88', save: 64, note: 'Prices shown in NZD.' }
+      };
+      var TAIL = ' Billed in your local currency by the App Store or Google Play.';
+      function el(id) { return document.getElementById(id); }
+      function apply(r) {
+        var p = P[r] || P.US;
+        if (el('planPrice'))  el('planPrice').textContent  = p.cur + p.an;
+        if (el('planPer'))    el('planPer').textContent    = '/ year · ~' + p.cur + p.per + '/mo';
+        if (el('planStrike')) el('planStrike').textContent = '~' + p.cur + p.strike + ' if paid monthly';
+        if (el('savePill'))   el('savePill').textContent   = 'Save ' + p.save + '%';
+        if (el('monthlyLink'))el('monthlyLink').textContent= 'Or monthly, ' + p.cur + p.mo + '/mo, no commitment';
+        if (el('regionNote')) el('regionNote').textContent = p.note + TAIL;
+        var b = document.querySelectorAll('.cur-btn');
+        for (var i = 0; i < b.length; i++) b[i].classList.toggle('is-active', b[i].getAttribute('data-region') === r);
+      }
+      function setRegion(r, persist) {
+        if (!P[r]) r = 'US';
+        apply(r);
+        if (persist) { try { localStorage.setItem('nishi_region', r); } catch (e) {} }
+      }
+      var btns = document.querySelectorAll('.cur-btn');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener('click', function () { setRegion(this.getAttribute('data-region'), true); });
+      }
+      var saved = null; try { saved = localStorage.getItem('nishi_region'); } catch (e) {}
+      if (saved && P[saved]) { setRegion(saved, false); return; }
+      setRegion('US', false); // default while detecting
+      fetch('https://get.geojs.io/v1/ip/country.json')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var c = ((d && d.country) || '').toUpperCase();
+          var map = { US: 'US', GB: 'UK', AU: 'AU', NZ: 'NZ' };
+          if (map[c]) setRegion(map[c], false);
+        })
+        .catch(function () {});
+    })();
+  </script>
 </body>
 </html>
