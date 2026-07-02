@@ -228,8 +228,8 @@
           const pid = (sub?.product_identifier || '').toLowerCase();
           document.getElementById('sub-plan-row').style.display = '';
           document.getElementById('sub-plan').textContent = /annual|year|yr/.test(pid)
-            ? 'Annual ($79.99/yr)'
-            : (pid ? 'Monthly ($9.99/mo)' : 'Premium');
+            ? 'Annual ($39.99/yr)'
+            : (pid ? 'Monthly ($8.99/mo)' : 'Premium');
         }
 
         // Expiry: own sub uses expires_date; promo uses promo_premium_until
