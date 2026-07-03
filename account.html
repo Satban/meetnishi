@@ -181,6 +181,11 @@
         // so a code redeemed on the web activates the moment this page loads.
         try { await window.NishiAuth.claimEmailGrants(session); } catch (_) {}
 
+        // Finish an identity-based redemption deferred through sign-in: a
+        // signed-out user who clicked a redeem link is sent through OAuth and
+        // lands here; bind the stashed code to their account now.
+        try { await window.NishiAuth.redeemPendingCode(session); } catch (_) {}
+
         // Authoritative check, mirrors the mobile app: get_effective_premium_status
         // covers the user's own subscription AND household-shared premium. The RPC
         // returns a table, so supabase-js gives back an array of rows.

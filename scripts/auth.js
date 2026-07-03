@@ -103,6 +103,41 @@
     }
   }
 
+  // Finish a redemption that was deferred through the sign-in round-trip.
+  //
+  // The redeem page activates codes by identity (redeem_promo_code binds the
+  // code straight to the signed-in user_id — no email, so Apple Hide-My-Email
+  // relay addresses are irrelevant). When a signed-out user clicks a redeem
+  // link, the page stashes the code and sends them through OAuth; they land
+  // back on account.html, where this runs and completes the redemption.
+  //
+  // Idempotent: the code is cleared after one definitive response, and
+  // redeem_promo_code rejects a second redemption by the same user anyway.
+  async function redeemPendingCode(session) {
+    let code = null;
+    try { code = localStorage.getItem('nishi_pending_redeem'); } catch (_) {}
+    if (!code) return null;
+    const s = session || (await getSession());
+    const uid = s?.user?.id;
+    if (!uid) return null;
+    try {
+      const { data, error } = await client.rpc('redeem_promo_code', {
+        p_code: code,
+        p_user_id: uid
+      });
+      if (error) {
+        console.warn('redeem_promo_code error', error);
+        return null;
+      }
+      // Any definitive response (granted, or already-redeemed) resolves intent.
+      try { localStorage.removeItem('nishi_pending_redeem'); } catch (_) {}
+      return data; // { success, duration_months, premium_until } or { success:false, error }
+    } catch (e) {
+      console.warn('redeemPendingCode failed', e);
+      return null;
+    }
+  }
+
   // Fire the claim automatically so it's seamless for users who are already
   // signed in: on page load with an existing session, and on fresh sign-ins.
   // Deduped to one attempt per page load. Pages that display premium status
@@ -127,6 +162,7 @@
     getSession,
     onSession,
     claimEmailGrants,
+    redeemPendingCode,
     signOut
   };
 
