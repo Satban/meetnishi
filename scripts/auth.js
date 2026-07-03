@@ -69,6 +69,56 @@
     window.location.href = '/';
   }
 
+  // Claim any pending email premium grants for the signed-in user.
+  //
+  // Promo codes redeemed on the web only *reserve* premium against an email
+  // (web-redeem creates a pending row in email_premium_grants). Premium
+  // activates when claim_email_grant runs while signed in as that email — it
+  // flips the grant into user_subscriptions.promo_premium_until. The mobile app
+  // does this on every launch; the website did NOT, so anyone who redeemed on
+  // the web and stayed web-only never got activated. This closes that gap.
+  //
+  // Idempotent: the RPC only picks up grants where user_id IS NULL, so calling
+  // it on every session load / refresh is safe and does nothing once claimed.
+  // We pass the session's own email, which equals auth.users.email, so the
+  // function's email-match check always passes for this user.
+  async function claimEmailGrants(session) {
+    try {
+      const s = session || (await getSession());
+      const uid = s?.user?.id;
+      const email = s?.user?.email;
+      if (!uid || !email) return null;
+      const { data, error } = await client.rpc('claim_email_grant', {
+        p_user_id: uid,
+        p_email: email
+      });
+      if (error) {
+        console.warn('claim_email_grant error', error);
+        return null;
+      }
+      return data; // { success, found, grants_claimed, premium_until, ... }
+    } catch (e) {
+      console.warn('claimEmailGrants failed', e);
+      return null;
+    }
+  }
+
+  // Fire the claim automatically so it's seamless for users who are already
+  // signed in: on page load with an existing session, and on fresh sign-ins.
+  // Deduped to one attempt per page load. Pages that display premium status
+  // (account.html) also await claimEmailGrants() directly before reading it, so
+  // the account page reflects a just-claimed grant immediately.
+  let _claimAttempted = false;
+  function autoClaim(session) {
+    if (!session || _claimAttempted) return;
+    _claimAttempted = true;
+    claimEmailGrants(session);
+  }
+  getSession().then(autoClaim);
+  client.auth.onAuthStateChange((event, session) => {
+    if (session) autoClaim(session);
+  });
+
   window.NishiAuth = {
     client,
     signInWithEmail,
@@ -76,6 +126,7 @@
     signInWithApple,
     getSession,
     onSession,
+    claimEmailGrants,
     signOut
   };
 

@@ -177,6 +177,10 @@
         const uid = session?.user?.id;
         if (!uid) return;
 
+        // Claim any pending web-redeemed premium grant before reading status,
+        // so a code redeemed on the web activates the moment this page loads.
+        try { await window.NishiAuth.claimEmailGrants(session); } catch (_) {}
+
         // Authoritative check, mirrors the mobile app: get_effective_premium_status
         // covers the user's own subscription AND household-shared premium. The RPC
         // returns a table, so supabase-js gives back an array of rows.
