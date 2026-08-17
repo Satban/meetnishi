@@ -122,7 +122,7 @@
           <span class="value" id="sub-renews">Not set</span>
         </div>
         <p id="sub-note" style="margin-top: 12px; font-size: 14px; color: var(--text-soft);">
-          Start a 7-day free trial of Premium. No card required.
+          Start a 7-day free trial of Premium. Card required, no charge until day 7.
         </p>
         <div class="account-actions" id="sub-actions">
           <a href="pricing.html" class="btn btn-primary">View pricing</a>
@@ -160,10 +160,29 @@
         try { return new Date(s).toLocaleDateString(); } catch (_) { return 'Not set'; }
       }
 
-      // Subscriptions are purchased in-app (Apple/Google) and synced here by the
-      // RevenueCat webhook. The web reads the same user_subscriptions table the
-      // mobile apps write to. When a Stripe web rail is added later, it writes to
-      // this same table, so this card needs no changes.
+      // Two subscription rails feed this card:
+      //  - In-app (Apple/Google) purchases -> user_subscriptions (RevenueCat webhook) + get_effective_premium_status.
+      //  - Web (Stripe Checkout) purchases  -> subscriptions table (stripe-webhook), read directly below.
+      // The web rail is its own source of truth; loadSubscription() reads both and shows whichever grants premium.
+      // Web (Stripe) subscribers manage/cancel via the Stripe billing portal (self-serve). The edge fn resolves
+      // the caller's OWN Stripe customer by UUID and 404s if there's no web subscription.
+      async function openBillingPortal() {
+        const btn = document.getElementById('manage-web-sub');
+        if (btn) { btn.disabled = true; btn.textContent = 'Opening…'; }
+        try {
+          const session = await window.NishiAuth.getSession();
+          if (!session) { window.location.href = '/signin.html'; return; }
+          const resp = await fetch(window.NISHI_CONFIG.supabaseUrl + '/functions/v1/create-billing-portal-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token, 'apikey': window.NISHI_CONFIG.supabaseAnonKey },
+          });
+          const data = await resp.json();
+          if (resp.ok && data.url) { window.location.href = data.url; return; }
+          alert(data.error || 'Could not open the billing portal. Try again.');
+        } catch (_) { alert('Network error. Please try again.'); }
+        if (btn) { btn.disabled = false; btn.textContent = 'Manage subscription'; }
+      }
+
       function manageLinksHtml() {
         return '<a href="https://apps.apple.com/account/subscriptions" target="_blank" rel="noopener" class="btn btn-ghost">Manage on App Store</a>' +
                '<a href="https://play.google.com/store/account/subscriptions" target="_blank" rel="noopener" class="btn btn-ghost">Manage on Google Play</a>';
@@ -210,20 +229,58 @@
           sub = data;
         } catch (_) {}
 
+        // Web (Stripe) subscription — its OWN source of truth. get_effective_premium_status
+        // covers RevenueCat/household only, so without this a web subscriber shows "Free tier"
+        // here. RLS (select_own) lets the caller read just their own row.
+        //
+        // Mirror the entitlement authority (webhook planSubscriptionGrant): access is granted
+        // until current_period_end for active | trialing | past_due | canceled | paused (dunning,
+        // a period-end cancellation, and a collection pause all keep access through the paid
+        // period), and is gated on that end being in the FUTURE — never on the status label alone.
+        // The webInPeriod check below matches the authority's paused rule exactly: null period end
+        // -> revoke (not shown), future -> grant (shown). unpaid/incomplete get no grant, excluded.
+        let webSub = null;
+        try {
+          const { data } = await client
+            .from('subscriptions')
+            .select('status, plan, current_period_end, cancel_at_period_end, stripe_customer_id')
+            .in('status', ['active', 'trialing', 'past_due', 'canceled', 'paused'])
+            .order('current_period_end', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          webSub = data;
+        } catch (_) {}
+
         const now = Date.now();
         const promoMs = sub?.promo_premium_until ? new Date(sub.promo_premium_until).getTime() : null;
         const promoActive = promoMs !== null && promoMs > now;
         const rpcPremium = !!effective?.is_premium;
         const source = effective?.source || null; // 'self' | 'household' | null
 
-        if (!rpcPremium && !promoActive) {
+        // Access iff one of the granted statuses AND the paid period has not ended — the same
+        // predicate the backend authority uses (effective_until > now), so the page never claims
+        // premium the app would deny, nor denies premium the app grants.
+        const webPeriodEndMs = webSub?.current_period_end ? new Date(webSub.current_period_end).getTime() : null;
+        const webInPeriod = webPeriodEndMs !== null && !Number.isNaN(webPeriodEndMs) && webPeriodEndMs > now;
+        const webActive = !!(webSub && webSub.stripe_customer_id && webInPeriod);
+
+        if (!rpcPremium && !promoActive && !webActive) {
           document.getElementById('sub-status').textContent = 'Free tier';
           return;
         }
 
-        // Status label
+        // Status label. A web (Stripe) subscription is the caller's OWN paid plan, so
+        // it takes precedence over household-shared premium for display.
+        // A canceled sub still inside its paid period, or one set to cancel at period end, is "ending".
+        const webEnding = webActive && (webSub.status === 'canceled' || webSub.cancel_at_period_end);
         let statusLabel = 'Premium · Active';
-        if (source === 'household') {
+        if (webActive) {
+          statusLabel = webSub.status === 'trialing' ? 'Premium · Free trial'
+            : webSub.status === 'past_due' ? 'Premium · Payment due'
+            : webSub.status === 'paused' ? 'Premium · Paused'
+            : webEnding ? 'Premium · Ending'
+            : 'Premium · Active';
+        } else if (source === 'household') {
           statusLabel = effective.household_name
             ? `Premium · via ${effective.household_name}`
             : 'Premium · via household';
@@ -232,8 +289,14 @@
         }
         document.getElementById('sub-status').textContent = statusLabel;
 
-        // Plan label only meaningful for the user's own paid subscription
-        if (source === 'self') {
+        // Plan label — web sub reports its plan directly; own store sub infers from product id.
+        if (webActive) {
+          document.getElementById('sub-plan-row').style.display = '';
+          document.getElementById('sub-plan').textContent =
+            webSub.plan === 'annual' ? 'Annual ($79.99/yr)'
+            : webSub.plan === 'monthly' ? 'Monthly ($9.99/mo)'
+            : 'Premium';
+        } else if (source === 'self') {
           const pid = (sub?.product_identifier || '').toLowerCase();
           document.getElementById('sub-plan-row').style.display = '';
           document.getElementById('sub-plan').textContent = /annual|year|yr/.test(pid)
@@ -241,17 +304,29 @@
             : (pid ? 'Monthly ($9.99/mo)' : 'Premium');
         }
 
-        // Expiry: own sub uses expires_date; promo uses promo_premium_until
-        const expiry = source === 'self' ? sub?.expires_date : (promoActive ? sub?.promo_premium_until : null);
+        // Expiry: web sub uses current_period_end; own store sub uses expires_date; promo uses promo_premium_until
+        const expiry = webActive ? webSub.current_period_end
+          : (source === 'self' ? sub?.expires_date : (promoActive ? sub?.promo_premium_until : null));
         if (expiry) {
           document.getElementById('sub-renews-row').style.display = '';
           document.getElementById('sub-renews-label').textContent =
-            source === 'self' ? 'Renews or expires' : 'Premium until';
+            webActive ? ((webEnding || webSub.status === 'paused') ? 'Access until' : 'Renews')
+            : source === 'self' ? 'Renews or expires' : 'Premium until';
           document.getElementById('sub-renews').textContent = fmtDate(expiry);
         }
 
         // Note + manage links. Household members manage nothing here; the payer does.
-        if (source === 'household') {
+        if (webActive) {
+          // Web (Stripe) subscription -> self-serve via the Stripe billing portal.
+          document.getElementById('sub-note').textContent =
+            webSub.status === 'paused' ? 'Your web subscription is paused — access continues until the date above. Resume it anytime.'
+            : webEnding ? 'Your web subscription is ending — access continues until the date above. Manage or resume it anytime.'
+            : 'Premium is active via your web subscription. Manage the card, view invoices, or cancel anytime.';
+          document.getElementById('sub-actions').innerHTML =
+            '<button type="button" class="btn btn-primary" id="manage-web-sub">Manage subscription</button>';
+          const mb = document.getElementById('manage-web-sub');
+          if (mb) mb.addEventListener('click', openBillingPortal);
+        } else if (source === 'household') {
           document.getElementById('sub-note').textContent =
             'Premium is active through your household.';
           document.getElementById('sub-actions').innerHTML = '';

@@ -7,19 +7,19 @@ render_with_liquid: false
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nishi pricing: free to start, Premium when it's earning its keep</title>
-  <meta name="description" content="Early access pricing. 7-day trial, no card. Cancel anytime. Free tier never expires. $9.99/month or $79.99/year for Premium.">
+  <meta name="description" content="Early access pricing. 7-day free trial, no charge until day 7. Cancel anytime. Free tier never expires. $9.99/month or $79.99/year for Premium.">
   <link rel="canonical" href="https://meetnishi.com/pricing.html">
   <meta property="og:title" content="Nishi pricing">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://meetnishi.com/pricing.html">
-  <meta property="og:description" content="Early access pricing. 7-day trial, no card. Cancel anytime. Free tier never expires. $9.99/month or $79.99/year for Premium.">
+  <meta property="og:description" content="Early access pricing. 7-day free trial, no charge until day 7. Cancel anytime. Free tier never expires. $9.99/month or $79.99/year for Premium.">
   <meta property="og:image" content="https://meetnishi.com/assets/og/pricing.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="Nishi">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Nishi pricing">
-  <meta name="twitter:description" content="Free to start. Premium when it's earning its keep. 7-day trial, no card.">
+  <meta name="twitter:description" content="Free to start. Premium when it's earning its keep. 7-day free trial, no charge until day 7.">
   <meta name="twitter:image" content="https://meetnishi.com/assets/og/pricing.png">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,7 +53,7 @@ render_with_liquid: false
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
-      { "@type": "Question", "name": "Is there really a free trial?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. 7 days of full Premium with no card. After day 7 you fall to the free tier. No surprise charge, no data loss." } },
+      { "@type": "Question", "name": "Is there really a free trial?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. 7 days of full Premium, free. Your card is collected but not charged until day 7, and you can cancel anytime before then. After day 7 you fall to the free tier if you cancel. No surprise charge, no data loss." } },
       { "@type": "Question", "name": "What happens after the trial?", "acceptedAnswer": { "@type": "Answer", "text": "If you do nothing, you keep using Nishi on the free tier. Free includes daily observations, basic chat, and food logging. It never expires. Premium features go quieter; nothing breaks." } },
       { "@type": "Question", "name": "Can I cancel anytime?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Open Settings, tap cancel, you're done. Your free tier continues automatically. No retention call." } },
       { "@type": "Question", "name": "Do you take HSA or FSA?", "acceptedAnswer": { "@type": "Answer", "text": "In a future release we'll surface HSA/FSA receipts via a partner (Truemed or Flex). Until then, your subscription receipt is itemized clearly enough that many users get reimbursed." } },
@@ -104,7 +104,7 @@ render_with_liquid: false
       <div class="hero-inner">
         <span class="eyebrow">Early access</span>
         <h1>Free to start. Premium when it's earning its keep.</h1>
-        <p class="lead">7-day trial, no card. Cancel anytime. Free tier never expires. Join the first users to help shape Nishi.</p>
+        <p class="lead">7-day free trial, no charge until day 7. Cancel anytime. Free tier never expires. Join the first users to help shape Nishi.</p>
       </div>
     </div>
 
@@ -125,12 +125,12 @@ render_with_liquid: false
           <span class="plan-per" id="planPer">/ year · ~$6.67/mo</span>
         </div>
         <div class="plan-strike" id="planStrike">~$119.88 if paid monthly</div>
-        <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" class="btn btn-primary btn-block" target="_blank" rel="noopener">Start your free trial</a>
+        <button type="button" class="btn btn-primary btn-block" data-plan="annual">Start your free trial</button>
         <div class="plan-monthly-link">
-          <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" target="_blank" rel="noopener" id="monthlyLink">Or monthly, $9.99/mo, no commitment</a>
+          <a href="#" id="monthlyLink" data-plan="monthly">Or monthly, $9.99/mo, no commitment</a>
         </div>
       </div>
-      <p class="plan-trust">Cancel anytime in Settings. No charge if you cancel before day 7.<br><span id="regionNote">Prices shown in USD. Billed in your local currency by the App Store or Google Play.</span></p>
+      <p class="plan-trust">7-day free trial. Card required, no charge until day 7. Cancel anytime.<br><span id="regionNote">Prices shown in USD.</span></p>
     </div>
   </header>
 
@@ -253,7 +253,7 @@ render_with_liquid: false
       </div>
 
       <div class="text-center mt-lg">
-        <a href="signup.html" class="btn btn-primary">Start your free trial</a>
+        <button type="button" class="btn btn-primary" data-plan="annual">Start your free trial</button>
       </div>
     </div>
   </section>
@@ -269,7 +269,7 @@ render_with_liquid: false
       <div class="faq-list reveal">
         <details class="faq-item">
           <summary>Is there really a free trial?</summary>
-          <p class="faq-answer">Yes. 7 days of full Premium with no card. After day 7 you fall to the free tier. No surprise charge, no data loss.</p>
+          <p class="faq-answer">Yes. 7 days of full Premium, free. Your card is collected but not charged until day 7, and you can cancel anytime before then. After day 7 you fall to the free tier if you cancel. No surprise charge, no data loss.</p>
         </details>
 
         <details class="faq-item">
@@ -313,7 +313,7 @@ render_with_liquid: false
   <section class="closing-cta closing-v2 solid">
     <div class="container">
       <h2 class="reveal">Start with one thing.</h2>
-      <p class="reveal">7 days of Premium, free. No card.</p>
+      <p class="reveal">7 days of Premium, free. No charge until day 7.</p>
       <a href="signup.html" class="btn btn-primary reveal">Get started</a>
     </div>
   </section>
@@ -377,7 +377,7 @@ render_with_liquid: false
         AU: { cur: 'A$',  an: '59.99', mo: '14.99', per: '5.00', strike: '179.88', save: 67, note: 'Prices shown in AUD.' },
         NZ: { cur: 'NZ$', an: '64.99', mo: '14.99', per: '5.42', strike: '179.88', save: 64, note: 'Prices shown in NZD.' }
       };
-      var TAIL = ' Billed in your local currency by the App Store or Google Play.';
+      var TAIL = '';
       function el(id) { return document.getElementById(id); }
       function apply(r) {
         var p = P[r] || P.US;

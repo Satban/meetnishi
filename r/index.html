@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Nishi</title>
+  <!-- Referred-link landing: /r/?c=<slug>. Records the click server-side (authoritative), stashes the click id
+       in localStorage so it survives the signup detour, then sends the visitor to pricing. Fail-open: if the
+       click can't be recorded we still stash the raw slug so create-referred-checkout can resolve it directly,
+       and if all else fails the visitor just lands on pricing and can type the code. The SERVER enforces the
+       30-day window + eligibility, so nothing here can mint a discount on its own. -->
+  <script src="/scripts/config.js"></script>
+  <style>body{font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;color:#6d6053;text-align:center;margin-top:56px}</style>
+</head>
+<body>
+  <p>Taking you to Nishi…</p>
+  <script>
+    (function () {
+      'use strict';
+      var c = '';
+      try { c = (new URLSearchParams(location.search).get('c') || '').trim(); } catch (_) {}
+      function go() { location.replace('/pricing.html'); }
+      if (!c || !window.NISHI_CONFIG) { return go(); }
+      try { localStorage.setItem('affiliate_ref', c); } catch (_) {}   // fail-open carrier
+      fetch(window.NISHI_CONFIG.supabaseUrl + '/functions/v1/capture-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': window.NISHI_CONFIG.supabaseAnonKey },
+        body: JSON.stringify({ code_or_slug: c })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d && d.recorded && d.click_id) {
+            try { localStorage.setItem('affiliate_click_id', d.click_id); } catch (_) {}
+          }
+        })
+        .catch(function () { /* keep the raw slug already stored */ })
+        .finally(go);
+    })();
+  </script>
+</body>
+</html>
