@@ -9,8 +9,9 @@
 
   // Test-mode price IDs. Update for live mode.
   const PRICE_IDS = {
-    monthly: 'price_1TgTIkJ3pIJt4gNSZljvsQvZ',
-    annual: 'price_1TgTJnJ3pIJt4gNS5UVoIwWy',
+    // LIVE (Mirae Ventures) — $9.99/mo, $79.99/yr
+    monthly: 'price_1U5IHsJUdBt48Nr03GynEwuH',
+    annual: 'price_1U5IFoJUdBt48Nr0pzwYueIH',
   };
 
   function setBusy(el, busy) {

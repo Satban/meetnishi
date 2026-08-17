@@ -360,8 +360,8 @@
           planLabel = 'Premium · Promo';
         } else {
           planLabel = /annual|year|yr/.test(pid)
-            ? 'Annual · $39.99/yr'
-            : (pid ? 'Monthly · $8.99/mo' : 'Premium');
+            ? 'Annual · $79.99/yr'
+            : (pid ? 'Monthly · $9.99/mo' : 'Premium');
         }
 
         const expiry = source === 'self' ? row?.expires_date : (promoActive ? row?.promo_premium_until : null);
