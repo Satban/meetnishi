@@ -44,9 +44,22 @@
 
     setBusy(triggerEl, true);
 
+    // REFERRAL (centralized here so it works for BOTH a direct click AND the resume-after-signin path — Codex):
+    // a /r/?c=<slug> landing stores the click id in localStorage (survives the signup detour). When present we
+    // route through create-referred-checkout, which resolves the click server-side, enforces the 30-day window,
+    // and auto-applies the creator coupon. A stale/invalid/absent click just falls back to unattributed checkout
+    // (the SERVER is authoritative — a client hint can never mint a discount or commission on its own).
+    let clickId = null, ref = null;
+    try { clickId = localStorage.getItem('affiliate_click_id'); ref = localStorage.getItem('affiliate_ref'); } catch (_) {}
+    const referred = !!(clickId || ref);
+    const endpoint = referred ? 'create-referred-checkout' : 'create-checkout-session';
+    const payload = referred
+      ? { price_id: priceId, ...(clickId ? { click_id: clickId } : {}), ...(ref ? { ref } : {}) }
+      : { price_id: priceId };
+
     try {
       const resp = await fetch(
-        `${window.NISHI_CONFIG.supabaseUrl}/functions/v1/create-checkout-session`,
+        `${window.NISHI_CONFIG.supabaseUrl}/functions/v1/${endpoint}`,
         {
           method: 'POST',
           headers: {
@@ -54,7 +67,7 @@
             'Authorization': `Bearer ${session.access_token}`,
             'apikey': window.NISHI_CONFIG.supabaseAnonKey,
           },
-          body: JSON.stringify({ price_id: priceId }),
+          body: JSON.stringify(payload),
         }
       );
 
