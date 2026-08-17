@@ -7,12 +7,12 @@ render_with_liquid: false
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nishi pricing: free to start, Premium when it's earning its keep</title>
-  <meta name="description" content="Early access pricing. 7-day trial, no card. Cancel anytime. Free tier never expires. $8.99/month or $39.99/year for Premium.">
+  <meta name="description" content="Early access pricing. 7-day trial, no card. Cancel anytime. Free tier never expires. $9.99/month or $79.99/year for Premium.">
   <link rel="canonical" href="https://meetnishi.com/pricing.html">
   <meta property="og:title" content="Nishi pricing">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://meetnishi.com/pricing.html">
-  <meta property="og:description" content="Early access pricing. 7-day trial, no card. Cancel anytime. Free tier never expires. $8.99/month or $39.99/year for Premium.">
+  <meta property="og:description" content="Early access pricing. 7-day trial, no card. Cancel anytime. Free tier never expires. $9.99/month or $79.99/year for Premium.">
   <meta property="og:image" content="https://meetnishi.com/assets/og/pricing.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -43,8 +43,8 @@ render_with_liquid: false
     "description": "Nishi Premium unlocks unlimited daily observations, multi-day pattern recognition, CGM integration, receipt-scan pantry, the full voice agent, and a shareable visit summary.",
     "brand": { "@type": "Brand", "name": "Nishi" },
     "offers": [
-      { "@type": "Offer", "name": "Monthly", "price": "8.99", "priceCurrency": "USD", "url": "https://meetnishi.com/pricing.html", "availability": "https://schema.org/InStock" },
-      { "@type": "Offer", "name": "Annual", "price": "39.99", "priceCurrency": "USD", "url": "https://meetnishi.com/pricing.html", "availability": "https://schema.org/InStock" }
+      { "@type": "Offer", "name": "Monthly", "price": "9.99", "priceCurrency": "USD", "url": "https://meetnishi.com/pricing.html", "availability": "https://schema.org/InStock" },
+      { "@type": "Offer", "name": "Annual", "price": "79.99", "priceCurrency": "USD", "url": "https://meetnishi.com/pricing.html", "availability": "https://schema.org/InStock" }
     ]
   }
   </script>
@@ -121,13 +121,13 @@ render_with_liquid: false
           <span class="save-pill" id="savePill">Save 63%</span>
         </div>
         <div class="plan-price-row">
-          <span class="plan-price" id="planPrice">$39.99</span>
-          <span class="plan-per" id="planPer">/ year · ~$3.33/mo</span>
+          <span class="plan-price" id="planPrice">$79.99</span>
+          <span class="plan-per" id="planPer">/ year · ~$6.67/mo</span>
         </div>
-        <div class="plan-strike" id="planStrike">~$107.88 if paid monthly</div>
+        <div class="plan-strike" id="planStrike">~$119.88 if paid monthly</div>
         <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" class="btn btn-primary btn-block" target="_blank" rel="noopener">Start your free trial</a>
         <div class="plan-monthly-link">
-          <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" target="_blank" rel="noopener" id="monthlyLink">Or monthly, $8.99/mo, no commitment</a>
+          <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" target="_blank" rel="noopener" id="monthlyLink">Or monthly, $9.99/mo, no commitment</a>
         </div>
       </div>
       <p class="plan-trust">Cancel anytime in Settings. No charge if you cancel before day 7.<br><span id="regionNote">Prices shown in USD. Billed in your local currency by the App Store or Google Play.</span></p>
@@ -367,8 +367,12 @@ render_with_liquid: false
   <script>
     // Region-aware pricing display. Store still charges the local price; this is indicative.
     (function () {
+      // US-first launch: web checkout charges USD, so show USD $79.99 to everyone and hide the region toggle.
+      // To re-enable per-country pricing later: set INTL_ENABLED = true and update the UK/AU/NZ prices below
+      // to the real App Store Connect / Play / Stripe per-currency tiers.
+      var INTL_ENABLED = false;
       var P = {
-        US: { cur: '$',   an: '39.99', mo: '8.99',  per: '3.33', strike: '107.88', save: 63, note: 'Prices shown in USD.' },
+        US: { cur: '$',   an: '79.99', mo: '9.99',  per: '6.67', strike: '119.88', save: 33, note: 'Prices shown in USD.' },
         UK: { cur: '£',   an: '29.99', mo: '7.99',  per: '2.50', strike: '95.88',  save: 69, note: 'Prices shown in GBP.' },
         AU: { cur: 'A$',  an: '59.99', mo: '14.99', per: '5.00', strike: '179.88', save: 67, note: 'Prices shown in AUD.' },
         NZ: { cur: 'NZ$', an: '64.99', mo: '14.99', per: '5.42', strike: '179.88', save: 64, note: 'Prices shown in NZD.' }
@@ -390,6 +394,13 @@ render_with_liquid: false
         if (!P[r]) r = 'US';
         apply(r);
         if (persist) { try { localStorage.setItem('nishi_region', r); } catch (e) {} }
+      }
+      // US-first: hide the region toggle and show USD to everyone (no geo switch).
+      if (!INTL_ENABLED) {
+        var tog = document.querySelector('.cur-toggle');
+        if (tog) tog.style.display = 'none';
+        setRegion('US', false);
+        return;
       }
       var btns = document.querySelectorAll('.cur-btn');
       for (var i = 0; i < btns.length; i++) {
