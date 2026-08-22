@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Nishi</title>
+  <!-- GitHub Pages serves this for any unmatched path. Creator share links use the pretty form
+       meetnishi.com/r/<slug>, but the static host has no file there, so it lands here. Map it to the real
+       query-based referral landing (/r/?c=<slug>), which records the click (server-authoritative) + carries
+       attribution, then sends the visitor to pricing. Everything else shows a normal not-found. -->
+  <script>
+    (function () {
+      'use strict';
+      try {
+        var m = (location.pathname || '').match(/^\/r\/([^\/?#]+)\/?$/);
+        if (m && m[1]) {
+          location.replace('/r/?c=' + encodeURIComponent(decodeURIComponent(m[1])) + (location.hash || ''));
+          return;   // navigating away — keep the page hidden (no 404 flash)
+        }
+      } catch (_) { /* malformed slug (e.g. bad %-encoding) — fall through to a normal 404, never blank */ }
+      // not a referral link (or a bad one) — reveal the branded 404
+      document.documentElement.style.visibility = 'visible';
+    })();
+  </script>
+  <style>
+    html { visibility: hidden; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+           color: #4a4038; background: #faf7f2; min-height: 100vh; display: flex; align-items: center;
+           justify-content: center; }
+    .card { text-align: center; padding: 40px 24px; max-width: 420px; }
+    .logo { height: 40px; width: auto; border-radius: 10px; margin-bottom: 20px; }
+    h1 { font-size: 26px; margin: 0 0 8px; color: #2f2a26; }
+    p { color: #6d6053; margin: 0 0 22px; line-height: 1.5; }
+    .btn { display: inline-block; background: #DD6C59; color: #fff; text-decoration: none;
+           padding: 12px 22px; border-radius: 12px; font-weight: 600; }
+  </style>
+  <noscript><style>html { visibility: visible !important; }</style></noscript>
+</head>
+<body>
+  <div class="card">
+    <img class="logo" src="/assets/nishi_logo.png" alt="Nishi">
+    <h1>Page not found</h1>
+    <p>That link doesn&rsquo;t lead anywhere. Let&rsquo;s get you back to Nishi.</p>
+    <a class="btn" href="/">Go to Nishi</a>
+  </div>
+</body>
+</html>
