@@ -20,9 +20,13 @@
       'use strict';
       var c = '';
       try { c = (new URLSearchParams(location.search).get('c') || '').trim(); } catch (_) {}
-      function go() { location.replace('/pricing.html'); }
+      // Carry the code in the URL (not storage-only) so attribution survives blocked/cleared localStorage.
+      function go() { location.replace('/pricing.html' + (c ? ('?ref=' + encodeURIComponent(c)) : '')); }
       if (!c || !window.NISHI_CONFIG) { return go(); }
-      try { localStorage.setItem('affiliate_ref', c); } catch (_) {}   // fail-open carrier
+      // Fresh click for THIS creator: stash the raw slug and drop any stale click id from a prior creator
+      // (a new click id is set below only if capture-click succeeds — never leave A's click paired with B's ref).
+      try { localStorage.setItem('affiliate_ref', c); } catch (_) {}
+      try { localStorage.removeItem('affiliate_click_id'); } catch (_) {}
       fetch(window.NISHI_CONFIG.supabaseUrl + '/functions/v1/capture-click', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'apikey': window.NISHI_CONFIG.supabaseAnonKey },

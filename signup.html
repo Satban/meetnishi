@@ -57,11 +57,21 @@
   <script src="scripts/main.js"></script>
   <script>
     // Stash the pending plan (if any) so account.html can auto-resume checkout after auth.
+    // Also re-seed the affiliate ref from ?ref here — this is the last same-origin hop before OAuth leaves for
+    // Apple/Google, so it keeps attribution alive even if storage was cleared upstream (checkout.js isn't loaded
+    // on this page). A fresh ref that differs drops the stale click id (may belong to a different creator).
     try {
       const params = new URLSearchParams(window.location.search);
       const plan = params.get('plan');
       if (plan === 'monthly' || plan === 'annual') {
         sessionStorage.setItem('pending_checkout_plan', plan);
+      }
+      const ref = (params.get('ref') || '').trim();
+      if (ref) {
+        if (localStorage.getItem('affiliate_ref') !== ref) {
+          localStorage.removeItem('affiliate_click_id');
+        }
+        localStorage.setItem('affiliate_ref', ref);
       }
     } catch (_) {}
   </script>
