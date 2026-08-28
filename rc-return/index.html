@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Nishi</title>
+  <!-- Web-purchase return target. On iOS WITH the app installed, the AASA universal-link match
+       (/.well-known/apple-app-site-association → /rc-return*) opens the app directly and this page
+       never renders. This is the FALLBACK for desktop / app-not-installed / Android-without-app:
+       tell the buyer their purchase is complete and route them to open (or get) the app, which then
+       refreshes RevenueCat entitlements and unlocks Premium. Never shows a 404. -->
+  <style>
+    :root { --bg:#faf7f2; --ink:#2f2a26; --sub:#6d6053; --accent:#DD6C59; }
+    html { visibility: hidden; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+           color:var(--ink); background:var(--bg); min-height:100vh; display:flex;
+           align-items:center; justify-content:center; }
+    .card { text-align:center; padding:40px 24px; max-width:420px; }
+    .logo { height:44px; width:auto; border-radius:11px; margin-bottom:20px; }
+    h1 { font-size:26px; margin:0 0 8px; }
+    p { color:var(--sub); margin:0 0 22px; line-height:1.5; }
+    .btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .btn { display:inline-block; background:var(--accent); color:#fff; text-decoration:none;
+           padding:12px 22px; border-radius:12px; font-weight:600; }
+  </style>
+  <noscript><style>html { visibility: visible !important; }</style></noscript>
+  <script>
+    (function () {
+      'use strict';
+      // Reveal immediately (this page only renders when the universal link did NOT open the app).
+      document.documentElement.style.visibility = 'visible';
+      var ua = navigator.userAgent || '';
+      var isAndroid = /Android/i.test(ua);
+      // Best-effort: on Android, nudge the Play listing (assetlinks opens the app if installed).
+      if (isAndroid) {
+        var a = document.getElementById('primary');
+        if (a) a.href = 'https://play.google.com/store/apps/details?id=com.getfoil.app';
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="card">
+    <img class="logo" src="/assets/nishi_logo.png" alt="Nishi">
+    <h1>You're all set</h1>
+    <p>Your purchase is complete. Open the Nishi app to start using Premium — your account unlocks automatically.</p>
+    <div class="btns">
+      <a id="primary" class="btn" href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471">Open Nishi</a>
+    </div>
+  </div>
+</body>
+</html>

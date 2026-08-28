@@ -11,6 +11,10 @@
           {
             "/": "/share/*",
             "comment": "Future: shareable observation/recipe deep links"
+          },
+          {
+            "/": "/rc-return*",
+            "comment": "Web-purchase return — deeplinks back into Nishi after an RC Web Billing checkout so the app refreshes entitlements and unlocks premium"
           }
         ]
       }
