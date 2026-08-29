@@ -77,6 +77,38 @@
 
     setBusy(triggerEl, true);
 
+    // ── Web-first RC Web Billing (the go-forward web checkout). Ask the shared resolver
+    // (get-applied-affiliate-code) for a checkout_url: it returns a DISCOUNTED tier link for an eligible
+    // coded user, a BASE full-price link otherwise, or null when web checkout is gated off (WEB_CHECKOUT_ENABLED
+    // — held until counsel's written OK). If we get a URL, bind the RC App User ID (== the Supabase user id)
+    // as a PATH segment — normalizing a possibly-missing trailing slash so the id lands as its own segment,
+    // never concatenated onto the link id — and hand off. On null / any error, fall through to the legacy
+    // Stripe path below so nothing breaks during the hold. Same URL shape as the in-app CTA (byte-aligned).
+    try {
+      const rcRes = await fetch(
+        `${window.NISHI_CONFIG.supabaseUrl}/functions/v1/get-applied-affiliate-code`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': window.NISHI_CONFIG.supabaseAnonKey,
+          },
+          body: JSON.stringify({ plan }),
+        }
+      );
+      const rcData = await rcRes.json().catch(() => ({}));
+      if (rcRes.ok && rcData && rcData.checkout_url && session.user && session.user.id) {
+        const u = new URL(rcData.checkout_url);
+        u.pathname = u.pathname.replace(/\/?$/, '/') + encodeURIComponent(session.user.id);
+        try { sessionStorage.removeItem('pending_checkout_plan'); } catch (_) {}
+        window.location.href = u.toString();
+        return;
+      }
+    } catch (err) {
+      console.warn('web checkout resolver failed; falling back to Stripe:', err);
+    }
+
     const referred = !!(clickId || ref);
     const endpoint = referred ? 'create-referred-checkout' : 'create-checkout-session';
     const payload = referred
