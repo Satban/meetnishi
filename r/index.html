@@ -3,75 +3,615 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Param-driven per-creator page; keep it out of the index but let social scrapers read og tags. -->
   <meta name="robots" content="noindex,nofollow">
-  <title>Nishi</title>
-  <!-- A0 smart link: creator /r/?c=<slug>. Store-first (health app: install, try, then buy). Records the click
-       server-side (authoritative, for the web path), then routes by device:
-         iOS/iPadOS  -> App Store (Apple strips install referrers; in-app attribution is the paywall code field).
-         Android     -> Play Store WITH &referrer=utm_...campaign=<slug> so Play Install Referrer delivers the
-                        creator slug to the app on first open (zero-touch attribution; parsed by the client
-                        Install Referrer service, source='install_referrer').
-         Desktop     -> /pricing.html?ref=<slug> (no app to install; web checkout carries the ref).
-       Fail-open: on any error the visitor still reaches a store / pricing. The SERVER enforces the window +
-       eligibility + US-gate; nothing here mints a discount. -->
-  <script src="/scripts/config.js"></script>
-  <style>body{font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;color:#6d6053;text-align:center;margin-top:56px}</style>
+  <title>Your Nishi founding invite</title>
+  <meta name="description" content="A founding-rate invite to Nishi, your nutrition companion. Your discount is applied at checkout. 7-day free trial, cancel anytime.">
+
+  <!-- Social preview (creators share this link widely) -->
+  <meta property="og:title" content="Your Nishi founding invite">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="Your founding rate, applied at checkout. 7-day free trial, cancel anytime.">
+  <meta property="og:image" content="https://meetnishi.com/assets/og/pricing.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Nishi">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Your Nishi founding invite">
+  <meta name="twitter:description" content="Your founding rate, applied at checkout. 7-day free trial, cancel anytime.">
+  <meta name="twitter:image" content="https://meetnishi.com/assets/og/pricing.png">
+
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/render.css">
+  <link rel="stylesheet" href="/styles/motion.css">
+
+  <style>
+    /* Page-scoped only. Everything else reuses tokens/components from main.css. */
+    .invite-hero { padding-top: calc(var(--nav-height) + var(--space-md)); }
+    .invite-eyebrow-creator { color: var(--text-muted); font-weight: 600; }
+
+    /* Founding offer card: reuses .plan-card look, adds the founding numbers */
+    .offer-card { margin-top: var(--space-md); }
+    .offer-old { font-size: 15px; color: var(--text-soft); text-decoration: line-through; }
+
+    /* The code hand-off */
+    .code-block {
+      margin: var(--space-md) auto 0;
+      max-width: 460px;
+      background: var(--accent-tint);
+      border: 1px solid var(--accent-soft);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      text-align: center;
+    }
+    .code-label {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-dark);
+      margin-bottom: 8px;
+    }
+    .code-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .code-value {
+      font-family: var(--font-sans);
+      font-size: clamp(30px, 7vw, 42px);
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: var(--text);
+      line-height: 1.05;
+      /* letter-spacing pushes the box right; nudge back so it reads centered */
+      padding-left: 0.16em;
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 9px 16px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      color: var(--text);
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .copy-btn:hover { background: var(--text); color: #fff; border-color: var(--text); }
+    .copy-btn.copied { background: var(--sage); color: #fff; border-color: var(--sage); }
+    .copy-btn svg { width: 15px; height: 15px; }
+    .code-hint { margin-top: 10px; font-size: 13px; color: var(--text-soft); }
+
+    /* Device-smart CTA area */
+    .device-cta { margin: var(--space-md) auto 0; max-width: 460px; }
+    .store-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 52px;
+      padding: 14px 24px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: #fff;
+      background: var(--text);
+      border: 1px solid var(--text);
+      border-radius: var(--radius-sm);
+      transition: all var(--duration-fast) var(--ease);
+    }
+    .store-btn:hover { background: transparent; color: var(--text); }
+    .store-btn:hover svg { color: var(--text); }
+    .store-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .store-note { margin-top: 10px; font-size: 13px; color: var(--text-soft); text-align: center; }
+
+    /* Desktop QR handoff */
+    .qr-card {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      text-align: left;
+    }
+    .qr-frame {
+      width: 168px;
+      height: 168px;
+      flex-shrink: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-frame img { width: 100%; height: 100%; image-rendering: pixelated; }
+    .qr-copy { max-width: 240px; }
+    .qr-copy h3 { font-family: var(--font-serif); font-size: 20px; margin-bottom: 6px; }
+    .qr-copy p { font-size: 14px; color: var(--text-soft); }
+    .badge-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: var(--space-sm); }
+    .badge-row .store-btn { width: auto; min-height: 46px; font-size: 14px; }
+
+    .trust-line {
+      margin-top: var(--space-md);
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .trust-line .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-muted); }
+
+    /* Steps */
+    .steps { max-width: 640px; margin: 0 auto; display: grid; gap: var(--space-md); }
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-sm) var(--space-md);
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--bg-dark);
+      color: #fff;
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step-body h3 { font-family: var(--font-serif); font-size: 19px; font-weight: 600; margin-bottom: 3px; }
+    .step-body p { font-size: 15px; color: var(--text-soft); line-height: 1.55; }
+    .step-body code {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: var(--accent-tint);
+      color: var(--accent-dark);
+      padding: 1px 7px;
+      border-radius: var(--radius-sm);
+    }
+
+    @media (max-width: 560px) {
+      .qr-card { flex-direction: column; text-align: center; }
+      .qr-copy { max-width: 100%; }
+    }
+  </style>
 </head>
 <body>
-  <p>Taking you to Nishi…</p>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo"><img src="/assets/nishi_wordmark.png" alt="Nishi"></a>
+      <ul class="nav-links">
+        <li><a href="/how-it-works.html">How it works</a></li>
+        <li><a href="/pricing.html">Pricing</a></li>
+        <li><a href="/story.html">Story</a></li>
+        <li><a href="/faq.html">FAQ</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="/signin.html" class="link">Sign in</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero invite-hero">
+    <div class="container">
+      <div class="hero-inner">
+        <span class="eyebrow">Founding invite</span>
+        <p class="invite-eyebrow-creator" id="creatorLine" hidden></p>
+        <h1 id="heroHeadline">Your founding rate, applied at checkout.</h1>
+        <p class="lead" id="heroLead">You found Nishi through a creator, so you get the founding annual rate. It is locked in as long as you stay subscribed.</p>
+      </div>
+
+      <!-- Founding offer -->
+      <div class="plan-card offer-card reveal">
+        <div class="plan-head">
+          <div class="plan-label">Founding annual</div>
+          <span class="save-pill" id="savePill" hidden>Save</span>
+        </div>
+        <div class="plan-price-row">
+          <span class="plan-price" id="planPrice">$79.99</span>
+          <span class="plan-per">/ year</span>
+        </div>
+        <div class="offer-old" id="planStrike" hidden></div>
+        <p class="plan-trust" style="margin-top:14px;">Founding rate. 7-day free trial, no charge until day 7. Cancel anytime.</p>
+      </div>
+
+      <!-- The code hand-off -->
+      <div class="code-block reveal" id="codeBlock" hidden>
+        <div class="code-label">Your code</div>
+        <div class="code-row">
+          <span class="code-value" id="codeValue">-</span>
+          <button type="button" class="copy-btn" id="copyBtn" aria-label="Copy code">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span id="copyBtnText">Copy</span>
+          </button>
+        </div>
+        <p class="code-hint" id="codeHint">Copied to your clipboard. Nishi picks it up automatically on first open.</p>
+      </div>
+
+      <!-- Device-smart CTA (built by JS) -->
+      <div class="device-cta reveal" id="deviceCta"></div>
+
+      <p class="trust-line">
+        <span>7-day free trial</span><span class="dot"></span>
+        <span>No charge until day 7</span><span class="dot"></span>
+        <span>Cancel anytime</span>
+      </p>
+    </div>
+  </header>
+
+  <!-- 3 steps -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">How to claim it</span>
+        <h2>Three steps.</h2>
+      </div>
+      <div class="steps reveal">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>Download Nishi</h3>
+            <p>Get the app on your phone and create your account.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>Your founding rate is applied at checkout</h3>
+            <p id="step2Body">On Android your code applies automatically. On iPhone, enter your code at checkout.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>Locked in as long as you stay subscribed</h3>
+            <p>The founding rate holds for as long as your subscription stays active.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <img class="footer-mark" src="/assets/nishi_logo.png" alt="Nishi">
+          <p class="footer-tagline">Your nutrition companion for metabolic health and mindful eating.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="/how-it-works.html">How it works</a></li>
+            <li><a href="/pricing.html">Pricing</a></li>
+            <li><a href="/faq.html">FAQ</a></li>
+            <li><a href="/blog/">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="/story.html">Story</a></li>
+            <li><a href="mailto:support@meetnishi.com">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="/privacy">Privacy</a></li>
+            <li><a href="/terms">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-legal">Nishi is a food and wellness companion, not a medical service. It does not diagnose, treat, or prescribe, and it is not a substitute for advice from a qualified healthcare professional. Always talk to your doctor about your health, diet, and any medications.</p>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Nishi</span>
+        <span><a href="mailto:support@meetnishi.com">support@meetnishi.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/scripts/config.js"></script>
+  <script src="/scripts/main.js"></script>
+  <script src="/scripts/motion.js"></script>
+  <!-- QR generator for the desktop hand-off. Optional: if it fails to load we fall back to store badges. -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+
   <script>
-    (function () {
-      'use strict';
-      var APP_STORE = 'https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471';
-      var PLAY_ID = 'com.getfoil.app';
-      var c = '';
-      try { c = (new URLSearchParams(location.search).get('c') || '').trim(); } catch (_) {}
+  (function () {
+    'use strict';
 
-      var ua = navigator.userAgent || navigator.vendor || '';
-      var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS reports MacIntel
-      var isAndroid = /Android/i.test(ua);
+    // ---- Store constants (PRESERVED from the prior redirect) ----
+    var APP_STORE = 'https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471';
+    var PLAY_ID   = 'com.getfoil.app';
+    // Public offer endpoint (CORS GET). NOTE: this is a different Supabase project than config.js
+    // (capture-click). Hardcoded per spec; the page is fully defensive if it is down or missing.
+    var OFFER_BASE = 'https://gdjjkqkyzbmlarykbnzo.supabase.co/functions/v1/public-code-offer';
 
-      var routed = false;
-      function route() {
-        if (routed) return; routed = true;
-        if (isIOS) { location.replace(APP_STORE); return; }
-        if (isAndroid) {
-          // Play Install Referrer carries the slug to the app on first open (no SDK). UTM scheme matches the
-          // web checkout so the client extracts the slug from utm_campaign consistently.
-          var ref = c ? encodeURIComponent('utm_source=affiliate&utm_medium=creator&utm_campaign=' + c) : '';
-          location.replace('https://play.google.com/store/apps/details?id=' + PLAY_ID + (ref ? ('&referrer=' + ref) : ''));
-          return;
-        }
-        // Desktop / unknown: web checkout, carry the code in the URL (survives blocked storage).
-        location.replace('/pricing.html' + (c ? ('?ref=' + encodeURIComponent(c)) : ''));
-      }
+    // ---- Slug ----
+    var c = '';
+    try { c = (new URLSearchParams(location.search).get('c') || '').trim(); } catch (_) {}
 
-      // No slug or no config -> just route (still store-first / pricing).
-      if (!c || !window.NISHI_CONFIG) { return route(); }
+    // ---- Device sniff (same logic as the prior redirect) ----
+    var ua = navigator.userAgent || navigator.vendor || '';
+    var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS reports MacIntel
+    var isAndroid = /Android/i.test(ua);
 
-      // Fresh click for THIS creator (for the web path + analytics): stash the raw slug, drop any stale click id.
+    function playUrl() {
+      // PRESERVE the Play Install Referrer so Android is zero-touch (slug -> utm_campaign -> app on first open).
+      var ref = c ? encodeURIComponent('utm_source=affiliate&utm_medium=creator&utm_campaign=' + c) : '';
+      return 'https://play.google.com/store/apps/details?id=' + PLAY_ID + (ref ? ('&referrer=' + ref) : '');
+    }
+
+    // ---- Attribution: record the click server-side + stash the raw slug (web/desktop path). ----
+    // Unchanged behaviour from the redirect version; just no longer followed by a redirect.
+    if (c && window.NISHI_CONFIG) {
       try { localStorage.setItem('affiliate_ref', c); } catch (_) {}
       try { localStorage.removeItem('affiliate_click_id'); } catch (_) {}
-
-      // Safety: never let a slow capture-click hang the redirect.
-      var timer = setTimeout(route, 800);
-
-      fetch(window.NISHI_CONFIG.supabaseUrl + '/functions/v1/capture-click', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': window.NISHI_CONFIG.supabaseAnonKey },
-        body: JSON.stringify({ code_or_slug: c }),
-        keepalive: true  // let the click record survive the imminent store/pricing redirect
-      })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          if (d && d.recorded && d.click_id) {
-            try { localStorage.setItem('affiliate_click_id', d.click_id); } catch (_) {}
-          }
+      try {
+        fetch(window.NISHI_CONFIG.supabaseUrl + '/functions/v1/capture-click', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': window.NISHI_CONFIG.supabaseAnonKey },
+          body: JSON.stringify({ code_or_slug: c }),
+          keepalive: true
         })
-        .catch(function () { /* keep the raw slug already stored */ })
-        .finally(function () { clearTimeout(timer); route(); });
-    })();
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (d && d.recorded && d.click_id) {
+              try { localStorage.setItem('affiliate_click_id', d.click_id); } catch (_) {}
+            }
+          })
+          .catch(function () { /* raw slug already stored; non-fatal */ });
+      } catch (_) {}
+    }
+
+    // ---- Money formatting (minor units -> $XX.XX) ----
+    var CUR = { USD: '$', GBP: '£', AUD: 'A$', NZD: 'NZ$', CAD: 'C$', EUR: '€' };
+    function fmt(minor, currency) {
+      var sym = CUR[(currency || 'USD').toUpperCase()] || ((currency || '') + ' ');
+      var n = (Number(minor) / 100);
+      if (!isFinite(n)) return '';
+      return sym + n.toFixed(2);
+    }
+
+    // ---- Clipboard hand-off: DISPLAY bare code, but WRITE a sentinel-prefixed string. ----
+    // The app reads the clipboard once on first run and only applies text starting with "nishi-code:".
+    var SENTINEL = 'nishi-code:';
+    function clipboardPayload(code) { return SENTINEL + code; }
+    function writeClipboard(code) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(clipboardPayload(code));
+        }
+      } catch (_) {}
+      // Legacy fallback (best-effort; may be blocked without a gesture).
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = clipboardPayload(code);
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'absolute';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (_) {}
+      return Promise.resolve();
+    }
+
+    // ---- QR (desktop): encode this landing URL so the phone reopens /r/?c=slug and routes there. ----
+    function makeQrDataUrl(text) {
+      try {
+        if (typeof qrcode === 'undefined') return null;
+        var qr = qrcode(0, 'M');
+        qr.addData(text);
+        qr.make();
+        return qr.createDataURL(6, 8);
+      } catch (_) { return null; }
+    }
+
+    var APPLE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>';
+    var PLAY_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg>';
+
+    function iosBtn() {
+      return '<a class="store-btn" href="' + APP_STORE + '" rel="noopener">' + APPLE_SVG + 'Download on the App Store</a>';
+    }
+    function androidBtn() {
+      return '<a class="store-btn" href="' + playUrl() + '" rel="noopener">' + PLAY_SVG + 'Get it on Google Play</a>';
+    }
+
+    function renderDeviceCta(hasCode) {
+      var el = document.getElementById('deviceCta');
+      if (!el) return;
+
+      if (isIOS) {
+        el.innerHTML = iosBtn() +
+          '<p class="store-note">' + (hasCode ? 'Enter your code at checkout to lock in the founding rate.' : 'Start your free trial in the app.') + '</p>';
+        return;
+      }
+      if (isAndroid) {
+        el.innerHTML = androidBtn() +
+          '<p class="store-note">Your code applies automatically at checkout.</p>';
+        return;
+      }
+
+      // Desktop / unknown -> QR to reopen this page on the phone, plus store badges.
+      var qr = makeQrDataUrl(location.href);
+      var qrHtml = qr
+        ? '<div class="qr-frame"><img src="' + qr + '" alt="Scan to open Nishi on your phone" width="168" height="168"></div>'
+        : '';
+      el.innerHTML =
+        '<div class="qr-card">' +
+          qrHtml +
+          '<div class="qr-copy">' +
+            '<h3>Open this on your phone</h3>' +
+            '<p>' + (qr ? 'Scan the code' : 'Open this link on your phone') +
+              ' to download Nishi and claim your founding rate.</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="badge-row">' + iosBtn() + androidBtn() + '</div>';
+    }
+
+    function renderStep2(code) {
+      var p = document.getElementById('step2Body');
+      if (!p) return;
+      if (isIOS) {
+        p.innerHTML = code
+          ? 'On iPhone, enter code <code>' + code + '</code> at checkout.'
+          : 'On iPhone, enter your code at checkout.';
+      } else if (isAndroid) {
+        p.textContent = 'On Android your code applies automatically. Nothing to type.';
+      } else {
+        p.innerHTML = code
+          ? 'On Android your code applies automatically. On iPhone, enter code <code>' + code + '</code> at checkout.'
+          : 'On Android your code applies automatically. On iPhone, enter your code at checkout.';
+      }
+    }
+
+    function showCode(code) {
+      var block = document.getElementById('codeBlock');
+      var val = document.getElementById('codeValue');
+      var hint = document.getElementById('codeHint');
+      if (!block || !val || !code) { return; }
+      val.textContent = code; // BARE code for the user to read/type
+      block.hidden = false;
+
+      // Auto-copy on load (best-effort; may be blocked without a gesture -> the Copy button is the reliable path).
+      Promise.resolve(writeClipboard(code))
+        .then(function () { if (hint) hint.textContent = 'Copied to your clipboard. Nishi picks it up automatically on first open.'; })
+        .catch(function () { if (hint) hint.textContent = 'Tap Copy, then Nishi picks it up automatically on first open.'; });
+
+      var btn = document.getElementById('copyBtn');
+      var btnText = document.getElementById('copyBtnText');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          Promise.resolve(writeClipboard(code)).then(function () {
+            btn.classList.add('copied');
+            if (btnText) btnText.textContent = 'Copied';
+            setTimeout(function () {
+              btn.classList.remove('copied');
+              if (btnText) btnText.textContent = 'Copy';
+            }, 1800);
+          });
+        });
+      }
+    }
+
+    // ---- Offer rendering ----
+    function renderEligible(o) {
+      var head = document.getElementById('heroHeadline');
+      var lead = document.getElementById('heroLead');
+      var price = document.getElementById('planPrice');
+      var strike = document.getElementById('planStrike');
+      var pill = document.getElementById('savePill');
+
+      var founding = fmt(o.founding_price_minor, o.currency);
+      var list = fmt(o.list_price_minor, o.currency);
+
+      if (price && founding) price.textContent = founding;
+      if (strike && list && list !== founding) { strike.textContent = list + ' regular'; strike.hidden = false; }
+
+      var pct = o.discount_percent;
+      if ((pct === undefined || pct === null || pct === '') &&
+          Number(o.list_price_minor) > 0 && Number(o.founding_price_minor) > 0) {
+        pct = Math.round((1 - Number(o.founding_price_minor) / Number(o.list_price_minor)) * 100);
+      }
+      pct = Number(pct);
+      if (pill && isFinite(pct) && pct > 0) { pill.textContent = 'Save ' + pct + '%'; pill.hidden = false; }
+
+      if (head) head.textContent = founding
+        ? 'Your founding rate: ' + founding + '/year.'
+        : 'Your founding rate, applied at checkout.';
+      if (lead) lead.textContent = 'You found Nishi through a creator, so you get the founding annual rate' +
+        (isFinite(pct) && pct > 0 ? ' (' + pct + '% off)' : '') +
+        '. It is locked in as long as you stay subscribed.';
+    }
+
+    function renderGeneric() {
+      // Prices already show the correct US list default ($79.99) in the markup. Keep the generic headline.
+      var pill = document.getElementById('savePill');
+      if (pill) pill.hidden = true;
+    }
+
+    function boot() {
+      // Creator line (from slug), lightly formatted.
+      if (c) {
+        var cl = document.getElementById('creatorLine');
+        if (cl) { cl.textContent = 'Invite code: ' + c; cl.hidden = false; }
+      }
+
+      // Fetch the public offer defensively (timeout + graceful fallback).
+      var offerCode = c; // fallback: the slug doubles as the code the app reads
+      var done = false;
+
+      function finish(offer) {
+        if (done) return; done = true;
+        var code = (offer && offer.code) ? offer.code : offerCode;
+        if (offer && offer.eligible) { renderEligible(offer); }
+        else { renderGeneric(); }
+        showCode(code);
+        renderStep2(code);
+        renderDeviceCta(!!code);
+      }
+
+      if (!c) {
+        // No slug -> still a sensible page + store links, never a dead end.
+        renderGeneric();
+        renderDeviceCta(false);
+        renderStep2('');
+        return;
+      }
+
+      var ctrl = null, timer = null;
+      try { ctrl = new AbortController(); } catch (_) {}
+      timer = setTimeout(function () { try { if (ctrl) ctrl.abort(); } catch (_) {} finish(null); }, 3500);
+
+      fetch(OFFER_BASE + '?c=' + encodeURIComponent(c), {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        signal: ctrl ? ctrl.signal : undefined
+      })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { clearTimeout(timer); finish(d); })
+        .catch(function () { clearTimeout(timer); finish(null); });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
+  })();
   </script>
 </body>
 </html>
