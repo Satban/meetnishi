@@ -121,6 +121,7 @@ body { overflow-x: hidden; }
   gap: var(--space-md); margin-top: var(--space-lg);
 }
 .proof-grid .photo-frame { aspect-ratio: 4/5; }
+.proof-grid.sci .photo-frame { aspect-ratio: 1 / 1; }
 .proof-grid figcaption {
   margin-top: 12px; font-family: var(--font-sans); font-size: 14px;
   color: var(--text-soft); text-align: center;
