@@ -60,6 +60,7 @@ body { overflow-x: hidden; }
 .hero-v2 h1 { font-size: clamp(40px, 5vw, 60px); }
 .hero-v2 .hero-cta { flex-direction: row; align-items: center; justify-content: flex-start; flex-wrap: wrap; }
 .hero-v2 .hero-cta .btn, .hero-v2 .hero-cta .btn-text { white-space: nowrap; }
+.hero-v2 .hero-cta-note { margin: 12px 0 0; font-size: 13px; color: var(--text-muted); }
 .hero-photo { position: relative; aspect-ratio: 4/5; }
 .hero-photo .float-card.a { bottom: 22px; left: -28px; }
 .hero-photo .float-card.b { top: 26px; right: -24px; max-width: 200px; }
