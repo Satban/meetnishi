@@ -1,0 +1,330 @@
+---
+render_with_liquid: false
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Research: the architecture behind Nishi | Active biometric observation for GLP-1 adherence</title>
+  <meta name="description" content="The design thesis behind Nishi: an active biometric observation architecture that replaces high-friction manual logging with a proactive daily loop to support GLP-1 adherence. Read the working paper.">
+  <link rel="canonical" href="https://meetnishi.com/research.html">
+  <meta property="og:title" content="The research behind Nishi">
+  <meta property="og:description" content="The design thesis behind Nishi: an active observation loop built to support GLP-1 adherence, in plain language and in a working paper.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://meetnishi.com/research.html">
+  <meta property="og:image" content="https://meetnishi.com/assets/og/home.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Nishi">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The research behind Nishi">
+  <meta name="twitter:description" content="The design thesis behind Nishi, in plain language and in a working paper.">
+  <meta name="twitter:image" content="https://meetnishi.com/assets/og/home.png">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/render.css?v=20261103b">
+  <link rel="stylesheet" href="styles/motion.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "An Active Biometric Observation Architecture for Improving Pharmacological Adherence and Reducing Macroeconomic Healthcare Expenditure",
+    "about": "GLP-1 therapy adherence, proactive biometric observation, digital health architecture, health economics",
+    "datePublished": "2026-10",
+    "inLanguage": "en",
+    "author": [
+      { "@type": "Person", "name": "Julian Rodriguez, Jr.", "affiliation": "Royal Economic Society / Royal Society of Arts" },
+      { "@type": "Person", "name": "Satyam Bansal", "affiliation": "Nishi" }
+    ],
+    "publisher": { "@type": "Organization", "name": "Nishi", "url": "https://meetnishi.com/" },
+    "url": "https://meetnishi.com/research.html"
+  }
+  </script>
+  <style>
+    /* research page, scoped */
+    .rp-meta { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin-top:18px; font-size:13px; color:var(--text-muted); }
+    .rp-pill { display:inline-block; font-family:var(--font-sans); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text); background:var(--bg-warm,#f3efe9); border:1px solid var(--border-strong,#d9d2c7); border-radius:999px; padding:5px 11px; }
+    .rp-lede { max-width:640px; }
+
+    /* the loop */
+    .rp-flow { max-width:900px; margin:0 auto; }
+    .rp-rail { text-align:center; font-family:var(--font-sans); font-size:13px; font-weight:600; color:var(--text-muted); letter-spacing:.01em; padding:14px 16px; border:1px dashed var(--border-strong,#d9d2c7); border-radius:14px; background:#fff; }
+    .rp-rail strong { color:var(--text); font-weight:700; }
+    .rp-arrow { display:block; text-align:center; color:var(--text-muted); font-size:20px; line-height:1; margin:10px 0; }
+    .rp-beats { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .rp-beat { background:#fff; border:1px solid var(--border,#e7e0d6); border-radius:16px; padding:22px 20px; text-align:left; }
+    .rp-beat .rp-when { display:flex; align-items:center; gap:8px; font-family:var(--font-sans); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; }
+    .rp-dot { width:9px; height:9px; border-radius:50%; flex:none; }
+    .rp-beat h3 { font-family:var(--font-serif); font-size:20px; margin:0 0 8px; }
+    .rp-beat p { font-size:15px; color:var(--text-soft); margin:0; line-height:1.5; }
+
+    /* compare */
+    .rp-compare { max-width:860px; margin:0 auto; border:1px solid var(--border,#e7e0d6); border-radius:16px; overflow:hidden; background:#fff; }
+    .rp-row { display:grid; grid-template-columns:1.1fr 1fr 1fr; }
+    .rp-row + .rp-row { border-top:1px solid var(--border,#e7e0d6); }
+    .rp-cell { padding:16px 18px; font-size:15px; line-height:1.45; }
+    .rp-cell.dim { font-weight:600; color:var(--text); }
+    .rp-cell.old { color:var(--text-soft); border-left:1px solid var(--border,#e7e0d6); }
+    .rp-cell.new { color:var(--text); border-left:1px solid var(--border,#e7e0d6); background:var(--bg-warm,#f7f3ed); }
+    .rp-head .rp-cell { font-family:var(--font-sans); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); background:#fff; }
+    .rp-head .rp-cell.new { color:var(--text); }
+
+    /* paper citation card */
+    .rp-paper { max-width:760px; margin:0 auto; background:#fff; border:1px solid var(--border,#e7e0d6); border-radius:18px; padding:28px 28px 24px; }
+    .rp-paper h3 { font-family:var(--font-serif); font-size:23px; line-height:1.25; margin:12px 0 10px; }
+    .rp-authors { font-size:14px; color:var(--text-soft); margin:0 0 4px; }
+    .rp-authors a { color:var(--accent-dark); text-decoration:none; border-bottom:1px solid transparent; }
+    .rp-authors a:hover { border-bottom-color:currentColor; }
+    .rp-abstract { font-size:15px; color:var(--text-soft); line-height:1.6; margin:16px 0 20px; }
+    .rp-paper-cta { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+    .rp-note { font-size:13px; color:var(--text-muted); line-height:1.55; margin:18px auto 0; max-width:760px; text-align:center; }
+
+    @media (max-width:720px){
+      .rp-beats { grid-template-columns:1fr; }
+      .rp-row { grid-template-columns:1fr; }
+      .rp-cell.old, .rp-cell.new { border-left:0; border-top:1px dashed var(--border,#e7e0d6); }
+      .rp-head { display:none; }
+      .rp-cell.old::before { content:"Traditional: "; font-weight:600; color:var(--text-muted); }
+      .rp-cell.new::before { content:"With Nishi: "; font-weight:700; color:var(--text); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo"><img src="assets/nishi_wordmark.png" alt="Nishi"></a>
+      <ul class="nav-links">
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="story.html">Story</a></li>
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="/blog/">Blog</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="signin.html" class="link">Sign in</a>
+        <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" class="btn btn-primary" target="_blank" rel="noopener">Get the app</a>
+      </div>
+      <button class="nav-toggle" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="nav-drawer">
+    <ul>
+      <li><a href="how-it-works.html">How it works</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="story.html">Story</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+        <li><a href="/blog/">Blog</a></li>
+      <li><a href="signin.html">Sign in</a></li>
+    </ul>
+    <a href="https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471" class="btn btn-primary" target="_blank" rel="noopener">Get the app</a>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero-inner" style="max-width:720px;">
+        <span class="eyebrow">Research</span>
+        <h1>The thinking behind the loop.</h1>
+        <p class="lead rp-lede">Medication gets people started. Staying with it is a daily, behavioral problem. Here is the design thesis behind Nishi, in plain language, and the working paper it comes from.</p>
+        <div class="rp-meta">
+          <span class="rp-pill">Working paper</span>
+          <span>Health Economics &amp; Systems Architecture</span>
+          <span class="dot" style="display:inline-block;width:3px;height:3px;border-radius:50%;background:currentColor;"></span>
+          <span>October 2026</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ THE PROBLEM ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">The problem</span>
+        <h2>GLP-1 works. Staying on it is the hard part.</h2>
+        <p class="lead">GLP-1 medications regulate appetite and blood sugar well. But the paper's starting point is a sobering one: a large share of people, by some estimates up to half, stop within the first year. Rarely because the drug failed. Usually because daily life got in the way.</p>
+      </div>
+
+      <div class="cards-grid stagger">
+        <article class="obs-card">
+          <span class="eyebrow-text">Side effects</span>
+          <p class="obs-text" style="font-size:16px;">Shifting digestion and recurring mild nausea or fatigue wear people down and push them to quit early.</p>
+        </article>
+        <article class="obs-card">
+          <span class="eyebrow-text">Nutrition gaps</span>
+          <p class="obs-text" style="font-size:16px;">Too little protein during rapid weight loss costs lean muscle and slows metabolism, the opposite of the goal.</p>
+        </article>
+        <article class="obs-card">
+          <span class="eyebrow-text">App fatigue</span>
+          <p class="obs-text" style="font-size:16px;">Logging every meal and symptom into a blank prompt is friction. People abandon the tracking long before the plan.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE ARCHITECTURE / THE LOOP ============ -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">The architecture</span>
+        <h2>An active observation loop, not a blank prompt.</h2>
+        <p class="lead">The idea at the center of the paper: flip the app from reactive to proactive. Instead of waiting for you to type, the system watches context in the background and surfaces one low-friction, useful step at a time.</p>
+      </div>
+
+      <div class="rp-flow reveal">
+        <div class="rp-rail"><strong>It starts quietly.</strong> Nishi reads background signals from Apple Health and Health Connect, sleep, activity, body metrics, with no manual logging.</div>
+        <span class="rp-arrow">&darr;</span>
+
+        <div class="rp-beats">
+          <div class="rp-beat">
+            <div class="rp-when"><span class="rp-dot" style="background:#E36C3F;"></span> Morning</div>
+            <h3>State check</h3>
+            <p>Reads overnight recovery and where you are in your dose, then suggests a gentle, protein-forward breakfast that is easy on nausea.</p>
+          </div>
+          <div class="rp-beat">
+            <div class="rp-when"><span class="rp-dot" style="background:#6BA572;"></span> Midday</div>
+            <h3>Pattern match</h3>
+            <p>Tracks protein and energy as the day builds and nudges a small adjustment before the afternoon dip sets in.</p>
+          </div>
+          <div class="rp-beat">
+            <div class="rp-when"><span class="rp-dot" style="background:#4A9DD8;"></span> Evening</div>
+            <h3>Quiet execution</h3>
+            <p>Checks what is in your kitchen against your targets, queues gentle recipes, and fills in what is missing for your grocery cart.</p>
+          </div>
+        </div>
+
+        <span class="rp-arrow">&darr;</span>
+        <div class="rp-rail"><strong>And it adds up for your doctor.</strong> Weekly dose, symptoms, weight trend, and nutrition fold into a one-tap summary you can share with your endocrinologist or dietitian.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMPARISON ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">The difference</span>
+        <h2>Two ways to run the same regimen.</h2>
+      </div>
+
+      <div class="rp-compare reveal">
+        <div class="rp-row rp-head">
+          <div class="rp-cell dim">&nbsp;</div>
+          <div class="rp-cell old">Traditional, unassisted</div>
+          <div class="rp-cell new">Active observation</div>
+        </div>
+        <div class="rp-row">
+          <div class="rp-cell dim">Daily experience</div>
+          <div class="rp-cell old">High-friction manual logging and blank prompts</div>
+          <div class="rp-cell new">A proactive, three-beat daily loop</div>
+        </div>
+        <div class="rp-row">
+          <div class="rp-cell dim">Staying on therapy</div>
+          <div class="rp-cell old">High dropout in the first 6 to 12 months</div>
+          <div class="rp-cell new">Support aimed at the symptom and nutrition hurdles that cause it</div>
+        </div>
+        <div class="rp-row">
+          <div class="rp-cell dim">Clinical visits</div>
+          <div class="rp-cell old">Fragmented, from-memory patient reports</div>
+          <div class="rp-cell new">A structured, one-tap trend summary</div>
+        </div>
+        <div class="rp-row">
+          <div class="rp-cell dim">Cost of care</div>
+          <div class="rp-cell old">Sunk cost when courses are abandoned</div>
+          <div class="rp-cell new">More value from each course that is completed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE PAPER ============ -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">Read it in full</span>
+        <h2>The working paper.</h2>
+      </div>
+
+      <div class="rp-paper reveal">
+        <span class="rp-pill">Working paper &middot; Pre-print</span>
+        <h3>An Active Biometric Observation Architecture for Improving Pharmacological Adherence and Reducing Macroeconomic Healthcare Expenditure</h3>
+        <p class="rp-authors">Julian Rodriguez, Jr. <a href="https://orcid.org/0009-0007-9332-0140" target="_blank" rel="noopener">(ORCID)</a>, Royal Economic Society / Royal Society of Arts</p>
+        <p class="rp-authors">Satyam Bansal <a href="https://orcid.org/0009-0005-6273-766X" target="_blank" rel="noopener">(ORCID)</a>, Nishi</p>
+        <p class="rp-abstract">The global rollout of GLP-1 receptor agonists is a major advance in chronic disease management, but it shares one operational failure point across patients and health systems: high discontinuation. The paper sets out an active biometric observation architecture designed to run alongside treatment, replacing passive, high-friction manual logging with a proactive observation loop of background telemetry, real-time symptom management, and automated dietary execution.</p>
+        <div class="rp-paper-cta">
+          <a href="assets/papers/active-biometric-observation-glp1-adherence.pdf" class="btn btn-primary" target="_blank" rel="noopener">Read the paper (PDF)</a>
+          <a href="how-it-works.html" class="btn btn-ghost">See how Nishi does this</a>
+        </div>
+      </div>
+
+      <p class="rp-note">This is a working paper that lays out a design thesis. It argues a model for supporting adherence and makes an economic case for it. It is not a clinical trial, and it does not claim proven medical outcomes. Nishi is a wellness companion, not a medical service.</p>
+    </div>
+  </section>
+
+  <!-- ============ CLOSING CTA ============ -->
+  <section class="closing-cta closing-v2 solid">
+    <div class="container">
+      <h2 class="reveal">See the loop in your own day.</h2>
+      <p class="reveal">Start with your targets. A 60-second quiz, no signup needed.</p>
+      <a href="https://labs.meetnishi.com/fit-finder/?from=research" class="btn btn-primary reveal">Find your targets</a>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <img class="footer-mark" src="assets/nishi_logo.png" alt="Nishi">
+          <p class="footer-tagline">Your nutrition companion for metabolic health and mindful eating.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="how-it-works.html">How it works</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+        <li><a href="/blog/">Blog</a></li>
+        <li><a href="https://labs.meetnishi.com">Nishi Labs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="story.html">Story</a></li>
+            <li><a href="research.html">Research</a></li>
+            <li><a href="mailto:support@meetnishi.com">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="/privacy">Privacy</a></li>
+            <li><a href="/terms">Terms</a></li>
+            <li><a href="/consumer-health-privacy">Health Data Privacy</a></li>
+            <li><a href="/safety">Safety</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-legal">Nishi is a food and wellness companion, not a medical service. It does not diagnose, treat, or prescribe, and it is not a substitute for advice from a qualified healthcare professional. Always talk to your doctor about your health, diet, and any medications.</p>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Nishi</span>
+        <span><a href="mailto:support@meetnishi.com">support@meetnishi.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="scripts/main.js"></script>
+  <script src="scripts/motion.js"></script>
+</body>
+</html>
