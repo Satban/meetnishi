@@ -58,14 +58,17 @@ body { overflow-x: hidden; }
 }
 .hero-v2 .hero-copy { max-width: 520px; }
 .hero-v2 h1 { font-size: clamp(40px, 5vw, 60px); }
-.hero-v2 .hero-cta { flex-direction: row; align-items: center; justify-content: flex-start; }
+.hero-v2 .hero-cta { flex-direction: row; align-items: center; justify-content: flex-start; flex-wrap: wrap; }
+.hero-v2 .hero-cta .btn, .hero-v2 .hero-cta .btn-text { white-space: nowrap; }
 .hero-photo { position: relative; aspect-ratio: 4/5; }
 .hero-photo .float-card.a { bottom: 22px; left: -28px; }
 .hero-photo .float-card.b { top: 26px; right: -24px; max-width: 200px; }
 @media (max-width: 860px) {
   .hero-v2 .hero-grid { grid-template-columns: 1fr; gap: var(--space-lg); }
   .hero-v2 .hero-copy { max-width: 100%; text-align: center; margin: 0 auto; }
-  .hero-v2 .hero-cta { justify-content: center; }
+  .hero-v2 .hero-cta { flex-direction: column; align-items: stretch; justify-content: center; }
+  .hero-v2 .hero-cta .btn { width: 100%; }
+  .hero-v2 .hero-cta .btn-text { align-self: center; margin-top: 4px; }
   .hero-photo { max-width: 380px; margin: 0 auto; }
   .hero-photo .float-card.a { left: -8px; }
   .hero-photo .float-card.b { right: -8px; }
