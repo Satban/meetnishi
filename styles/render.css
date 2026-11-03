@@ -61,6 +61,11 @@ body { overflow-x: hidden; }
 .hero-v2 .hero-cta { flex-direction: row; align-items: center; justify-content: flex-start; flex-wrap: wrap; }
 .hero-v2 .hero-cta .btn, .hero-v2 .hero-cta .btn-text { white-space: nowrap; }
 .hero-v2 .hero-cta-note { margin: 12px 0 0; font-size: 13px; color: var(--text-muted); }
+
+/* trust strip: non-trademarked "works with" treatment */
+.hero-trust .ti { display: inline-flex; align-items: center; gap: 6px; }
+.hero-trust .ti svg { width: 15px; height: 15px; flex: none; opacity: .8; }
+.hero-trust .sep { width: 1px; height: 13px; border-radius: 1px; background: var(--border-strong, #d9d2c7); display: inline-block; }
 .hero-photo { position: relative; aspect-ratio: 4/5; }
 .hero-photo .float-card.a { bottom: 22px; left: -28px; }
 .hero-photo .float-card.b { top: 26px; right: -24px; max-width: 200px; }
