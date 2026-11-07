@@ -14,7 +14,8 @@
      Flame is 3.91:1, so it may fill and it may set large numerals,
      but it must never carry small text and must never be a button
      with white text on it (that combination fails AA). Where an
-     orange has to be readable, use --accent-dark at 4.60:1.
+     orange has to be readable, use --accent-dark (5.35:1 on the
+     --bg-warm band, not only on white).
    ------------------------------------------------------------ */
 :root {
   /* Background */
@@ -25,7 +26,7 @@
 
   /* Brand flame — accent only */
   --accent: #E8481E;         /* 3.91 · fills, bars, large numerals */
-  --accent-dark: #C2540F;    /* 4.60 · AA · the text-safe orange */
+  --accent-dark: #AA4A0D;    /* 5.35 on --bg-warm · AA · text-safe orange (was #C2540F = 4.33 on the warm band, failed) */
   --accent-soft: #FBE3DA;
   --accent-tint: #FDF0EB;
 
