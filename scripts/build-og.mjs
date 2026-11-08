@@ -21,6 +21,7 @@ const cards = [
   { slug: 'pricing',       eyebrow: 'Early access',            title: 'Free to start. Premium when it earns it.', sub: '7-day trial. No card. Free tier never expires.' },
   { slug: 'story',         eyebrow: 'Our story',               title: 'Why Nishi exists.',                    sub: 'Built for the question GLP-1 leaves behind: what do I eat now?' },
   { slug: 'faq',           eyebrow: 'FAQ',                     title: 'Questions, answered.',                 sub: 'What Nishi is, how privacy works, what Premium unlocks.' },
+  { slug: 'nexus',         eyebrow: 'Nishi Nexus',             title: 'Nishi for the people you serve.',      sub: 'Buy seats, share one link. People join on their own.' },
 ];
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

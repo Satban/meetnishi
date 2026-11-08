@@ -1,0 +1,504 @@
+---
+render_with_liquid: false
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nishi Nexus: Nishi for your patients, members and employees</title>
+  <meta name="description" content="Offer Nishi Premium to the people you serve. Telehealth programs, clinics, employers and health plans buy seats and share one link. Members join on their own.">
+  <link rel="canonical" href="https://meetnishi.com/nexus/">
+  <meta property="og:title" content="Nishi Nexus">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://meetnishi.com/nexus/">
+  <meta property="og:description" content="Offer Nishi Premium to your patients, members or employees. You buy seats and share one link. They join on their own.">
+  <meta property="og:image" content="https://meetnishi.com/assets/og/nexus.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Nishi">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Nishi Nexus">
+  <meta name="twitter:description" content="Nishi Premium for the people you serve. Seats, one link, nothing personal shared.">
+  <meta name="twitter:image" content="https://meetnishi.com/assets/og/nexus.png">
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/render.css">
+  <link rel="stylesheet" href="/styles/motion.css">
+  <style>
+    /* Nexus page only. Uses the site tokens from main.css; no new colours. */
+    .nx-hero-cta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: var(--space-md); }
+    .nx-who { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); max-width: 1080px; margin: 0 auto; }
+    .nx-who h3 { font-size: 19px; margin: 6px 0 10px; }
+    .nx-who p { font-size: 15px; line-height: 1.55; margin: 0; }
+    @media (max-width: 980px) { .nx-who { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .nx-who { grid-template-columns: 1fr; } }
+
+    .nx-shots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px; max-width: 1120px; margin: 0 auto; }
+    .nx-shot { margin: 0; }
+    .nx-shot img { display: block; width: 100%; max-width: 330px; height: auto; border: 1px solid var(--border); border-radius: 18px; background: var(--bg-warm); }
+    .nx-shot figcaption { margin-top: 14px; }
+    .nx-shot figcaption strong { display: block; font-size: 15px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+    .nx-shot figcaption span { font-size: 14px; line-height: 1.5; color: var(--text-soft); }
+    @media (max-width: 900px) {
+      .nx-shots { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 16px; padding-bottom: 8px; }
+      .nx-shot { flex: 0 0 min(64vw, 260px); scroll-snap-align: start; }
+    }
+    .nx-note { text-align: center; max-width: 620px; margin: var(--space-md) auto 0; font-size: 15px; }
+
+    .nx-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); max-width: 1000px; margin: 0 auto; counter-reset: step; }
+    .nx-step { counter-increment: step; }
+    .nx-step::before { content: counter(step); display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 15px; margin-bottom: 14px; }
+    .nx-step h3 { font-size: 20px; margin: 0 0 8px; }
+    .nx-step p { font-size: 15px; line-height: 1.55; margin: 0; }
+    @media (max-width: 820px) { .nx-steps { grid-template-columns: 1fr; } }
+
+    .nx-privacy { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); max-width: 900px; margin: 0 auto; }
+    .nx-privacy ul { list-style: none; padding: 0; margin: 14px 0 0; }
+    .nx-privacy li { padding: 9px 0; border-top: 1px solid var(--border); font-size: 15px; color: var(--text); }
+    .nx-privacy .nx-small { font-size: 13px; color: var(--text-muted); margin: 14px 0 0; }
+    .nx-see { border-top: 3px solid var(--sage); }
+    .nx-never { border-top: 3px solid var(--accent); }
+    @media (max-width: 720px) { .nx-privacy { grid-template-columns: 1fr; } }
+
+    .nx-pricing { max-width: 640px; margin: 0 auto; }
+    .nx-pricing td.nx-price { font-weight: 600; color: var(--text); text-align: right; }
+    .nx-pricing th.nx-price-h { text-align: right; }
+    .nx-example { margin-top: var(--space-md); padding: 18px 20px; background: var(--bg-warm); border: 1px solid var(--border); border-radius: var(--radius); font-size: 15px; }
+    .nx-example strong { color: var(--text); }
+    .nx-terms { font-size: 14px; color: var(--text-muted); margin-top: 14px; }
+
+    .nx-form { max-width: 620px; margin: 0 auto; display: grid; gap: 18px; }
+    .nx-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 600px) { .nx-row { grid-template-columns: 1fr; } }
+    .nx-field label { display: block; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .nx-field .nx-opt { font-weight: 400; color: var(--text-muted); }
+    .nx-field input, .nx-field select, .nx-field textarea { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: #fff; font-size: 16px; color: var(--text); }
+    .nx-field textarea { min-height: 110px; resize: vertical; }
+    .nx-field input:focus, .nx-field select:focus, .nx-field textarea:focus { outline: 2px solid var(--accent-dark); outline-offset: 1px; border-color: var(--accent-dark); }
+    .nx-hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+    .nx-form .btn { justify-self: start; }
+    .nx-form .btn[disabled] { opacity: 0.7; cursor: progress; }
+    .nx-fineprint { font-size: 13px; color: var(--text-muted); margin: 0; }
+    .nx-status { max-width: 620px; margin: 0 auto; padding: 22px 24px; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; }
+    .nx-status h3 { font-size: 22px; margin: 0 0 8px; }
+    .nx-status p { margin: 0; font-size: 15px; }
+    .nx-status.nx-ok { border-left: 3px solid var(--sage); }
+    .nx-error { color: var(--error); font-size: 15px; margin: 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo" aria-label="Nishi home">
+        <img src="/assets/nishi_wordmark.png" alt="Nishi">
+      </a>
+      <ul class="nav-links">
+        <li><a href="/how-it-works.html">How it works</a></li>
+        <li><a href="/pricing.html">Pricing</a></li>
+        <li><a href="https://labs.meetnishi.com">Labs</a></li>
+        <li><a href="/faq.html">FAQ</a></li>
+        <li><a href="/blog/">Blog</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="#demo" class="btn btn-primary">Request a demo</a>
+      </div>
+      <button class="nav-toggle" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="nav-drawer" aria-hidden="true">
+    <ul>
+      <li><a href="/how-it-works.html">How it works</a></li>
+      <li><a href="/pricing.html">Pricing</a></li>
+      <li><a href="https://labs.meetnishi.com">Labs</a></li>
+      <li><a href="/faq.html">FAQ</a></li>
+      <li><a href="/blog/">Blog</a></li>
+    </ul>
+    <a href="#demo" class="btn btn-primary">Request a demo</a>
+  </div>
+
+  <main>
+  <header class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <span class="eyebrow">Nishi Nexus</span>
+        <h1>Give the people you serve a nutrition companion.</h1>
+        <p class="lead">Telehealth programs, clinics, employers and health plans can offer Nishi Premium to their patients, members or employees. You buy the seats and share one link. People join on their own, and you never send us a client list.</p>
+        <div class="nx-hero-cta">
+          <a href="#demo" class="btn btn-primary">Request a demo</a>
+          <a href="#pricing" class="btn btn-ghost">See pricing</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ WHO IT'S FOR ============ -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">Who it's for</span>
+        <h2>Built for the people already caring for them.</h2>
+      </div>
+      <div class="nx-who stagger">
+        <article class="obs-card">
+          <span class="eyebrow-text muted">Telehealth</span>
+          <h3>GLP-1 and weight programs</h3>
+          <p>Day-to-day support between visits: protein, hydration and meals that fit life on medication.</p>
+        </article>
+        <article class="obs-card">
+          <span class="eyebrow-text muted">Clinics</span>
+          <h3>Clinics and dietitian practices</h3>
+          <p>Something useful for patients between appointments, plus a summary they can bring to the next one.</p>
+        </article>
+        <article class="obs-card">
+          <span class="eyebrow-text muted">Employers</span>
+          <h3>Employee benefits</h3>
+          <p>A nutrition benefit people actually open, for metabolic health and everyday eating.</p>
+        </article>
+        <article class="obs-card">
+          <span class="eyebrow-text muted">Health plans</span>
+          <h3>Member engagement</h3>
+          <p>A friendly daily companion for members working on their metabolic health.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHAT MEMBERS GET ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">What members get</span>
+        <h2>The full Nishi Premium app.</h2>
+        <p class="lead">The same app someone would buy for themselves, at no cost to them.</p>
+      </div>
+      <div class="nx-shots">
+        <figure class="nx-shot">
+          <img src="/assets/nexus/today.jpg" width="660" height="1434" alt="Nishi Today screen showing calories, protein and fiber for the day, with a suggestion to close the protein gap" loading="lazy" decoding="async">
+          <figcaption><strong>A clear daily view</strong><span>Protein, fiber and calories, with a nudge on what would close the gap.</span></figcaption>
+        </figure>
+        <figure class="nx-shot">
+          <img src="/assets/nexus/ask-nishi.jpg" width="660" height="1434" alt="Ask Nishi chat where a meal is logged by describing it in plain words" loading="lazy" decoding="async">
+          <figcaption><strong>Log by saying it</strong><span>Describe a meal in plain words. Nishi does the math.</span></figcaption>
+        </figure>
+        <figure class="nx-shot">
+          <img src="/assets/nexus/glp1-tracker.jpg" width="660" height="1434" alt="GLP-1 tracker card with the weekly dose recorded and injection site tracking" loading="lazy" decoding="async">
+          <figcaption><strong>GLP-1 support</strong><span>Track doses and injection sites, and see how eating fits the week.</span></figcaption>
+        </figure>
+        <figure class="nx-shot">
+          <img src="/assets/nexus/plan-week.jpg" width="660" height="1434" alt="A week of planned meals with calories and protein for each" loading="lazy" decoding="async">
+          <figcaption><strong>A week of real meals</strong><span>Meals sized to their goals, with a shopping list.</span></figcaption>
+        </figure>
+        <figure class="nx-shot">
+          <img src="/assets/nexus/visit-summary.jpg" width="660" height="1434" alt="One-page visit summary with sleep, steps and resting heart rate trends" loading="lazy" decoding="async">
+          <figcaption><strong>Ready for the next visit</strong><span>A one-page summary of trends to bring to an appointment.</span></figcaption>
+        </figure>
+      </div>
+      <p class="nx-note">Screens show sample data.</p>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">How it works</span>
+        <h2>Three steps, no integration.</h2>
+      </div>
+      <div class="nx-steps stagger">
+        <div class="nx-step">
+          <h3>Choose your seats</h3>
+          <p>Start with 25 or more. One annual agreement, invoiced.</p>
+        </div>
+        <div class="nx-step">
+          <h3>Share your link</h3>
+          <p>We set up a private sign-up page with your name on it. Send it by email, patient portal, flyer or however you reach people.</p>
+        </div>
+        <div class="nx-step">
+          <h3>People join on their own</h3>
+          <p>They sign in with Apple or Google and get 12 months of Premium at no cost to them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRIVACY ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">Privacy</span>
+        <h2>You see counts. Everything personal stays with Nishi.</h2>
+        <p class="lead">You never send us a list of names, and we never send you anything about a person.</p>
+      </div>
+      <div class="nx-privacy">
+        <div class="obs-card nx-see">
+          <span class="eyebrow-text sage">What you see</span>
+          <ul>
+            <li>How many people joined</li>
+            <li>How many use Nishi each week</li>
+            <li>Seats used against seats bought</li>
+          </ul>
+          <p class="nx-small">Shown only once 10 or more people have joined, so no one can be singled out.</p>
+        </div>
+        <div class="obs-card nx-never">
+          <span class="eyebrow-text">Never leaves Nishi</span>
+          <ul>
+            <li>Names, emails, or who joined</li>
+            <li>Meals, weight or medication details</li>
+            <li>Conversations with Nishi</li>
+            <li>Any one person's activity</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section class="section section-warm" id="pricing">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">Pricing</span>
+        <h2>The more seats, the less each one costs.</h2>
+        <p class="lead">Each price applies to the seats in its band. Individual Premium is $79.99 a year.</p>
+      </div>
+      <div class="nx-pricing">
+        <table class="compare-table">
+          <thead>
+            <tr><th scope="col">Seats</th><th scope="col" class="nx-price-h">Per seat, per year</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="row-head">1 to 50</td><td class="nx-price" data-band="1-50">$69</td></tr>
+            <tr><td class="row-head">51 to 100</td><td class="nx-price" data-band="51-100">$59</td></tr>
+            <tr><td class="row-head">101 to 250</td><td class="nx-price" data-band="101-250">$49</td></tr>
+            <tr><td class="row-head">251 to 500</td><td class="nx-price" data-band="251-500">$42</td></tr>
+            <tr><td class="row-head">Over 500</td><td class="nx-price" data-band="501+">Let's talk</td></tr>
+          </tbody>
+        </table>
+        <div class="nx-example">
+          <strong>Example: 100 seats.</strong> The first 50 at $69 and the next 50 at $59, so <strong>$6,400 a year</strong>, about $64 a seat.
+        </div>
+        <p class="nx-terms">Minimum 25 seats. Annual agreement, invoiced. Add seats any time during the year.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section">
+    <div class="container-prose">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">Questions</span>
+        <h2>Good to know.</h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Who pays?</summary>
+          <p class="faq-answer">Your organization pays for the seats. The people you offer it to pay nothing.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What do people get?</summary>
+          <p class="faq-answer">Twelve months of Nishi Premium, the same app someone would buy for themselves.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What can we see?</summary>
+          <p class="faq-answer">Totals only: how many people joined, how many use Nishi each week, and how many seats are in use. We show these once 10 or more people have joined. We never share names, emails or anything a person logs.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How do people join?</summary>
+          <p class="faq-answer">You share a private link we set up for you. People open it, sign in with Apple or Google, and Premium switches on. There is nothing to integrate and no list to send us.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How long is the agreement?</summary>
+          <p class="faq-answer">One year. You can add seats during the year, and we send the renewal invoice 30 days before it ends.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is Nishi a medical service?</summary>
+          <p class="faq-answer">No. Nishi is a food and wellness companion. It does not give medical advice, and it works alongside the care people already get.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REQUEST A DEMO ============ -->
+  <section class="section section-warm" id="demo">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow-text">Request a demo</span>
+        <h2>Let's talk about your people.</h2>
+        <p class="lead">Tell us a little about your organization. We reply within one business day.</p>
+      </div>
+
+      <form class="nx-form" id="nx-form" novalidate>
+        <div class="nx-row">
+          <div class="nx-field">
+            <label for="nx-name">Your name</label>
+            <input id="nx-name" name="name" type="text" autocomplete="name" maxlength="120" required>
+          </div>
+          <div class="nx-field">
+            <label for="nx-email">Work email</label>
+            <input id="nx-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+          </div>
+        </div>
+        <div class="nx-field">
+          <label for="nx-org">Organization</label>
+          <input id="nx-org" name="organization" type="text" autocomplete="organization" maxlength="160" required>
+        </div>
+        <div class="nx-row">
+          <div class="nx-field">
+            <label for="nx-type">Type of organization</label>
+            <select id="nx-type" name="org_type" required>
+              <option value="">Choose one</option>
+              <option value="telehealth">Telehealth program</option>
+              <option value="clinic">Clinic or dietitian practice</option>
+              <option value="employer">Employer</option>
+              <option value="health_plan">Health plan</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="nx-field">
+            <label for="nx-band">How many people might join?</label>
+            <select id="nx-band" name="member_band" required>
+              <option value="">Choose one</option>
+              <option value="under_100">Under 100</option>
+              <option value="100_500">100 to 500</option>
+              <option value="500_2000">500 to 2,000</option>
+              <option value="over_2000">Over 2,000</option>
+              <option value="unsure">Not sure yet</option>
+            </select>
+          </div>
+        </div>
+        <div class="nx-field">
+          <label for="nx-msg">Anything we should know? <span class="nx-opt">(optional)</span></label>
+          <textarea id="nx-msg" name="message" maxlength="2000"></textarea>
+        </div>
+        <div class="nx-hp" aria-hidden="true">
+          <label for="nx-website">Website</label>
+          <input id="nx-website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <p class="nx-error" id="nx-error" role="alert" hidden></p>
+        <button type="submit" class="btn btn-primary" id="nx-submit">Request a demo</button>
+        <p class="nx-fineprint">We use these details only to reply to you. See our <a href="/privacy">privacy policy</a>.</p>
+      </form>
+
+      <div class="nx-status nx-ok" id="nx-ok" role="status" hidden>
+        <h3>Thanks, we have your request.</h3>
+        <p>We reply within one business day from support@meetnishi.com.</p>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <img class="footer-mark" src="/assets/nishi_logo.png" alt="Nishi">
+          <p class="footer-tagline">Your nutrition companion for metabolic health and mindful eating.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="/how-it-works.html">How it works</a></li>
+            <li><a href="/pricing.html">Pricing</a></li>
+            <li><a href="/faq.html">FAQ</a></li>
+            <li><a href="/blog/">Blog</a></li>
+            <li><a href="https://labs.meetnishi.com">Nishi Labs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="/story.html">Story</a></li>
+            <li><a href="mailto:support@meetnishi.com">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="/privacy">Privacy</a></li>
+            <li><a href="/terms">Terms</a></li>
+            <li><a href="/consumer-health-privacy">Health Data Privacy</a></li>
+            <li><a href="/safety">Safety</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-legal">Nishi is a food and wellness companion, not a medical service. It does not diagnose, treat, or prescribe, and it is not a substitute for advice from a qualified healthcare professional. Always talk to your doctor about your health, diet, and any medications.</p>
+      <div class="footer-bottom">
+        <span>&copy; 2026 Nishi</span>
+        <span><a href="mailto:support@meetnishi.com">support@meetnishi.com</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/scripts/main.js"></script>
+  <script src="/scripts/motion.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var FN_URL = 'https://aqdapnwrsvyjrpiwtwip.supabase.co/functions/v1/nexus-demo-request';
+      var form = document.getElementById('nx-form');
+      var btn = document.getElementById('nx-submit');
+      var err = document.getElementById('nx-error');
+      var ok = document.getElementById('nx-ok');
+      var FALLBACK = 'That did not go through. Please email us at <a href="mailto:support@meetnishi.com">support@meetnishi.com</a> and we will pick it up from there.';
+
+      function showError(html) { err.innerHTML = html; err.hidden = false; }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        err.hidden = true;
+        if (!form.checkValidity()) {
+          var first = form.querySelector(':invalid');
+          showError('Please fill in ' + (first && first.labels && first.labels[0] ? first.labels[0].textContent.replace(/\s*\(optional\)\s*/, '').toLowerCase() : 'the required fields') + '.');
+          if (first) first.focus();
+          return;
+        }
+        var f = form.elements;
+        var data = {
+          name: f.namedItem('name').value,
+          email: f.namedItem('email').value,
+          organization: f.namedItem('organization').value,
+          org_type: f.namedItem('org_type').value,
+          member_band: f.namedItem('member_band').value,
+          message: f.namedItem('message').value,
+          website: f.namedItem('website').value
+        };
+        btn.disabled = true;
+        btn.textContent = 'Sending your request...';
+        fetch(FN_URL, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(data)
+        }).then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (body) { return { res: res, body: body }; });
+        }).then(function (r) {
+          if (r.res.ok && r.body && r.body.ok) {
+            form.hidden = true;
+            ok.hidden = false;
+            ok.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+          }
+          if (r.res.status === 400 && r.body && r.body.field) {
+            showError('Please check the ' + ({ name: 'name', email: 'work email', organization: 'organization', org_type: 'type of organization', member_band: 'number of people', message: 'message' }[r.body.field] || 'form') + ' field.');
+          } else {
+            showError(FALLBACK);
+          }
+          btn.disabled = false;
+          btn.textContent = 'Request a demo';
+        }).catch(function () {
+          showError(FALLBACK);
+          btn.disabled = false;
+          btn.textContent = 'Request a demo';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
