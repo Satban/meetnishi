@@ -51,20 +51,30 @@ sitemap: true
     }
     .nx-note { text-align: center; max-width: 620px; margin: var(--space-md) auto 0; font-size: 15px; }
 
-    .nx-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); max-width: 1000px; margin: 0 auto; counter-reset: step; }
-    .nx-step { counter-increment: step; }
-    .nx-step::before { content: counter(step); display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 15px; margin-bottom: 14px; }
-    .nx-step h3 { font-size: 20px; margin: 0 0 8px; }
-    .nx-step p { font-size: 15px; line-height: 1.55; margin: 0; }
-    @media (max-width: 820px) { .nx-steps { grid-template-columns: 1fr; } }
-
-    .nx-privacy { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); max-width: 900px; margin: 0 auto; }
-    .nx-privacy ul { list-style: none; padding: 0; margin: 14px 0 0; }
-    .nx-privacy li { padding: 9px 0; border-top: 1px solid var(--border); font-size: 15px; color: var(--text); }
-    .nx-privacy .nx-small { font-size: 13px; color: var(--text-muted); margin: 14px 0 0; }
-    .nx-see { border-top: 3px solid var(--sage); }
-    .nx-never { border-top: 3px solid var(--accent); }
-    @media (max-width: 720px) { .nx-privacy { grid-template-columns: 1fr; } }
+    /* Partnership graphic: 4 phases x 2 lanes (organization, participants). Desktop: columns with
+       rows aligned by subgrid; narrow screens: one phase per block, lanes stacked. */
+    .nx-flow { list-style: none; margin: 0 auto; padding: 0; max-width: 1120px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto 1fr auto 1fr; column-gap: 18px; position: relative; }
+    .nx-flow::before { content: ""; position: absolute; left: 12%; right: 12%; top: 17px; height: 2px; background: var(--border-strong); }
+    .nx-phase { display: grid; grid-row: span 4; grid-template-rows: subgrid; position: relative; }
+    .nx-phase-h { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 18px; }
+    .nx-num { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 0 6px var(--bg-warm); }
+    .nx-phase-name { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-soft); }
+    .nx-cell { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px 18px; }
+    .nx-cell-org { border-top: 3px solid var(--sage); }
+    .nx-cell-person { border-top: 3px solid var(--accent); }
+    .nx-lane { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+    .nx-cell-person .nx-lane { color: var(--accent-dark); }
+    .nx-lane svg { width: 16px; height: 16px; flex: none; }
+    .nx-cell h3 { font-size: 18px; margin: 8px 0 6px; }
+    .nx-cell p { font-size: 14.5px; line-height: 1.55; margin: 0; color: var(--text-soft); }
+    .nx-link { height: 22px; width: 2px; margin: 0 auto; background: var(--border-strong); }
+    @media (max-width: 900px) {
+      .nx-flow { grid-template-columns: 1fr; grid-template-rows: none; row-gap: 28px; max-width: 560px; }
+      .nx-flow::before { display: none; }
+      .nx-phase { grid-row: auto; grid-template-rows: none; }
+      .nx-phase-h { flex-direction: row; justify-content: flex-start; margin-bottom: 12px; }
+      .nx-num { box-shadow: none; }
+    }
 
     .nx-pricing { max-width: 640px; margin: 0 auto; }
     .nx-pricing td.nx-price { font-weight: 600; color: var(--text); text-align: right; }
@@ -209,57 +219,72 @@ sitemap: true
     </div>
   </section>
 
-  <!-- ============ HOW IT WORKS ============ -->
-  <section class="section section-warm">
+  <!-- ============ HOW THE PARTNERSHIP WORKS (replaces the 3-step list and the privacy cards) ============ -->
+  <section class="section section-warm" id="how-it-works">
     <div class="container">
       <div class="section-header reveal">
         <span class="eyebrow-text">How it works</span>
-        <h2>Three steps, no integration.</h2>
+        <h2>What your organization does, and what participants experience.</h2>
+        <p class="lead">No integration and no member lists. You see totals; personal details stay between each participant and Nishi.</p>
       </div>
-      <div class="nx-steps stagger">
-        <div class="nx-step">
-          <h3>Choose your seats</h3>
-          <p>Start with 25 or more. One annual agreement, invoiced.</p>
-        </div>
-        <div class="nx-step">
-          <h3>Share your link</h3>
-          <p>We set up a private sign-up page with your name on it. Send it by email, patient portal, flyer or however you reach people.</p>
-        </div>
-        <div class="nx-step">
-          <h3>People join on their own</h3>
-          <p>They sign in with Apple or Google and get Premium at no cost to them, for as long as your plan runs.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ PRIVACY ============ -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="eyebrow-text">Privacy</span>
-        <h2>You see counts. Everything personal stays with Nishi.</h2>
-        <p class="lead">You never send us a list of names, and we never send you anything about a person.</p>
-      </div>
-      <div class="nx-privacy">
-        <div class="obs-card nx-see">
-          <span class="eyebrow-text sage">What you see</span>
-          <ul>
-            <li>How many people joined</li>
-            <li>Seats in use and seats available</li>
-          </ul>
-          <p class="nx-small">Shown only once 10 or more people have joined, so no one can be singled out.</p>
-        </div>
-        <div class="obs-card nx-never">
-          <span class="eyebrow-text">Never leaves Nishi</span>
-          <ul>
-            <li>Names, emails, or who joined</li>
-            <li>Meals, weight or medication details</li>
-            <li>Conversations with Nishi</li>
-            <li>Any one person's activity</li>
-          </ul>
-        </div>
-      </div>
+      <ol class="nx-flow stagger">
+        <li class="nx-phase">
+          <div class="nx-phase-h"><span class="nx-num">1</span><span class="nx-phase-name">Set up</span></div>
+          <div class="nx-cell nx-cell-org">
+            <span class="nx-lane"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5l8-3 8 3v16M9 21v-5h6v5M8 9h2M14 9h2M8 13h2M14 13h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Your organization</span>
+            <h3>Plan your program</h3>
+            <p>A short call to agree on seats and a start date, then one annual agreement, invoiced to your organization.</p>
+          </div>
+          <div class="nx-link" aria-hidden="true"></div>
+          <div class="nx-cell nx-cell-person">
+            <span class="nx-lane"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Participants</span>
+            <h3>Hear about it from you</h3>
+            <p>We never ask you for their names or contact details, and we do not reach out to them directly.</p>
+          </div>
+        </li>
+        <li class="nx-phase">
+          <div class="nx-phase-h"><span class="nx-num">2</span><span class="nx-phase-name">Launch</span></div>
+          <div class="nx-cell nx-cell-org">
+            <span class="nx-lane"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5l8-3 8 3v16M9 21v-5h6v5M8 9h2M14 9h2M8 13h2M14 13h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Your organization</span>
+            <h3>Share your private link</h3>
+            <p>We set up a sign-up page with your organization's name. Share it by email, patient portal or flyer.</p>
+          </div>
+          <div class="nx-link" aria-hidden="true"></div>
+          <div class="nx-cell nx-cell-person">
+            <span class="nx-lane"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Participants</span>
+            <h3>Join on their own</h3>
+            <p>They open the link, sign in with Apple or Google, and Premium turns on at no cost to them.</p>
+          </div>
+        </li>
+        <li class="nx-phase">
+          <div class="nx-phase-h"><span class="nx-num">3</span><span class="nx-phase-name">Day to day</span></div>
+          <div class="nx-cell nx-cell-org">
+            <span class="nx-lane"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5l8-3 8 3v16M9 21v-5h6v5M8 9h2M14 9h2M8 13h2M14 13h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Your organization</span>
+            <h3>See totals only</h3>
+            <p>People joined, seats in use and seats available. Shown once 10 or more people have joined.</p>
+          </div>
+          <div class="nx-link" aria-hidden="true"></div>
+          <div class="nx-cell nx-cell-person">
+            <span class="nx-lane"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Participants</span>
+            <h3>Use Nishi privately</h3>
+            <p>They log meals, plan their week and track GLP-1 doses on iPhone or Android. What they log is not shared with your organization.</p>
+          </div>
+        </li>
+        <li class="nx-phase">
+          <div class="nx-phase-h"><span class="nx-num">4</span><span class="nx-phase-name">Renewal</span></div>
+          <div class="nx-cell nx-cell-org">
+            <span class="nx-lane"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5l8-3 8 3v16M9 21v-5h6v5M8 9h2M14 9h2M8 13h2M14 13h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Your organization</span>
+            <h3>Grow or renew</h3>
+            <p>Add seats at any time. We send the renewal invoice 30 days before your year ends.</p>
+          </div>
+          <div class="nx-link" aria-hidden="true"></div>
+          <div class="nx-cell nx-cell-person">
+            <span class="nx-lane"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Participants</span>
+            <h3>Keep their access</h3>
+            <p>Premium continues for as long as your agreement is active.</p>
+          </div>
+        </li>
+      </ol>
     </div>
   </section>
 
