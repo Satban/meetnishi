@@ -310,9 +310,9 @@ test("P1 offerLine: seat codes show the contract end, others show months", () =>
 });
 
 test("F6 signInOptions: Android never offers Apple; desktop explains Apple is iPhone only", () => {
-  assert.deepEqual(signInOptions("android"), { apple: false, appleNote: false });
-  assert.deepEqual(signInOptions("ios"), { apple: true, appleNote: false });
-  for (const p of ["desktop", undefined, "other"]) assert.deepEqual(signInOptions(p), { apple: true, appleNote: true }, String(p));
+  assert.deepEqual(signInOptions("android"), { apple: false, appleNote: false, androidNote: true });
+  assert.deepEqual(signInOptions("ios"), { apple: true, appleNote: false, androidNote: false });
+  for (const p of ["desktop", undefined, "other"]) assert.deepEqual(signInOptions(p), { apple: true, appleNote: true, androidNote: false }, String(p));
   const ANDROID = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36";
   assert.equal(signInOptions(platform(ANDROID)).apple, false, "real Android UA");
   assert.equal(signInOptions(platform(SAFARI_IOS)).apple, true, "real iOS UA");
@@ -323,5 +323,6 @@ test("F6 layout: every Apple button sits beside a Google button, and the Apple n
   const apple = (html.match(/data-action="apple"/g) || []).length;
   const google = (html.match(/data-action="google"/g) || []).length;
   assert.ok(apple >= 3 && apple === google, `apple ${apple} google ${google}`);
-  assert.match(html, /data-when="apple-note" hidden>[^<]*iPhone app only/);
+  assert.match(html, /data-when="apple-note" hidden>[^<]*iPhone app only[^<]*same email address/);
+  assert.match(html, /data-when="android-note" hidden>[^<]*same email address/);
 });

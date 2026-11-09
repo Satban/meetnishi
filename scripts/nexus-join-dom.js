@@ -80,6 +80,7 @@ function render(d, info) {
   const opts = signInOptions(platform(UA));
   root.querySelectorAll('[data-action="apple"]').forEach((el) => { el.hidden = !opts.apple; });
   root.querySelectorAll('[data-when="apple-note"]').forEach((el) => { el.hidden = !opts.appleNote; });
+  root.querySelectorAll('[data-when="android-note"]').forEach((el) => { el.hidden = !opts.androidNote; });
   bindAll(root, "offer", offerLine(info.validate));
   root.querySelectorAll('[data-when="signed-out"]').forEach((el) => {
     el.hidden = !showSignInBlock(state, !!info.email);

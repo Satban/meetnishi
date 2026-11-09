@@ -132,12 +132,15 @@ export function payingStatus(storeRow, webLive, nowMs) {
 /**
  * Sign-in choices for this device. The Android app offers Google only, so an
  * Android visitor who joined with Apple could never sign in on their phone.
- * -> {apple: show the Apple button?, appleNote: show "Apple is iPhone only"?}
+ * -> {apple: show the Apple button?, appleNote: desktop "Apple is iPhone only" note?,
+ *     androidNote: Android "signed up with Apple before?" note?}
+ * Both notes say "the same email address": Google sign-in only lands on an existing
+ * Apple-created account when the email matches (Supabase links verified emails).
  */
 export function signInOptions(plat) {
-  if (plat === "android") return { apple: false, appleNote: false };
-  if (plat === "ios") return { apple: true, appleNote: false };
-  return { apple: true, appleNote: true };
+  if (plat === "android") return { apple: false, appleNote: false, androidNote: true };
+  if (plat === "ios") return { apple: true, appleNote: false, androidNote: false };
+  return { apple: true, appleNote: true, androidNote: false };
 }
 
 /** Signed-out visitors on a full or closed program may be existing members: let them sign in. */
