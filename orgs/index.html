@@ -49,6 +49,31 @@ sitemap: true
       .nx-shots { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 16px; padding-bottom: 8px; }
       .nx-shot { flex: 0 0 min(64vw, 260px); scroll-snap-align: start; }
     }
+    /* Screenshot viewer: tap a screen to see it large; arrows / swipe-free buttons, Esc closes. */
+    .nx-zoom { display: block; position: relative; cursor: zoom-in; border-radius: 18px; }
+    .nx-zoom:focus-visible { outline: 2px solid var(--accent-dark); outline-offset: 3px; }
+    .nx-zoom-hint { position: absolute; right: 10px; bottom: 10px; width: 34px; height: 34px; border-radius: 50%; background: rgba(31,46,61,.82); color: #fff; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s; }
+    .nx-zoom-hint svg { width: 18px; height: 18px; }
+    .nx-zoom:hover .nx-zoom-hint, .nx-zoom:focus-visible .nx-zoom-hint { opacity: 1; }
+    @media (hover: none) { .nx-zoom-hint { opacity: 1; } }
+    .nx-lightbox { border: 0; padding: 0; background: transparent; max-width: 100vw; max-height: 100vh; width: 100vw; height: 100vh; }
+    .nx-lightbox::backdrop { background: rgba(15,23,32,.93); }
+    .nx-lb-inner { height: 100%; display: flex; align-items: center; justify-content: center; gap: 28px; padding: 24px 16px; box-sizing: border-box; }
+    .nx-lb-fig { margin: 0; display: flex; flex-direction: column; align-items: center; max-height: 100%; min-height: 0; }
+    .nx-lb-fig img { display: block; height: min(80vh, 1434px); width: auto; max-width: min(88vw, 660px); object-fit: contain; border-radius: 22px; background: #fff; }
+    .nx-lb-fig figcaption { color: #fff; text-align: center; max-width: 420px; margin-top: 14px; font-size: 15px; line-height: 1.5; }
+    .nx-lb-fig figcaption strong { display: block; font-size: 17px; margin-bottom: 2px; }
+    .nx-lb-btn { flex: none; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); color: #fff; font-size: 22px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .nx-lb-btn:hover { background: rgba(255,255,255,.18); }
+    .nx-lb-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    .nx-lb-close { position: absolute; top: 16px; right: 16px; }
+    @media (max-width: 640px) {
+      .nx-lb-inner { gap: 0; padding: 64px 12px 20px; flex-direction: column; }
+      .nx-lb-fig img { height: auto; max-height: 68vh; max-width: 86vw; }
+      .nx-lb-prev, .nx-lb-next { position: absolute; bottom: 20px; }
+      .nx-lb-prev { left: 20px; } .nx-lb-next { right: 20px; }
+      .nx-lb-fig figcaption { padding: 0 52px; }
+    }
     .nx-note { text-align: center; max-width: 620px; margin: var(--space-md) auto 0; font-size: 15px; }
 
     /* Partnership graphic: 4 phases x 2 lanes (organization, participants). Desktop: columns with
@@ -195,23 +220,23 @@ sitemap: true
       </div>
       <div class="nx-shots">
         <figure class="nx-shot">
-          <img src="/assets/orgs/today.jpg" width="660" height="1434" alt="Nishi Today screen showing calories, protein and fiber for the day, with a suggestion to close the protein gap" loading="lazy" decoding="async">
+          <a class="nx-zoom" href="/assets/orgs/today.jpg" aria-label="Enlarge screenshot"><img src="/assets/orgs/today.jpg" width="660" height="1434" alt="Nishi Today screen showing calories, protein and fiber for the day, with a suggestion to close the protein gap" loading="lazy" decoding="async"><span class="nx-zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5M11 8v6M8 11h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></a>
           <figcaption><strong>A clear daily view</strong><span>Protein, fiber and calories, with a nudge on what would close the gap.</span></figcaption>
         </figure>
         <figure class="nx-shot">
-          <img src="/assets/orgs/ask-nishi.jpg" width="660" height="1434" alt="Ask Nishi chat where a meal is logged by describing it in plain words" loading="lazy" decoding="async">
+          <a class="nx-zoom" href="/assets/orgs/ask-nishi.jpg" aria-label="Enlarge screenshot"><img src="/assets/orgs/ask-nishi.jpg" width="660" height="1434" alt="Ask Nishi chat where a meal is logged by describing it in plain words" loading="lazy" decoding="async"><span class="nx-zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5M11 8v6M8 11h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></a>
           <figcaption><strong>Log by saying it</strong><span>Describe a meal in plain words. Nishi does the math.</span></figcaption>
         </figure>
         <figure class="nx-shot">
-          <img src="/assets/orgs/glp1-tracker.jpg" width="660" height="1434" alt="GLP-1 tracker card with the weekly dose recorded and injection site tracking" loading="lazy" decoding="async">
+          <a class="nx-zoom" href="/assets/orgs/glp1-tracker.jpg" aria-label="Enlarge screenshot"><img src="/assets/orgs/glp1-tracker.jpg" width="660" height="1434" alt="GLP-1 tracker card with the weekly dose recorded and injection site tracking" loading="lazy" decoding="async"><span class="nx-zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5M11 8v6M8 11h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></a>
           <figcaption><strong>GLP-1 support</strong><span>Track doses and injection sites, and see how eating fits the week.</span></figcaption>
         </figure>
         <figure class="nx-shot">
-          <img src="/assets/orgs/plan-week.jpg" width="660" height="1434" alt="A personalized week of planned meals with calories and protein for each" loading="lazy" decoding="async">
+          <a class="nx-zoom" href="/assets/orgs/plan-week.jpg" aria-label="Enlarge screenshot"><img src="/assets/orgs/plan-week.jpg" width="660" height="1434" alt="A personalized week of planned meals with calories and protein for each" loading="lazy" decoding="async"><span class="nx-zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5M11 8v6M8 11h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></a>
           <figcaption><strong>Meal plans built for them</strong><span>Personalized to their goals, their data and their body, with a shopping list.</span></figcaption>
         </figure>
         <figure class="nx-shot">
-          <img src="/assets/orgs/visit-summary.jpg" width="660" height="1434" alt="One-page visit summary with sleep, steps and resting heart rate trends" loading="lazy" decoding="async">
+          <a class="nx-zoom" href="/assets/orgs/visit-summary.jpg" aria-label="Enlarge screenshot"><img src="/assets/orgs/visit-summary.jpg" width="660" height="1434" alt="One-page visit summary with sleep, steps and resting heart rate trends" loading="lazy" decoding="async"><span class="nx-zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5M11 8v6M8 11h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></a>
           <figcaption><strong>Ready for the next visit</strong><span>A one-page summary of trends to bring to an appointment.</span></figcaption>
         </figure>
       </div>
@@ -518,6 +543,51 @@ sitemap: true
           btn.textContent = 'Request a demo';
         });
       });
+    })();
+  </script>
+  <dialog class="nx-lightbox" aria-label="Screenshot">
+    <div class="nx-lb-inner">
+      <button type="button" class="nx-lb-btn nx-lb-prev" aria-label="Previous screen">&#8249;</button>
+      <figure class="nx-lb-fig"><img alt=""><figcaption></figcaption></figure>
+      <button type="button" class="nx-lb-btn nx-lb-next" aria-label="Next screen">&#8250;</button>
+      <button type="button" class="nx-lb-btn nx-lb-close" aria-label="Close">&#215;</button>
+    </div>
+  </dialog>
+  <script>
+    (function () {
+      var dlg = document.querySelector('.nx-lightbox');
+      if (!dlg || typeof dlg.showModal !== 'function') return; // no <dialog>: links open the image
+      var shots = Array.prototype.slice.call(document.querySelectorAll('.nx-shot'));
+      var img = dlg.querySelector('img'), cap = dlg.querySelector('figcaption');
+      var i = 0, opener = null;
+      function show(n) {
+        i = (n + shots.length) % shots.length;
+        var s = shots[i], src = s.querySelector('img');
+        img.src = src.getAttribute('src'); img.alt = src.alt;
+        cap.innerHTML = s.querySelector('figcaption').innerHTML;
+      }
+      shots.forEach(function (s, n) {
+        s.querySelector('.nx-zoom').addEventListener('click', function (e) {
+          e.preventDefault(); opener = this; show(n); dlg.showModal();
+          document.documentElement.style.overflow = 'hidden';
+        });
+      });
+      dlg.querySelector('.nx-lb-prev').addEventListener('click', function () { show(i - 1); });
+      dlg.querySelector('.nx-lb-next').addEventListener('click', function () { show(i + 1); });
+      function hide() { if (dlg.open) dlg.close(); restore(); }
+      function restore() {
+        document.documentElement.style.overflow = '';
+        if (opener) { opener.focus(); opener = null; }
+      }
+      dlg.querySelector('.nx-lb-close').addEventListener('click', hide);
+      dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.classList.contains('nx-lb-inner')) hide(); });
+      dlg.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); show(i - 1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); show(i + 1); }
+        if (e.key === 'Escape') { e.preventDefault(); hide(); }
+      });
+      dlg.addEventListener('close', restore); // Esc and any other close path
+
     })();
   </script>
 </body>
