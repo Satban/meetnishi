@@ -142,6 +142,7 @@ sitemap: true
         <li><a href="https://labs.meetnishi.com">Labs</a></li>
         <li><a href="/faq.html">FAQ</a></li>
         <li><a href="/blog/">Blog</a></li>
+        <li aria-current="page"><a href="/orgs/">For organizations</a></li>
       </ul>
       <div class="nav-cta">
         <a href="#demo" class="btn btn-primary">Request a demo</a>
@@ -159,6 +160,7 @@ sitemap: true
       <li><a href="https://labs.meetnishi.com">Labs</a></li>
       <li><a href="/faq.html">FAQ</a></li>
       <li><a href="/blog/">Blog</a></li>
+      <li aria-current="page"><a href="/orgs/">For organizations</a></li>
     </ul>
     <a href="#demo" class="btn btn-primary">Request a demo</a>
   </div>
@@ -413,7 +415,7 @@ sitemap: true
               <option value="">Choose one</option>
               <option value="under_100">Under 100</option>
               <option value="100_500">100 to 500</option>
-              <option value="500_2000">500 to 2,000</option>
+              <option value="500_2000">501 to 2,000</option>
               <option value="over_2000">Over 2,000</option>
               <option value="unsure">Not sure yet</option>
             </select>
@@ -501,7 +503,8 @@ sitemap: true
         err.hidden = true;
         if (!form.checkValidity()) {
           var first = form.querySelector(':invalid');
-          showError('Please fill in ' + (first && first.labels && first.labels[0] ? first.labels[0].textContent.replace(/\s*\(optional\)\s*/, '').toLowerCase() : 'the required fields') + '.');
+          var MSG = { 'nx-name': 'Please enter your name.', 'nx-email': 'Please enter a valid work email.', 'nx-org': 'Please enter your organization.', 'nx-type': 'Please select an organization type.', 'nx-band': 'Please select how many people might join.' };
+          showError((first && MSG[first.id]) || 'Please complete the required fields.');
           if (first) first.focus();
           return;
         }
