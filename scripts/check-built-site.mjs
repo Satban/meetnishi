@@ -48,6 +48,11 @@ for (const f of walk("_site").filter((f) => f.endsWith(".html"))) {
   if (!nav || !nav.includes("<li")) continue; // app-flow pages have an empty header on purpose
   navPages++;
   must(nav.includes('href="/orgs/"'), `${f}: header has no For organizations link`);
+  // Story lives in the footer only (founder decision 2026-11-03); Labs takes its header slot.
+  must(!/story\.html/.test(nav), `${f}: header lists Story (footer only)`);
+  const drawer = (html.match(/<div class="nav-drawer"[^>]*>\s*<ul>([\s\S]*?)<\/ul>/) || [])[1] || "";
+  must(!/story\.html/.test(drawer), `${f}: mobile menu lists Story (footer only)`);
+  must(/story\.html/.test(html.slice(html.lastIndexOf("<footer"))), `${f}: footer lost its Story link`);
 }
 must(navPages >= 15, `only ${navPages} pages with a header menu; the scan went vacuous`);
 
