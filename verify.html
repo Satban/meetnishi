@@ -60,6 +60,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="scripts/config.js"></script>
   <script src="scripts/auth.js"></script>
+  <script type="module">
+    import * as NexusJoin from "/scripts/nexus-join.js";
+    window.NexusJoin = NexusJoin;
+  </script>
   <script>
     (function () {
       const title = document.getElementById('verify-title');
@@ -74,10 +78,31 @@
         actions.style.display = 'block';
       }
 
-      function goAccount() {
+      // onSession and getSession can both fire; navigate exactly once (Nexus plan, review #4).
+      let navigated = false;
+      async function goAccount(session) {
+        if (navigated) return;
+        navigated = true;
+        let dest = '/account.html';
+        try {
+          const stash = sessionStorage.getItem('nexus_return');
+          if (stash) {
+            // nexus-join.js is a module (deferred); give it up to 2 s to load.
+            for (let i = 0; i < 20 && !window.NexusJoin; i++) await new Promise(r => setTimeout(r, 100));
+            if (window.NexusJoin) dest = window.NexusJoin.verifyDestination(stash, Date.now());
+            sessionStorage.removeItem('nexus_return');
+            const uid = session && session.user && session.user.id;
+            if (dest !== '/account.html' && uid) {
+              // One-shot token bound to THIS account; the Nexus page auto-activates only for it.
+              let provider;
+              try { provider = JSON.parse(stash).provider; } catch (_) {}
+              sessionStorage.setItem('nexus_just_signed_in', JSON.stringify({ uid: uid, at: Date.now(), provider: provider }));
+            }
+          }
+        } catch (_) { dest = '/account.html'; }
         title.textContent = 'You are signed in.';
-        sub.textContent = 'Taking you to your account…';
-        setTimeout(() => { window.location.href = '/account.html'; }, 600);
+        sub.textContent = dest === '/account.html' ? 'Taking you to your account…' : 'Taking you back…';
+        setTimeout(() => { window.location.href = dest; }, 600);
       }
 
       // Surface any explicit error in the URL hash
@@ -100,14 +125,14 @@
         window.NishiAuth.onSession((session) => {
           if (session) {
             clearTimeout(timeout);
-            goAccount();
+            goAccount(session);
           }
         });
         // Also try a direct read in case the event already fired
         window.NishiAuth.getSession().then((session) => {
           if (session) {
             clearTimeout(timeout);
-            goAccount();
+            goAccount(session);
           }
         });
       }

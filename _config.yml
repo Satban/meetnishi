@@ -13,6 +13,12 @@ collections:
     output: true
 
 defaults:
+  # Nishi Nexus customer sign-up pages are private: never in the sitemap.
+  # nexus/index.html (the public B2B page) opts back in with sitemap: true.
+  - scope:
+      path: "nexus"
+    values:
+      sitemap: false
   # AASA MIME type — extensionless file would otherwise be served as
   # application/octet-stream by Jekyll.
   - scope:
@@ -72,3 +78,4 @@ exclude:
   - README.md
   - .well-known/README.md
   - scripts/migrate_blog.py  # one-time migration tool, not site content
+  - scripts/*.test.mjs       # unit tests, not site content
