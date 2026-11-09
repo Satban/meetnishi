@@ -15,7 +15,7 @@ import {
   showSignInBlock,
   showSwitchBlock,
   signInOptions,
-} from "/scripts/nexus-join.js";
+} from "/scripts/nexus-join.js?v=d60323f7";
 
 const APP_STORE = "https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471";
 const PLAY = "https://play.google.com/store/apps/details?id=com.getfoil.app";

@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Unit tests gate every deploy (Nexus sign-up page logic, scripts/*.test.mjs).
+  # Unit tests gate every deploy (sponsor sign-up page logic, scripts/*.test.mjs).
   test:
     runs-on: ubuntu-latest
     steps:
@@ -40,6 +40,9 @@ jobs:
         with:
           ruby-version: "3.3"
           bundler-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - uses: actions/configure-pages@v5
       # Fail closed: reject any Liquid delimiters in post bodies before build.
       # render_with_liquid:false already neutralizes them; this catches them
@@ -56,6 +59,9 @@ jobs:
         run: bundle exec jekyll build --strict_front_matter
         env:
           JEKYLL_ENV: production
+      # Sponsor pages, the /nexus/ forwarder and the sitemap, checked on the built output.
+      - name: Check built site
+        run: node scripts/check-built-site.mjs
       - uses: actions/upload-pages-artifact@v3
 
   deploy:

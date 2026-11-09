@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Nishi</title>
+  <link rel="canonical" href="{{ site.url }}{{ page.redirect_to }}">
+  <!-- Forwarder for an old address. The target comes ONLY from this page's front matter
+       (a site path), never from the URL, so it cannot be turned into an open redirect.
+       The script runs first so ?query and #hash survive (the demo page uses ?demo=);
+       the meta refresh is the no-JS fallback and drops them, which is fine because the
+       destination needs JS anyway. -->
+  <script>
+    (function () {
+      var target = {{ page.redirect_to | jsonify }};
+      if (typeof target !== "string" || !/^\/(?!\/)/.test(target)) target = "/";
+      location.replace(target + location.search + location.hash);
+    })();
+  </script>
+  {% if page.redirect_to %}<meta http-equiv="refresh" content="0; url={{ page.redirect_to }}">{% endif %}
+</head>
+<body>
+  <p>This page has moved. <a href="{{ page.redirect_to }}">Continue to Nishi</a>.</p>
+</body>
+</html>
