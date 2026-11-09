@@ -176,3 +176,14 @@ export function formatDate(iso) {
   const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${m[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
+
+/**
+ * The offer in the landing headline. Seat codes (validate returns access_ends_at)
+ * run to the contract end, so they show the date; other codes show months.
+ */
+export function offerLine(validate) {
+  const end = validate && validate.access_ends_at ? formatDate(validate.access_ends_at) : "";
+  if (end) return `Nishi Premium, free, until ${end}`;
+  const n = validate && Number.isInteger(validate.duration_months) && validate.duration_months > 0 ? validate.duration_months : 12;
+  return `${n === 1 ? "1 month" : `${n} months`} of Nishi Premium, free`;
+}

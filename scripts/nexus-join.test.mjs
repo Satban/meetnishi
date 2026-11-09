@@ -10,6 +10,7 @@ import {
   justSignedIn,
   justSignedInUid,
   normalizeReturnPath,
+  offerLine,
   payingStatus,
   platform,
   providerLabel,
@@ -219,4 +220,12 @@ test("J6 unknown failures -> error", () => {
 test("formatDate is UTC and plain", () => {
   assert.equal(formatDate("2027-11-08T03:00:00Z"), "Nov 8, 2027");
   assert.equal(formatDate("nope"), "");
+});
+
+test("P1 offerLine: seat codes show the contract end, others show months", () => {
+  assert.equal(offerLine({ valid: true, duration_months: 12, access_ends_at: "2027-03-31T23:59:00Z" }), "Nishi Premium, free, until Mar 31, 2027");
+  assert.equal(offerLine({ valid: true, duration_months: 12 }), "12 months of Nishi Premium, free");
+  assert.equal(offerLine({ valid: true, duration_months: 1 }), "1 month of Nishi Premium, free");
+  assert.equal(offerLine(undefined), "12 months of Nishi Premium, free");
+  assert.equal(offerLine({ access_ends_at: "garbage", duration_months: 6 }), "6 months of Nishi Premium, free");
 });
