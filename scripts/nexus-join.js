@@ -91,18 +91,81 @@ export function inAppBrowser(ua) {
   return false;
 }
 
+/** Web (Stripe) subscription statuses that will charge again. */
+const WEB_CHARGING = ["active", "trialing", "past_due"];
+
 /**
- * Does this member already pay for Premium themselves?
- * store: an active Apple/Google subscription mirrored from RevenueCat.
- * web: a Stripe (or Stripe trial) subscription from the ledger.
+ * The member's own Stripe subscription rows that will renew and charge them.
+ * A subscription already set to cancel at period end is not "paying": there is
+ * nothing left for them to turn off.
  */
-export function payingStatus(subRow, entitlementSource, nowMs) {
-  if (subRow && subRow.is_premium === true && subRow.expires_date) {
-    const exp = Date.parse(subRow.expires_date);
-    if (Number.isFinite(exp) && exp > nowMs) return "store";
+export function liveWebRows(rows, nowMs) {
+  if (!Array.isArray(rows)) return [];
+  return rows.filter((r) => {
+    if (!r || !WEB_CHARGING.includes(r.status)) return false;
+    if (r.cancel_at_period_end === true) return false;
+    if (r.current_period_end == null) return true;
+    const end = Date.parse(r.current_period_end);
+    return Number.isFinite(end) && end > nowMs;
+  });
+}
+
+/**
+ * Does this member already pay for Premium themselves? -> "store" | "web" | "both" | "none"
+ * store: an active Apple/Google subscription mirrored from RevenueCat (user_subscriptions).
+ * web: a renewing Stripe subscription (see liveWebRows). Checked independently of which
+ * entitlement "wins", because a long seat outranks a monthly Stripe grant.
+ */
+export function payingStatus(storeRow, webLive, nowMs) {
+  let store = false;
+  if (storeRow && storeRow.is_premium === true && storeRow.expires_date) {
+    const exp = Date.parse(storeRow.expires_date);
+    store = Number.isFinite(exp) && exp > nowMs;
   }
-  if (entitlementSource === "stripe" || entitlementSource === "trial") return "web";
+  const web = webLive === true;
+  if (store && web) return "both";
+  if (store) return "store";
+  if (web) return "web";
   return "none";
+}
+
+/**
+ * Sign-in choices for this device. The Android app offers Google only, so an
+ * Android visitor who joined with Apple could never sign in on their phone.
+ * -> {apple: show the Apple button?, appleNote: desktop "Apple is iPhone only" note?,
+ *     androidNote: Android "signed up with Apple before?" note?}
+ * Both notes say "the same email address": Google sign-in only lands on an existing
+ * Apple-created account when the email matches (Supabase links verified emails).
+ */
+export function signInOptions(plat) {
+  if (plat === "android") return { apple: false, appleNote: false, androidNote: true };
+  if (plat === "ios") return { apple: true, appleNote: false, androidNote: false };
+  return { apple: true, appleNote: true, androidNote: false };
+}
+
+/** Signed-out visitors on a full or closed program may be existing members: let them sign in. */
+export function showSignInBlock(state, hasSession) {
+  return !hasSession && (state === "full" || state === "ended");
+}
+
+/** Signed in on a full or closed program: maybe the wrong account, so offer a switch. */
+export function showSwitchBlock(state, hasSession) {
+  return !!hasSession && (state === "full" || state === "ended");
+}
+
+/**
+ * What a tap on a [data-action] button should do -> a verb the DOM shell carries out.
+ * retry and copy always work (the error screen can appear before any flow starts);
+ * everything else needs a live (non-demo) flow.
+ */
+export function actionFor(current, action) {
+  if (action === "retry") return "reload";
+  if (action === "copy") return "copy";
+  if (!current || current.demo) return "ignore";
+  if (action === "apple" || action === "google") return "signin";
+  if (action === "activate") return "activate";
+  if (action === "switch" || action === "restart") return "switch";
+  return "ignore";
 }
 
 function future(iso, nowMs) {
@@ -149,7 +212,7 @@ export function decide(input) {
   if (r && r.success === true) {
     if (!future(r.premium_until, nowMs)) return { state: "ended", next: "none", reason: "lapsed" };
     if (input.paying === undefined) return { state: "activating", next: "readPaying" };
-    const state = input.paying === "store" || input.paying === "web" ? "success_paying" : "success";
+    const state = ["store", "web", "both"].includes(input.paying) ? "success_paying" : "success";
     return { state, next: "none", premiumUntil: r.premium_until, paying: input.paying };
   }
 
