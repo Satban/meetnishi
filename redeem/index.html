@@ -465,6 +465,12 @@
 
       let currentCode = null;
       let codeDuration = null;
+      let codeEndsAt = null;   // Nexus seat codes run to a contract end date
+      function endText(iso) {
+        const d = new Date(iso);
+        if (!Number.isFinite(d.getTime())) return '';
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+      }
 
       function ready() {
         return window.NishiAuth && window.NishiAuth.client;
@@ -508,9 +514,11 @@
 
           currentCode = code.trim().toUpperCase();
           codeDuration = data.duration_months;
+          codeEndsAt = data.access_ends_at || null;
           document.getElementById('display-code').textContent = currentCode;
-          document.getElementById('display-duration').textContent =
-            `${durationText(codeDuration)} FREE Premium`;
+          document.getElementById('display-duration').textContent = codeEndsAt
+            ? `FREE Premium until ${endText(codeEndsAt)}`
+            : `${durationText(codeDuration)} FREE Premium`;
 
           // Signed in? Offer one-tap activate. Otherwise, prompt sign-in.
           const session = await window.NishiAuth.getSession();
@@ -550,7 +558,8 @@
             ? window.RedeemClassify.classifyRedeem(data)
             : (data && data.success === true ? 'success' : 'invalid');
           if (kind === 'success') {
-            finishSuccess(data.duration_months || codeDuration);
+            const isSeat = !!codeEndsAt || data.duration_months === null;
+            finishSuccess(isSeat ? null : (data.duration_months || codeDuration), data.premium_until || codeEndsAt);
           } else if (kind === 'other_account') {
             showState('state-other-account');
           } else if (kind === 'expired') {
@@ -574,11 +583,14 @@
         }
       }
 
-      function finishSuccess(months) {
-        document.getElementById('success-lead').textContent =
-          `Your ${durationText(months)} of Premium is now active.`;
+      function finishSuccess(months, untilIso) {
+        // Seat codes return duration_months: null and a contract end date.
+        document.getElementById('success-lead').textContent = (!months && untilIso)
+          ? `Your Premium is now active until ${endText(untilIso)}.`
+          : `Your ${durationText(months)} of Premium is now active.`;
         showState('state-success');
       }
+
 
       function stashAndSignIn(provider) {
         try { localStorage.setItem('nishi_pending_redeem', currentCode); } catch (_) {}

@@ -6,6 +6,7 @@ import {
   formatDate,
   justSignedIn,
   normalizeReturnPath,
+  offerLine,
   payingStatus,
   platform,
   providerLabel,
@@ -72,7 +73,7 @@ function render(d, info) {
   const section = root.querySelector(`[data-state="${state}"]`);
   bindAll(root, "customer", cfg.customer);
   bindAll(root, "url", PAGE_URL);
-  if (info.durationMonths) bindAll(root, "duration", info.durationMonths === 1 ? "1 month" : `${info.durationMonths} months`);
+  bindAll(root, "offer", offerLine(info.validate));
   if (state === "confirm") bindAll(section, "email", info.email || "your account");
   if (state === "ended") bindAll(section, "ended-title", d.reason === "lapsed" ? "Your access from this program has ended." : "This program has ended.");
   if (state === "success" || state === "already_in") {
@@ -128,7 +129,7 @@ async function fetchNext(next, input) {
 function sessionInfo(input) {
   const u = input.session && input.session.user;
   const provider = input.tappedProvider || (u && u.app_metadata ? u.app_metadata.provider : undefined);
-  return { email: u ? u.email : "", provider, durationMonths: input.validate && input.validate.duration_months };
+  return { email: u ? u.email : "", provider, validate: input.validate };
 }
 
 // One run at a time; a run owns the input object it was started with.
@@ -194,7 +195,7 @@ root.addEventListener("click", async (e) => {
 function demo(state) {
   current = { demo: true };
   const until = new Date(Date.now() + 365 * 864e5).toISOString();
-  const info = { email: "susan@example.com", provider: "google", durationMonths: 12 };
+  const info = { email: "susan@example.com", provider: "google", validate: { valid: true, duration_months: 12, access_ends_at: until } };
   const d = { state, next: "none", premiumUntil: until };
   if (state === "success_paying") d.paying = "store";
   if (state === "ended") d.reason = undefined;
