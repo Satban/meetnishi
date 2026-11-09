@@ -110,6 +110,8 @@ sitemap: true
     .nx-terms-list { margin: 0; padding-left: 20px; }
     .nx-terms-list li { margin: 6px 0; }
 
+    /* The hidden attribute must win over any display rule (the form used to stay visible after sending). */
+    [hidden] { display: none !important; }
     .nx-form { max-width: 620px; margin: 0 auto; display: grid; gap: 18px; }
     .nx-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     @media (max-width: 600px) { .nx-row { grid-template-columns: 1fr; } }

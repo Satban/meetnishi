@@ -60,6 +60,10 @@ must(navPages >= 15, `only ${navPages} pages with a header menu; the scan went v
 must(!existsSync("_site/assets/founder.jpg"), "founder photo is published");
 must(!/founder\.jpg|class="founder-photo"/.test(read("_site/story.html") || ""), "Story page shows the founder photo");
 
+// [hidden] must beat class display rules, site-wide and on the sales page (form success state).
+must(/\[hidden\]\s*\{\s*display:\s*none\s*!important;?\s*\}/.test(read("_site/styles/main.css") || ""), "main.css lacks the [hidden] rule");
+if (sales) must(/\[hidden\]\s*\{\s*display:\s*none\s*!important;?\s*\}/.test(sales), "sales page lacks the [hidden] rule");
+
 if (fails.length) {
   for (const f of fails) console.error("::error::" + f);
   process.exit(1);

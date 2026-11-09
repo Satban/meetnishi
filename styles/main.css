@@ -279,6 +279,9 @@ p { color: var(--text-soft); }
   width: auto;
 }
 
+/* The hidden attribute always hides, even on elements whose class sets display. */
+[hidden] { display: none !important; }
+
 .nav-links {
   display: flex;
   align-items: center;
