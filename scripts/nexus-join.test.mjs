@@ -3,6 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import {
   actionFor,
   decide,
@@ -46,24 +47,32 @@ const SESSION = { user: USER };
 const base = { ua: SAFARI_IOS, nowMs: NOW };
 
 // ── J1 ──────────────────────────────────────────────────────────────────────
-test("J1 returnPathOk accepts only a bare /nexus/<slug>/", () => {
-  assert.equal(returnPathOk("/nexus/example-health/"), true);
-  assert.equal(returnPathOk("/nexus/abc/"), true);
+test("J1 returnPathOk accepts only a bare /orgs/<slug>/", () => {
+  assert.equal(returnPathOk("/orgs/example-health/"), true);
+  assert.equal(returnPathOk("/orgs/abc/"), true);
+  assert.equal(returnPathOk("/orgs/" + "a".repeat(40) + "/"), true);
   for (const bad of [
     "//evil.com/",
-    "/nexus/../account.html",
-    "https://evil.com/nexus/abc/",
-    "/nexus/abc/?a=b",
-    "/nexus/abc/#x",
-    "/nexus/AB/",
-    "/nexus/ab/",
-    "/nexus/abc",
-    "/nexus/abc/x/",
+    "/orgs/../account.html",
+    "https://evil.com/orgs/abc/",
+    "/orgs/abc/?a=b",
+    "/orgs/abc/#x",
+    "/orgs/AB/",
+    "/ORGS/abc/",
+    "/orgs/ab/",
+    "/orgs/abc",
+    "/orgs/abc/x/",
+    "/orgs/example-health/index.html",
+    "/orgs/",
+    "/orgsx/abc/",
+    "/x/orgs/abc/",
+    "/nexus/example-health/",
+    "/nexus/abc/",
     "/account.html",
     "",
     null,
     undefined,
-    "/nexus/" + "a".repeat(41) + "/",
+    "/orgs/" + "a".repeat(41) + "/",
   ]) {
     assert.equal(returnPathOk(bad), false, `rejects ${JSON.stringify(bad)}`);
   }
@@ -72,14 +81,16 @@ test("J1 returnPathOk accepts only a bare /nexus/<slug>/", () => {
 // ── J2 ──────────────────────────────────────────────────────────────────────
 test("J2 verifyDestination honours the 10-minute window exactly", () => {
   const stash = (path, at) => JSON.stringify({ path, at });
-  assert.equal(verifyDestination(stash("/nexus/example-health/", NOW), NOW), "/nexus/example-health/");
-  assert.equal(verifyDestination(stash("/nexus/example-health/", NOW - RETURN_TTL_MS), NOW), "/nexus/example-health/");
-  assert.equal(verifyDestination(stash("/nexus/example-health/", NOW - RETURN_TTL_MS - 1), NOW), "/account.html");
-  assert.equal(verifyDestination(stash("/nexus/example-health/", NOW + 60_000), NOW), "/account.html");
+  assert.equal(verifyDestination(stash("/orgs/example-health/", NOW), NOW), "/orgs/example-health/");
+  assert.equal(verifyDestination(stash("/orgs/example-health/", NOW - RETURN_TTL_MS), NOW), "/orgs/example-health/");
+  assert.equal(verifyDestination(stash("/orgs/example-health/", NOW - RETURN_TTL_MS - 1), NOW), "/account.html");
+  assert.equal(verifyDestination(stash("/orgs/example-health/", NOW + 60_000), NOW), "/account.html");
+  // The old address is a forwarder now, never a return target.
+  assert.equal(verifyDestination(stash("/nexus/example-health/", NOW), NOW), "/account.html");
   assert.equal(verifyDestination(stash("//evil.com/", NOW), NOW), "/account.html");
   assert.equal(verifyDestination("{not json", NOW), "/account.html");
   assert.equal(verifyDestination(null, NOW), "/account.html");
-  assert.equal(verifyDestination(JSON.stringify({ path: "/nexus/example-health/" }), NOW), "/account.html");
+  assert.equal(verifyDestination(JSON.stringify({ path: "/orgs/example-health/" }), NOW), "/account.html");
 });
 test("J2 justSignedInUid honours the 2-minute window and shape", () => {
   const tok = (uid, at) => JSON.stringify({ uid, at });
@@ -97,8 +108,8 @@ test("J2 justSignedIn carries the provider tapped on this page (apple/google onl
   assert.deepEqual(justSignedIn(JSON.stringify({ uid: "u", at: NOW }), NOW), { uid: "u", provider: undefined });
 });
 test("normalizeReturnPath makes any form of the page path pass returnPathOk", () => {
-  for (const p of ["/nexus/example-health/", "/nexus/example-health/index.html", "/nexus/example-health"]) {
-    assert.equal(normalizeReturnPath(p), "/nexus/example-health/");
+  for (const p of ["/orgs/example-health/", "/orgs/example-health/index.html", "/orgs/example-health"]) {
+    assert.equal(normalizeReturnPath(p), "/orgs/example-health/");
     assert.equal(returnPathOk(normalizeReturnPath(p)), true);
   }
 });
@@ -346,4 +357,44 @@ test("F6 layout: every Apple button sits beside a Google button, and the Apple n
   const notes = (re) => (html.match(re) || []).length;
   assert.equal(notes(/data-when="apple-note" hidden>[^<]*iPhone app only[^<]*same email address[^<]*hid your email/g), 3, "apple note on landing, full, ended");
   assert.equal(notes(/data-when="android-note" hidden>[^<]*same email address[^<]*hid your email/g), 3, "android note on landing, full, ended");
+});
+
+// ── Rename to /orgs/ (plan: foil-strategy/ORGS_RENAME_PLAN.md v2) ─────────────────
+const read = (rel) => readFileSync(new URL("../" + rel, import.meta.url), "utf8");
+const sha8 = (rel) => createHash("sha256").update(readFileSync(new URL("../" + rel, import.meta.url))).digest("hex").slice(0, 8);
+
+test("R1 every import of the member-page modules carries the file's content hash", () => {
+  // Cloudflare caches /scripts/* for 4 hours. A fresh page with a stale module breaks sign-in,
+  // so each import URL is versioned by content: change a module, CI says which ?v= to write.
+  const sites = [
+    ["verify.html", "nexus-join.js"],
+    ["scripts/nexus-join-dom.js", "nexus-join.js"],
+    ["_layouts/nexus-customer.html", "nexus-join-dom.js"],
+  ];
+  for (const [file, mod] of sites) {
+    const src = read(file);
+    const refs = [...src.matchAll(new RegExp(`/scripts/${mod.replace(".", "\\.")}(\\?v=[0-9a-f]*)?["']`, "g"))];
+    assert.ok(refs.length >= 1, `${file} imports ${mod}`);
+    for (const r of refs) assert.equal(r[1], `?v=${sha8("scripts/" + mod)}`, `${file}: ${mod} needs ?v=${sha8("scripts/" + mod)}`);
+  }
+});
+
+test("R2 demo mode is allowed only on the /orgs/ example page (whole attribute)", () => {
+  assert.match(read("_layouts/nexus-customer.html"),
+    /data-demo-allowed="\{% if page\.url == '\/orgs\/example-health\/' %\}1\{% else %\}0\{% endif %\}"/);
+  assert.match(read("orgs/example-health/index.html"), /^layout: nexus-customer$/m);
+});
+
+test("R3 the old /nexus/ demo address is a fixed forwarder, not a sign-up page", () => {
+  const page = read("nexus/example-health/index.html");
+  const fm = (page.match(/^---\n([\s\S]*?)\n---/) || [, ""])[1];
+  assert.match(fm, /^layout: redirect$/m);
+  assert.match(fm, /^redirect_to: \/orgs\/example-health\/$/m);
+  assert.doesNotMatch(fm, /^(code|customer|welcome):/m, "no seat code on the forwarder");
+  const layout = read("_layouts/redirect.html");
+  assert.match(layout, /var target = \{\{ page\.redirect_to \| jsonify \}\};/);
+  assert.match(layout, /if \(typeof target !== "string" \|\| !\/\^\\\/\(\?!\\\/\)\/\.test\(target\)\) target = "\/";/);
+  assert.doesNotMatch(layout, /URLSearchParams|searchParams|\.get\(|location\.href\s*=|document\.referrer/, "target never comes from the URL");
+  assert.match(layout, /noindex/);
+  assert.ok(layout.indexOf("location.replace") < layout.indexOf('http-equiv="refresh"'), "script runs before the meta refresh");
 });

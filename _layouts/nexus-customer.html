@@ -70,7 +70,7 @@
   <main class="nj-wrap" id="nj-root"
         data-customer="{{ page.customer | escape }}"
         data-code="{{ page.code | escape }}"
-        data-demo-allowed="{% if page.url == '/nexus/example-health/' %}1{% else %}0{% endif %}">
+        data-demo-allowed="{% if page.url == '/orgs/example-health/' %}1{% else %}0{% endif %}">
 
     <div class="nj-brand">
       {% if page.logo %}<span class="nj-badge"><img src="{{ page.logo | escape }}" alt="{{ page.customer | escape }}"></span>{% else %}<span class="nj-badge">{{ page.customer | escape }}</span>{% endif %}
@@ -249,6 +249,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/config.js"></script>
   <script src="/scripts/auth.js"></script>
-  <script type="module" src="/scripts/nexus-join-dom.js"></script>
+  <script type="module" src="/scripts/nexus-join-dom.js?v=f4470666"></script>
 </body>
 </html>

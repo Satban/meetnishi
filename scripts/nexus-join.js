@@ -1,4 +1,4 @@
-// Nishi Nexus member sign-up page: pure decision logic (no DOM, no network).
+// Nishi for Organizations member sign-up page (internal name: Nexus): pure decision logic (no DOM, no network).
 // Loaded as an ES module by _layouts/nexus-customer.html and verify.html, and by
 // scripts/nexus-join.test.mjs under `node --test`.
 //
@@ -16,9 +16,9 @@
 export const RETURN_TTL_MS = 10 * 60 * 1000;
 export const JUST_SIGNED_IN_TTL_MS = 2 * 60 * 1000;
 
-const RETURN_PATH_RE = /^\/nexus\/[a-z0-9-]{3,40}\/$/;
+const RETURN_PATH_RE = /^\/orgs\/[a-z0-9-]{3,40}\/$/;
 
-/** Only a bare /nexus/<slug>/ path on this origin may be returned to. */
+/** Only a bare /orgs/<slug>/ path on this origin may be returned to. */
 export function returnPathOk(path) {
   return typeof path === "string" && RETURN_PATH_RE.test(path);
 }
@@ -55,7 +55,7 @@ export function justSignedInUid(tokenJson, nowMs) {
   return t ? t.uid : null;
 }
 
-/** /nexus/x/index.html and /nexus/x -> /nexus/x/ so the stash always matches returnPathOk. */
+/** /orgs/x/index.html and /orgs/x -> /orgs/x/ so the stash always matches returnPathOk. */
 export function normalizeReturnPath(pathname) {
   let p = String(pathname || "").replace(/index\.html$/, "");
   if (!p.endsWith("/")) p += "/";

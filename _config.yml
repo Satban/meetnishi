@@ -13,8 +13,13 @@ collections:
     output: true
 
 defaults:
-  # Nishi Nexus customer sign-up pages are private: never in the sitemap.
-  # nexus/index.html (the public B2B page) opts back in with sitemap: true.
+  # Nishi for Organizations sponsor sign-up pages (/orgs/<slug>/) are private: never in the sitemap.
+  # orgs/index.html (the public B2B page) opts back in with sitemap: true.
+  - scope:
+      path: "orgs"
+    values:
+      sitemap: false
+  # Old /nexus/ addresses are forwarders only.
   - scope:
       path: "nexus"
     values:
