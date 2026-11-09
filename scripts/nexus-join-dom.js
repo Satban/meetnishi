@@ -2,14 +2,18 @@
 // This file only: reads the page config, fetches what `decide()` asks for (`next`),
 // renders the state, and wires the buttons.
 import {
+  actionFor,
   decide,
   formatDate,
   justSignedIn,
+  liveWebRows,
   normalizeReturnPath,
   offerLine,
   payingStatus,
   platform,
   providerLabel,
+  showSignInBlock,
+  signInOptions,
 } from "/scripts/nexus-join.js";
 
 const APP_STORE = "https://apps.apple.com/us/app/nishi-your-nutrition-companion/id6759352471";
@@ -73,7 +77,13 @@ function render(d, info) {
   const section = root.querySelector(`[data-state="${state}"]`);
   bindAll(root, "customer", cfg.customer);
   bindAll(root, "url", PAGE_URL);
+  const opts = signInOptions(platform(UA));
+  root.querySelectorAll('[data-action="apple"]').forEach((el) => { el.hidden = !opts.apple; });
+  root.querySelectorAll('[data-when="apple-note"]').forEach((el) => { el.hidden = !opts.appleNote; });
   bindAll(root, "offer", offerLine(info.validate));
+  root.querySelectorAll('[data-when="signed-out"]').forEach((el) => {
+    el.hidden = !showSignInBlock(state, !!info.email);
+  });
   if (state === "confirm") bindAll(section, "email", info.email || "your account");
   if (state === "ended") bindAll(section, "ended-title", d.reason === "lapsed" ? "Your access from this program has ended." : "This program has ended.");
   if (state === "success" || state === "already_in") {
@@ -81,8 +91,8 @@ function render(d, info) {
     fillSteps(section, info);
     const pay = section.querySelector('[data-slot="paying"]');
     if (pay) {
-      const t = d.paying === "store" ? "nj-paying-store" : d.paying === "web" ? "nj-paying-web" : null;
-      pay.replaceChildren(t ? document.getElementById(t).content.cloneNode(true) : "");
+      const ids = { store: ["nj-paying-store"], web: ["nj-paying-web"], both: ["nj-paying-store", "nj-paying-web"] }[d.paying] || [];
+      pay.replaceChildren(...ids.map((id) => document.getElementById(id).content.cloneNode(true)));
     }
   }
   root.querySelectorAll("[data-action]").forEach((b) => { b.disabled = false; });
@@ -112,17 +122,20 @@ async function fetchNext(next, input) {
   }
   if (next === "readPaying") {
     let row = null;
-    let source = null;
+    let webLive = false;
     try {
       const sub = await client.from("user_subscriptions")
         .select("is_premium, expires_date, product_identifier")
         .eq("user_id", input.session.user.id).maybeSingle();
       row = sub.data || null;
-      const ent = await client.rpc("get_self_entitlement");
-      const first = Array.isArray(ent.data) ? ent.data[0] : ent.data;
-      source = first ? first.source : null;
+      // The member's own Stripe rows (RLS: select_own). Read directly, not via the
+      // winning entitlement: a long seat outranks a monthly web subscription.
+      const web = await client.from("subscriptions")
+        .select("status, current_period_end, cancel_at_period_end")
+        .eq("user_id", input.session.user.id);
+      webLive = liveWebRows(web.data, Date.now()).length > 0;
     } catch (_) { /* best effort: no callout */ }
-    input.paying = payingStatus(row, source, Date.now());
+    input.paying = payingStatus(row, webLive, Date.now());
   }
 }
 
@@ -176,19 +189,18 @@ async function signOutToLanding() {
 
 root.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-action]");
-  if (!b || !current || b.disabled) return;
-  const a = b.dataset.action;
-  if (a === "copy") {
+  if (!b || b.disabled) return;
+  const verb = actionFor(current, b.dataset.action);
+  if (verb === "reload") { location.reload(); return; }
+  if (verb === "copy") {
     const field = root.querySelector('[data-bind="url"]');
     field.select();
     try { await navigator.clipboard.writeText(field.value); b.textContent = "Copied"; } catch (_) { b.textContent = "Select and copy"; }
     return;
   }
-  if (current.demo) return; // demo screens are pictures, not a working flow
-  if (a === "apple" || a === "google") signIn(a, b);
-  else if (a === "activate") { b.disabled = true; current.confirmed = true; run(current); }
-  else if (a === "switch" || a === "restart") signOutToLanding();
-  else if (a === "retry") location.reload();
+  if (verb === "signin") signIn(b.dataset.action, b);
+  else if (verb === "activate") { b.disabled = true; current.confirmed = true; run(current); }
+  else if (verb === "switch") signOutToLanding();
 });
 
 // ── demo mode (example customer only, no network) ───────────────────────────

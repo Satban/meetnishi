@@ -109,6 +109,7 @@
           Continue with Google
         </button>
         <p class="nj-note">Use the same sign-in you will use in the Nishi app.</p>
+        <p class="nj-note" data-when="apple-note" hidden>Apple sign-in works in the iPhone app only. On Android, use Google.</p>
         <hr class="nj-sep">
         <p class="nj-small"><span data-bind="customer"></span> only sees how many people joined. Never your name, what you log, or anything about you.</p>
         <div class="nj-faq">
@@ -158,12 +159,22 @@
       <section data-state="full" hidden>
         <h2>All of <span data-bind="customer"></span>'s spots are taken.</h2>
         <p>Let them know you would like to join, and they can add more.</p>
+        <div class="nj-signin-again" data-when="signed-out" hidden>
+          <p class="nj-note">Already joined? Sign in to see your access.</p>
+          <button type="button" class="nj-btn nj-dark" data-action="apple">Continue with Apple</button>
+          <button type="button" class="nj-btn nj-light" data-action="google">Continue with Google</button>
+        </div>
         <p class="nj-note">Questions? <a href="mailto:support@meetnishi.com">support@meetnishi.com</a></p>
       </section>
 
       <section data-state="ended" hidden>
         <h2 data-bind="ended-title">This program has ended.</h2>
         <p>You can keep using Nishi for free, or choose Premium at the personal price in the app.</p>
+        <div class="nj-signin-again" data-when="signed-out" hidden>
+          <p class="nj-note">Already joined? Sign in to see your access.</p>
+          <button type="button" class="nj-btn nj-dark" data-action="apple">Continue with Apple</button>
+          <button type="button" class="nj-btn nj-light" data-action="google">Continue with Google</button>
+        </div>
         <p class="nj-note">Questions? <a href="mailto:support@meetnishi.com">support@meetnishi.com</a></p>
       </section>
 

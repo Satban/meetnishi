@@ -2,13 +2,16 @@
 // IDs (J1..J7) match foil-strategy/NEXUS_V1_WEEK2_PLAN.md section F.
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
+  actionFor,
   decide,
   formatDate,
   inAppBrowser,
   JUST_SIGNED_IN_TTL_MS,
   justSignedIn,
   justSignedInUid,
+  liveWebRows,
   normalizeReturnPath,
   offerLine,
   payingStatus,
@@ -16,6 +19,8 @@ import {
   providerLabel,
   RETURN_TTL_MS,
   returnPathOk,
+  showSignInBlock,
+  signInOptions,
   verifyDestination,
 } from "./nexus-join.js";
 
@@ -125,17 +130,90 @@ test("J4 inAppBrowser: embedded browsers true, real browsers false", () => {
 });
 
 // ── J5 ──────────────────────────────────────────────────────────────────────
-test("J5 payingStatus", () => {
-  assert.equal(payingStatus({ is_premium: true, expires_date: FUTURE, product_identifier: "annual" }, null, NOW), "store");
-  assert.equal(payingStatus({ is_premium: true, expires_date: FUTURE, product_identifier: null }, null, NOW), "store", "TRANSFER with no product id");
-  assert.equal(payingStatus({ is_premium: true, expires_date: PAST, product_identifier: "annual" }, null, NOW), "none");
-  assert.equal(payingStatus({ is_premium: false, expires_date: null, promo_premium_until: FUTURE }, null, NOW), "none", "promo-only is not paying");
-  assert.equal(payingStatus(null, "stripe", NOW), "web");
-  assert.equal(payingStatus(null, "trial", NOW), "web");
-  for (const s of ["partner_grant", "seat", "admin", null, undefined]) assert.equal(payingStatus(null, s, NOW), "none");
+test("J5 payingStatus: store x web grid", () => {
+  const STORE = {
+    live: { is_premium: true, expires_date: FUTURE, product_identifier: "annual" },
+    transfer: { is_premium: true, expires_date: FUTURE, product_identifier: null },
+    expired: { is_premium: true, expires_date: PAST, product_identifier: "annual" },
+    promoOnly: { is_premium: false, expires_date: null, promo_premium_until: FUTURE },
+    none: null,
+  };
+  const storeLive = { live: true, transfer: true, expired: false, promoOnly: false, none: false };
+  for (const [k, row] of Object.entries(STORE)) {
+    for (const web of [true, false, undefined, "yes"]) {
+      const s = storeLive[k];
+      const w = web === true;
+      const want = s && w ? "both" : s ? "store" : w ? "web" : "none";
+      assert.equal(payingStatus(row, web, NOW), want, `${k} web=${web}`);
+    }
+  }
 });
 
-// ── J6: signed out ──────────────────────────────────────────────────────────
+test("J5 liveWebRows: every status x period end x cancel-at-period-end", () => {
+  const STATUSES = ["active", "trialing", "past_due", "canceled", "expired", "revoked", "incomplete", "unpaid", null];
+  const CHARGING = new Set(["active", "trialing", "past_due"]);
+  const ENDS = { null: null, past: PAST, future: FUTURE, garbage: "not a date" };
+  for (const status of STATUSES) {
+    for (const [ek, end] of Object.entries(ENDS)) {
+      for (const cape of [true, false, null]) {
+        const row = { status, current_period_end: end, cancel_at_period_end: cape };
+        const inPeriod = ek === "null" || ek === "future";
+        const want = CHARGING.has(status) && inPeriod && cape !== true;
+        assert.equal(liveWebRows([row], NOW).length === 1, want, JSON.stringify(row));
+      }
+    }
+  }
+  assert.deepEqual(liveWebRows(null, NOW), []);
+  assert.deepEqual(liveWebRows([null, undefined], NOW), []);
+  const mixed = [{ status: "canceled", current_period_end: FUTURE, cancel_at_period_end: false },
+                 { status: "active", current_period_end: FUTURE, cancel_at_period_end: false }];
+  assert.equal(liveWebRows(mixed, NOW).length, 1, "one live row among dead ones counts");
+});
+
+const ALL_STATES = ["loading", "landing", "open_in_browser", "confirm", "activating", "success", "success_paying",
+  "already_in", "other_account", "full", "ended", "invalid", "error", "session_expired"];
+
+test("F1 showSignInBlock: only full/ended and only when signed out", () => {
+  for (const st of ALL_STATES) {
+    for (const has of [true, false]) {
+      assert.equal(showSignInBlock(st, has), !has && (st === "full" || st === "ended"), `${st} ${has}`);
+    }
+  }
+});
+
+test("F1 layout: full and ended carry a signed-out Apple + Google sign-in block", () => {
+  const html = readFileSync(new URL("../_layouts/nexus-customer.html", import.meta.url), "utf8");
+  for (const st of ALL_STATES) {
+    const m = html.match(new RegExp(`<section data-state="${st}"[\\s\\S]*?</section>`));
+    const sec = m ? m[0] : "";
+    const block = (sec.match(/<div[^>]*data-when="signed-out"[\s\S]*?<\/div>/) || [""])[0];
+    if (st === "full" || st === "ended") {
+      assert.ok(block, `${st} has the block`);
+      assert.match(block, /data-action="apple"/, `${st} apple`);
+      assert.match(block, /data-action="google"/, `${st} google`);
+      assert.match(block, /\bhidden\b/, `${st} block starts hidden`);
+    } else {
+      assert.equal(block, "", `${st} has no signed-out block`);
+    }
+  }
+});
+
+test("F3 actionFor: every action x no flow / demo / live", () => {
+  const ACTIONS = ["retry", "copy", "apple", "google", "activate", "switch", "restart", "bogus", undefined];
+  const FLOWS = { none: null, demo: { demo: true }, live: { ua: "x" } };
+  const LIVE = { apple: "signin", google: "signin", activate: "activate", switch: "switch", restart: "switch" };
+  for (const a of ACTIONS) {
+    for (const [fk, cur] of Object.entries(FLOWS)) {
+      let want;
+      if (a === "retry") want = "reload";
+      else if (a === "copy") want = "copy";
+      else if (fk !== "live") want = "ignore";
+      else want = LIVE[a] || "ignore";
+      assert.equal(actionFor(cur, a), want, `${a} ${fk}`);
+    }
+  }
+});
+
 test("J6 signed out: first fetch is validate, then each outcome", () => {
   assert.deepEqual(decide({ ...base }), { state: "loading", next: "validate" });
   assert.equal(decide({ ...base, validate: { valid: true } }).state, "landing");
@@ -169,6 +247,7 @@ test("J6 success: reads paying status next, then success / success_paying", () =
   assert.deepEqual(decide({ ...signedIn, redeem: ok, paying: "none" }), { state: "success", next: "none", premiumUntil: FUTURE, paying: "none" });
   assert.deepEqual(decide({ ...signedIn, redeem: ok, paying: "store" }), { state: "success_paying", next: "none", premiumUntil: FUTURE, paying: "store" });
   assert.equal(decide({ ...signedIn, redeem: ok, paying: "web" }).state, "success_paying");
+  assert.equal(decide({ ...signedIn, redeem: ok, paying: "both" }).state, "success_paying");
   assert.equal(decide({ ...signedIn, redeem: ok, paying: "none" }).next, "none");
 });
 test("J6 already_redeemed success payload is a success", () => {
@@ -228,4 +307,21 @@ test("P1 offerLine: seat codes show the contract end, others show months", () =>
   assert.equal(offerLine({ valid: true, duration_months: 1 }), "1 month of Nishi Premium, free");
   assert.equal(offerLine(undefined), "12 months of Nishi Premium, free");
   assert.equal(offerLine({ access_ends_at: "garbage", duration_months: 6 }), "6 months of Nishi Premium, free");
+});
+
+test("F6 signInOptions: Android never offers Apple; desktop explains Apple is iPhone only", () => {
+  assert.deepEqual(signInOptions("android"), { apple: false, appleNote: false });
+  assert.deepEqual(signInOptions("ios"), { apple: true, appleNote: false });
+  for (const p of ["desktop", undefined, "other"]) assert.deepEqual(signInOptions(p), { apple: true, appleNote: true }, String(p));
+  const ANDROID = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36";
+  assert.equal(signInOptions(platform(ANDROID)).apple, false, "real Android UA");
+  assert.equal(signInOptions(platform(SAFARI_IOS)).apple, true, "real iOS UA");
+});
+
+test("F6 layout: every Apple button sits beside a Google button, and the Apple note exists", () => {
+  const html = readFileSync(new URL("../_layouts/nexus-customer.html", import.meta.url), "utf8");
+  const apple = (html.match(/data-action="apple"/g) || []).length;
+  const google = (html.match(/data-action="google"/g) || []).length;
+  assert.ok(apple >= 3 && apple === google, `apple ${apple} google ${google}`);
+  assert.match(html, /data-when="apple-note" hidden>[^<]*iPhone app only/);
 });
