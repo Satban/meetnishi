@@ -148,6 +148,11 @@ export function showSignInBlock(state, hasSession) {
   return !hasSession && (state === "full" || state === "ended");
 }
 
+/** Signed in on a full or closed program: maybe the wrong account, so offer a switch. */
+export function showSwitchBlock(state, hasSession) {
+  return !!hasSession && (state === "full" || state === "ended");
+}
+
 /**
  * What a tap on a [data-action] button should do -> a verb the DOM shell carries out.
  * retry and copy always work (the error screen can appear before any flow starts);

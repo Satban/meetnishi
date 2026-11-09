@@ -20,6 +20,7 @@ import {
   RETURN_TTL_MS,
   returnPathOk,
   showSignInBlock,
+  showSwitchBlock,
   signInOptions,
   verifyDestination,
 } from "./nexus-join.js";
@@ -181,6 +182,25 @@ test("F1 showSignInBlock: only full/ended and only when signed out", () => {
   }
 });
 
+test("F7 showSwitchBlock: only full/ended and only when signed in", () => {
+  for (const st of ALL_STATES) {
+    for (const has of [true, false, undefined]) {
+      assert.equal(showSwitchBlock(st, has), has === true && (st === "full" || st === "ended"), `${st} ${has}`);
+    }
+  }
+});
+
+test("F7 layout: [hidden] beats .nj-btn display, and full/ended offer a signed-in switch", () => {
+  const html = readFileSync(new URL("../_layouts/nexus-customer.html", import.meta.url), "utf8");
+  assert.match(html, /^\s*\[hidden\] \{ display: none !important; \}/m, "global [hidden] rule");
+  for (const st of ALL_STATES) {
+    const sec = (html.match(new RegExp(`<section data-state="${st}"[\\s\\S]*?</section>`)) || [""])[0];
+    const sw = (sec.match(/<div data-when="signed-in" hidden>[\s\S]*?<\/div>/) || [""])[0];
+    if (st === "full" || st === "ended") assert.match(sw, /data-action="switch"/, `${st} switch`);
+    else assert.equal(sw, "", `${st} no switch block`);
+  }
+});
+
 test("F1 layout: full and ended carry a signed-out Apple + Google sign-in block", () => {
   const html = readFileSync(new URL("../_layouts/nexus-customer.html", import.meta.url), "utf8");
   for (const st of ALL_STATES) {
@@ -323,6 +343,7 @@ test("F6 layout: every Apple button sits beside a Google button, and the Apple n
   const apple = (html.match(/data-action="apple"/g) || []).length;
   const google = (html.match(/data-action="google"/g) || []).length;
   assert.ok(apple >= 3 && apple === google, `apple ${apple} google ${google}`);
-  assert.match(html, /data-when="apple-note" hidden>[^<]*iPhone app only[^<]*same email address/);
-  assert.match(html, /data-when="android-note" hidden>[^<]*same email address/);
+  const notes = (re) => (html.match(re) || []).length;
+  assert.equal(notes(/data-when="apple-note" hidden>[^<]*iPhone app only[^<]*same email address[^<]*hid your email/g), 3, "apple note on landing, full, ended");
+  assert.equal(notes(/data-when="android-note" hidden>[^<]*same email address[^<]*hid your email/g), 3, "android note on landing, full, ended");
 });

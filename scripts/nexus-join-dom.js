@@ -13,6 +13,7 @@ import {
   platform,
   providerLabel,
   showSignInBlock,
+  showSwitchBlock,
   signInOptions,
 } from "/scripts/nexus-join.js";
 
@@ -83,7 +84,10 @@ function render(d, info) {
   root.querySelectorAll('[data-when="android-note"]').forEach((el) => { el.hidden = !opts.androidNote; });
   bindAll(root, "offer", offerLine(info.validate));
   root.querySelectorAll('[data-when="signed-out"]').forEach((el) => {
-    el.hidden = !showSignInBlock(state, !!info.email);
+    el.hidden = !showSignInBlock(state, info.hasSession === true);
+  });
+  root.querySelectorAll('[data-when="signed-in"]').forEach((el) => {
+    el.hidden = !showSwitchBlock(state, info.hasSession === true);
   });
   if (state === "confirm") bindAll(section, "email", info.email || "your account");
   if (state === "ended") bindAll(section, "ended-title", d.reason === "lapsed" ? "Your access from this program has ended." : "This program has ended.");
@@ -93,7 +97,10 @@ function render(d, info) {
     const pay = section.querySelector('[data-slot="paying"]');
     if (pay) {
       const ids = { store: ["nj-paying-store"], web: ["nj-paying-web"], both: ["nj-paying-store", "nj-paying-web"] }[d.paying] || [];
-      pay.replaceChildren(...ids.map((id) => document.getElementById(id).content.cloneNode(true)));
+      const parts = ids.map((id) => document.getElementById(id).content.cloneNode(true));
+      // Paying in both places: one heading, not two identical ones.
+      if (parts.length > 1) { const lead = parts[1].querySelector("strong"); if (lead) lead.closest("p").remove(); }
+      pay.replaceChildren(...parts);
     }
   }
   root.querySelectorAll("[data-action]").forEach((b) => { b.disabled = false; });
@@ -143,7 +150,7 @@ async function fetchNext(next, input) {
 function sessionInfo(input) {
   const u = input.session && input.session.user;
   const provider = input.tappedProvider || (u && u.app_metadata ? u.app_metadata.provider : undefined);
-  return { email: u ? u.email : "", provider, validate: input.validate };
+  return { email: u ? u.email : "", hasSession: !!u, provider, validate: input.validate };
 }
 
 // One run at a time; a run owns the input object it was started with.
