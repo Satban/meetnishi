@@ -84,3 +84,5 @@ exclude:
   - .well-known/README.md
   - scripts/migrate_blog.py  # one-time migration tool, not site content
   - scripts/*.test.mjs       # unit tests, not site content
+  - scripts/check-built-site.mjs  # CI check, not site content
+  - scripts/build-og.mjs     # OG image builder, not site content

@@ -2,7 +2,7 @@
 // IDs (J1..J7) match foil-strategy/NEXUS_V1_WEEK2_PLAN.md section F.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import {
   actionFor,
@@ -363,20 +363,28 @@ test("F6 layout: every Apple button sits beside a Google button, and the Apple n
 const read = (rel) => readFileSync(new URL("../" + rel, import.meta.url), "utf8");
 const sha8 = (rel) => createHash("sha256").update(readFileSync(new URL("../" + rel, import.meta.url))).digest("hex").slice(0, 8);
 
-test("R1 every import of the member-page modules carries the file's content hash", () => {
+test("R1 every import of the member-page modules, anywhere in the site, carries the file's content hash", () => {
   // Cloudflare caches /scripts/* for 4 hours. A fresh page with a stale module breaks sign-in,
-  // so each import URL is versioned by content: change a module, CI says which ?v= to write.
-  const sites = [
-    ["verify.html", "nexus-join.js"],
-    ["scripts/nexus-join-dom.js", "nexus-join.js"],
-    ["_layouts/nexus-customer.html", "nexus-join-dom.js"],
-  ];
-  for (const [file, mod] of sites) {
-    const src = read(file);
-    const refs = [...src.matchAll(new RegExp(`/scripts/${mod.replace(".", "\\.")}(\\?v=[0-9a-f]*)?["']`, "g"))];
-    assert.ok(refs.length >= 1, `${file} imports ${mod}`);
-    for (const r of refs) assert.equal(r[1], `?v=${sha8("scripts/" + mod)}`, `${file}: ${mod} needs ?v=${sha8("scripts/" + mod)}`);
+  // so each import URL is versioned by content: change a module, CI lists every ?v= to write.
+  // Scans the tree (the class), not a list of known pages.
+  const root = new URL("../", import.meta.url);
+  const skip = /^(\.git|_site|node_modules|vendor|\.jekyll-cache|\.bundle)(\/|$)/;
+  const files = readdirSync(root, { recursive: true })
+    .map(String)
+    .filter((f) => !skip.test(f) && /\.(html|js|mjs|md)$/.test(f) && !f.endsWith(".test.mjs"));
+  const want = { "nexus-join.js": sha8("scripts/nexus-join.js"), "nexus-join-dom.js": sha8("scripts/nexus-join-dom.js") };
+  const bad = [];
+  let hits = 0;
+  for (const f of files) {
+    const src = read(f);
+    for (const m of src.matchAll(/\/scripts\/(nexus-join(?:-dom)?\.js)(\?v=[0-9a-f]*)?/g)) {
+      hits++;
+      if (m[2] !== `?v=${want[m[1]]}`) bad.push(`${f}: /scripts/${m[1]} needs ?v=${want[m[1]]} (has ${m[2] || "none"})`);
+    }
   }
+  assert.ok(hits >= 3, `found only ${hits} import sites; the scan went vacuous`);
+  // After fixing nexus-join.js imports, rerun once: nexus-join-dom.js's own hash changes with them.
+  assert.deepEqual(bad, [], "\n" + bad.join("\n"));
 });
 
 test("R2 demo mode is allowed only on the /orgs/ example page (whole attribute)", () => {

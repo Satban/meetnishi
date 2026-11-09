@@ -18,7 +18,7 @@
       location.replace(target + location.search + location.hash);
     })();
   </script>
-  <meta http-equiv="refresh" content="0; url={{ page.redirect_to }}">
+  {% if page.redirect_to %}<meta http-equiv="refresh" content="0; url={{ page.redirect_to }}">{% endif %}
 </head>
 <body>
   <p>This page has moved. <a href="{{ page.redirect_to }}">Continue to Nishi</a>.</p>
