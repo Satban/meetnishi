@@ -94,7 +94,9 @@
             const uid = session && session.user && session.user.id;
             if (dest !== '/account.html' && uid) {
               // One-shot token bound to THIS account; the Nexus page auto-activates only for it.
-              sessionStorage.setItem('nexus_just_signed_in', JSON.stringify({ uid: uid, at: Date.now() }));
+              let provider;
+              try { provider = JSON.parse(stash).provider; } catch (_) {}
+              sessionStorage.setItem('nexus_just_signed_in', JSON.stringify({ uid: uid, at: Date.now(), provider: provider }));
             }
           }
         } catch (_) { dest = '/account.html'; }

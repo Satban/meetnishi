@@ -4,7 +4,8 @@
 import {
   decide,
   formatDate,
-  justSignedInUid,
+  justSignedIn,
+  normalizeReturnPath,
   payingStatus,
   platform,
   providerLabel,
@@ -23,6 +24,8 @@ const cfg = {
   code: root.dataset.code || "",
   demoAllowed: root.dataset.demoAllowed === "1",
 };
+const UA = navigator.userAgent + (navigator.maxTouchPoints > 1 ? " touch" : "");
+const PAGE_URL = location.origin + location.pathname;
 
 // ── rendering ───────────────────────────────────────────────────────────────
 function bindAll(scope, key, text) {
@@ -32,13 +35,15 @@ function bindAll(scope, key, text) {
   });
 }
 
-function storeButtons(ua) {
-  const p = platform(ua);
-  const apple = `<a class="nj-btn nj-dark" href="${APP_STORE}" target="_blank" rel="noopener">Download on the App Store</a>`;
-  const play = `<a class="nj-btn nj-light" href="${PLAY}" target="_blank" rel="noopener">Get it on Google Play</a>`;
-  if (p === "ios") return apple + `<p class="nj-note"><a href="${PLAY}" target="_blank" rel="noopener">On Android instead?</a></p>`;
-  if (p === "android") return play.replace("nj-light", "nj-dark") + `<p class="nj-note"><a href="${APP_STORE}" target="_blank" rel="noopener">On iPhone instead?</a></p>`;
-  return apple + play + `<p class="nj-note">Or open this page on your phone.</p>`;
+function storeButtons() {
+  const p = platform(UA);
+  // On a phone the store opens its own app; a new tab would be left behind blank.
+  const tgt = p === "desktop" ? ' target="_blank" rel="noopener"' : "";
+  const apple = (cls) => `<a class="nj-btn ${cls}" href="${APP_STORE}"${tgt}>Download on the App Store</a>`;
+  const play = (cls) => `<a class="nj-btn ${cls}" href="${PLAY}"${tgt}>Get it on Google Play</a>`;
+  if (p === "ios") return apple("nj-dark") + `<p class="nj-note"><a href="${PLAY}"${tgt}>On Android instead?</a></p>`;
+  if (p === "android") return play("nj-dark") + `<p class="nj-note"><a href="${APP_STORE}"${tgt}>On iPhone instead?</a></p>`;
+  return apple("nj-dark") + play("nj-light") + `<p class="nj-note">Or open this page on your phone.</p>`;
 }
 
 function fillSteps(section, info) {
@@ -48,7 +53,7 @@ function fillSteps(section, info) {
   bindAll(slot, "email", info.email || "your account");
   const relay = slot.querySelector('[data-bind="relay-note"]');
   if (relay) relay.hidden = !/privaterelay\.appleid\.com$/i.test(info.email || "");
-  slot.querySelector('[data-slot="stores"]').innerHTML = storeButtons(navigator.userAgent + (navigator.maxTouchPoints > 1 ? " touch" : ""));
+  slot.querySelector('[data-slot="stores"]').innerHTML = storeButtons();
   const label = providerLabel(info.provider);
   const btn = slot.querySelector('[data-bind="provider-button"]');
   const note = slot.querySelector('[data-bind="provider-note"]');
@@ -66,7 +71,7 @@ function render(d, info) {
   root.querySelectorAll("[data-state]").forEach((s) => { s.hidden = s.dataset.state !== state; });
   const section = root.querySelector(`[data-state="${state}"]`);
   bindAll(root, "customer", cfg.customer);
-  bindAll(root, "url", location.href.split("?")[0]);
+  bindAll(root, "url", PAGE_URL);
   if (info.durationMonths) bindAll(root, "duration", info.durationMonths === 1 ? "1 month" : `${info.durationMonths} months`);
   if (state === "confirm") bindAll(section, "email", info.email || "your account");
   if (state === "ended") bindAll(section, "ended-title", d.reason === "lapsed" ? "Your access from this program has ended." : "This program has ended.");
@@ -79,15 +84,16 @@ function render(d, info) {
       pay.replaceChildren(t ? document.getElementById(t).content.cloneNode(true) : "");
     }
   }
+  root.querySelectorAll("[data-action]").forEach((b) => { b.disabled = false; });
 }
 
 // ── data fetching (only what decide() asks for) ────────────────────────────
 async function fetchNext(next, input) {
   const client = window.NishiAuth.client;
   if (next === "validate") {
-    const { data, error } = await client.rpc("validate_promo_code", { p_code: cfg.code });
-    if (error) input.validateError = { status: error.status || 0 };
-    else input.validate = data;
+    const res = await client.rpc("validate_promo_code", { p_code: cfg.code });
+    if (res.error) input.validateError = { status: res.status || 0 };
+    else input.validate = res.data;
     return;
   }
   if (next === "redeem") {
@@ -119,62 +125,79 @@ async function fetchNext(next, input) {
   }
 }
 
-let input = null;
-
-function sessionInfo(session) {
-  const u = session && session.user;
-  return { email: u ? u.email : "", provider: u && u.app_metadata ? u.app_metadata.provider : undefined };
+function sessionInfo(input) {
+  const u = input.session && input.session.user;
+  const provider = input.tappedProvider || (u && u.app_metadata ? u.app_metadata.provider : undefined);
+  return { email: u ? u.email : "", provider, durationMonths: input.validate && input.validate.duration_months };
 }
 
-async function run() {
-  // Bounded: each step resolves one missing input.
+// One run at a time; a run owns the input object it was started with.
+let current = null;
+async function run(input) {
+  current = input;
   for (let i = 0; i < 6; i++) {
+    if (current !== input) return; // superseded (e.g. "Use a different account")
     input.nowMs = Date.now();
     const d = decide(input);
-    const info = { ...sessionInfo(input.session), durationMonths: input.validate && input.validate.duration_months };
-    render(d, info);
+    render(d, sessionInfo(input));
     if (d.next === "none") return;
+    root.querySelectorAll("[data-action]").forEach((b) => { b.disabled = true; });
     try { await fetchNext(d.next, input); } catch (_) { input.rpcError = input.rpcError || { status: 0 }; }
   }
+  if (current === input) render({ state: "error", next: "none" }, {});
 }
 
 // ── actions ─────────────────────────────────────────────────────────────────
-function stashReturn() {
-  try { sessionStorage.setItem("nexus_return", JSON.stringify({ path: location.pathname, at: Date.now() })); } catch (_) {}
+function stashReturn(provider) {
+  try {
+    sessionStorage.setItem("nexus_return", JSON.stringify({ path: normalizeReturnPath(location.pathname), at: Date.now(), provider }));
+  } catch (_) {}
 }
-function signIn(provider) {
-  stashReturn();
-  if (provider === "apple") window.NishiAuth.signInWithApple();
-  else window.NishiAuth.signInWithGoogle({ selectAccount: true });
+async function signIn(provider, button) {
+  button.disabled = true;
+  stashReturn(provider);
+  let res = null;
+  try {
+    res = provider === "apple"
+      ? await window.NishiAuth.signInWithApple()
+      : await window.NishiAuth.signInWithGoogle({ selectAccount: true });
+  } catch (_) { res = { error: true }; }
+  if (res && res.error) {
+    try { sessionStorage.removeItem("nexus_return"); } catch (_) {}
+    render({ state: "error", next: "none" }, {});
+  }
 }
 async function signOutToLanding() {
-  try { await window.NishiAuth.signOut(); } catch (_) {}
-  input = { ua: navigator.userAgent, nowMs: Date.now(), session: null };
-  run();
+  // The raw client: NishiAuth.signOut() also redirects to the homepage.
+  try { await window.NishiAuth.client.auth.signOut(); } catch (_) {}
+  run({ ua: UA, nowMs: Date.now(), session: null });
 }
 
 root.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-action]");
-  if (!b || !input) return;
+  if (!b || !current || b.disabled) return;
   const a = b.dataset.action;
-  if (a === "apple" || a === "google") { b.disabled = true; signIn(a); }
-  else if (a === "activate") { b.disabled = true; input.confirmed = true; run(); }
-  else if (a === "switch" || a === "restart") signOutToLanding();
-  else if (a === "retry") location.reload();
-  else if (a === "copy") {
+  if (a === "copy") {
     const field = root.querySelector('[data-bind="url"]');
     field.select();
     try { await navigator.clipboard.writeText(field.value); b.textContent = "Copied"; } catch (_) { b.textContent = "Select and copy"; }
+    return;
   }
+  if (current.demo) return; // demo screens are pictures, not a working flow
+  if (a === "apple" || a === "google") signIn(a, b);
+  else if (a === "activate") { b.disabled = true; current.confirmed = true; run(current); }
+  else if (a === "switch" || a === "restart") signOutToLanding();
+  else if (a === "retry") location.reload();
 });
 
 // ── demo mode (example customer only, no network) ───────────────────────────
 function demo(state) {
-  input = { demo: true };
+  current = { demo: true };
   const until = new Date(Date.now() + 365 * 864e5).toISOString();
   const info = { email: "susan@example.com", provider: "google", durationMonths: 12 };
   const d = { state, next: "none", premiumUntil: until };
   if (state === "success_paying") d.paying = "store";
+  if (state === "ended") d.reason = undefined;
   render(d, info);
 }
 
@@ -188,12 +211,17 @@ async function boot() {
   // Consume the one-shot token exactly once, valid or not.
   let token = null;
   try {
-    token = justSignedInUid(sessionStorage.getItem("nexus_just_signed_in"), Date.now());
+    token = justSignedIn(sessionStorage.getItem("nexus_just_signed_in"), Date.now());
     sessionStorage.removeItem("nexus_just_signed_in");
   } catch (_) {}
 
   const session = await window.NishiAuth.getSession();
-  input = { ua: navigator.userAgent, nowMs: Date.now(), session, justSignedInUid: token };
-  run();
+  run({
+    ua: UA,
+    nowMs: Date.now(),
+    session,
+    justSignedInUid: token ? token.uid : null,
+    tappedProvider: token ? token.provider : undefined,
+  });
 }
 boot();

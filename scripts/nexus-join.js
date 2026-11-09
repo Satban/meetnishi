@@ -41,18 +41,31 @@ export function verifyDestination(stashJson, nowMs) {
   return s.path;
 }
 
-/** The uid from the one-shot "just signed in here" token, or null if absent/stale. */
-export function justSignedInUid(tokenJson, nowMs) {
+/** The one-shot "just signed in here" token: {uid, provider} or null if absent/stale. */
+export function justSignedIn(tokenJson, nowMs) {
   const t = parse(tokenJson);
   if (!t || typeof t.uid !== "string" || !t.uid || typeof t.at !== "number") return null;
   if (nowMs - t.at > JUST_SIGNED_IN_TTL_MS || nowMs < t.at) return null;
-  return t.uid;
+  const provider = t.provider === "apple" || t.provider === "google" ? t.provider : undefined;
+  return { uid: t.uid, provider };
+}
+
+export function justSignedInUid(tokenJson, nowMs) {
+  const t = justSignedIn(tokenJson, nowMs);
+  return t ? t.uid : null;
+}
+
+/** /nexus/x/index.html and /nexus/x -> /nexus/x/ so the stash always matches returnPathOk. */
+export function normalizeReturnPath(pathname) {
+  let p = String(pathname || "").replace(/index\.html$/, "");
+  if (!p.endsWith("/")) p += "/";
+  return p;
 }
 
 export function providerLabel(provider) {
   if (provider === "apple") return "Continue with Apple";
   if (provider === "google") return "Continue with Google";
-  if (provider === "email") return "the email and password you already use";
+  if (provider === "email") return "the email you signed in with here";
   return "the same way you signed in here";
 }
 
@@ -120,7 +133,8 @@ export function decide(input) {
   const uid = session.user.id;
 
   if (input.rpcError) {
-    if (input.rpcError.status === 401) return { state: "session_expired", next: "none" };
+    // 401 (bad/expired JWT) or 403 (session gone, request fell back to the anon key).
+    if (input.rpcError.status === 401 || input.rpcError.status === 403) return { state: "session_expired", next: "none" };
     return { state: "error", next: "none" };
   }
 
@@ -142,6 +156,7 @@ export function decide(input) {
   const err = String((r && r.error) || "").toLowerCase();
   if (err === "unauthorized") return { state: "session_expired", next: "none" };
   if (err.includes("another account")) return { state: "other_account", next: "none" };
+  if (err.includes("invalid promo code")) return { state: "invalid", next: "none" };
   const expired = err.includes("expired");
   const full = err.includes("limit") || err.includes("fully redeemed");
   if (expired || full) {

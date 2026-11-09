@@ -68,7 +68,7 @@
   <main class="nj-wrap" id="nj-root"
         data-customer="{{ page.customer | escape }}"
         data-code="{{ page.code | escape }}"
-        data-demo-allowed="{% if page.demo_allowed %}1{% else %}0{% endif %}">
+        data-demo-allowed="{% if page.url == '/nexus/example-health/' %}1{% else %}0{% endif %}">
 
     <div class="nj-brand">
       {% if page.logo %}<span class="nj-badge"><img src="{{ page.logo | escape }}" alt="{{ page.customer | escape }}"></span>{% else %}<span class="nj-badge">{{ page.customer | escape }}</span>{% endif %}

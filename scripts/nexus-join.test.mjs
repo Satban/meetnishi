@@ -7,7 +7,9 @@ import {
   formatDate,
   inAppBrowser,
   JUST_SIGNED_IN_TTL_MS,
+  justSignedIn,
   justSignedInUid,
+  normalizeReturnPath,
   payingStatus,
   platform,
   providerLabel,
@@ -82,10 +84,21 @@ test("J2 justSignedInUid honours the 2-minute window and shape", () => {
 });
 
 // ── J3 ──────────────────────────────────────────────────────────────────────
+test("J2 justSignedIn carries the provider tapped on this page (apple/google only)", () => {
+  assert.deepEqual(justSignedIn(JSON.stringify({ uid: "u", at: NOW, provider: "apple" }), NOW), { uid: "u", provider: "apple" });
+  assert.deepEqual(justSignedIn(JSON.stringify({ uid: "u", at: NOW, provider: "evil" }), NOW), { uid: "u", provider: undefined });
+  assert.deepEqual(justSignedIn(JSON.stringify({ uid: "u", at: NOW }), NOW), { uid: "u", provider: undefined });
+});
+test("normalizeReturnPath makes any form of the page path pass returnPathOk", () => {
+  for (const p of ["/nexus/example-health/", "/nexus/example-health/index.html", "/nexus/example-health"]) {
+    assert.equal(normalizeReturnPath(p), "/nexus/example-health/");
+    assert.equal(returnPathOk(normalizeReturnPath(p)), true);
+  }
+});
 test("J3 providerLabel", () => {
   assert.equal(providerLabel("apple"), "Continue with Apple");
   assert.equal(providerLabel("google"), "Continue with Google");
-  assert.equal(providerLabel("email"), "the email and password you already use");
+  assert.equal(providerLabel("email"), "the email you signed in with here");
   assert.equal(providerLabel(undefined), "the same way you signed in here");
 });
 
@@ -152,8 +165,8 @@ const signedIn = { ...base, session: SESSION, justSignedInUid: "uid-1" };
 test("J6 success: reads paying status next, then success / success_paying", () => {
   const ok = { success: true, already_redeemed: false, premium_until: FUTURE };
   assert.deepEqual(decide({ ...signedIn, redeem: ok }), { state: "activating", next: "readPaying" });
-  assert.equal(decide({ ...signedIn, redeem: ok, paying: "none" }).state, "success");
-  assert.equal(decide({ ...signedIn, redeem: ok, paying: "store" }).state, "success_paying");
+  assert.deepEqual(decide({ ...signedIn, redeem: ok, paying: "none" }), { state: "success", next: "none", premiumUntil: FUTURE, paying: "none" });
+  assert.deepEqual(decide({ ...signedIn, redeem: ok, paying: "store" }), { state: "success_paying", next: "none", premiumUntil: FUTURE, paying: "store" });
   assert.equal(decide({ ...signedIn, redeem: ok, paying: "web" }).state, "success_paying");
   assert.equal(decide({ ...signedIn, redeem: ok, paying: "none" }).next, "none");
 });
@@ -164,7 +177,7 @@ test("J6 already_redeemed success payload is a success", () => {
 test("J6 success with a past or missing premium_until never shows a date", () => {
   for (const pu of [PAST, null, undefined, "not a date"]) {
     const d = decide({ ...signedIn, redeem: { success: true, premium_until: pu }, paying: "none" });
-    assert.equal(d.state, "ended", String(pu));
+    assert.deepEqual(d, { state: "ended", next: "none", reason: "lapsed" }, String(pu));
   }
 });
 test("J6 cross-account email block is NOT a success (contains 'already redeemed')", () => {
@@ -188,10 +201,17 @@ for (const [label, error, closed] of [
 test("J6 session expiry: Unauthorized JSON and RPC-level 401 both -> session_expired", () => {
   assert.equal(decide({ ...signedIn, redeem: { success: false, error: "Unauthorized" } }).state, "session_expired");
   assert.equal(decide({ ...signedIn, rpcError: { status: 401, message: "JWT expired" } }).state, "session_expired");
+  assert.equal(decide({ ...signedIn, rpcError: { status: 403, message: "permission denied" } }).state, "session_expired");
   assert.equal(decide({ ...signedIn, rpcError: { status: 500 } }).state, "error");
 });
+test("J6 signed-in member on a bad code sees invalid, not a server error", () => {
+  assert.equal(decide({ ...signedIn, redeem: { success: false, error: "Invalid promo code" } }).state, "invalid");
+});
+test("J6 open_in_browser applies only when signed out", () => {
+  assert.equal(decide({ ...base, ua: WKWEBVIEW_IOS, session: SESSION, justSignedInUid: "uid-1" }).state, "activating");
+});
 test("J6 unknown failures -> error", () => {
-  assert.equal(decide({ ...signedIn, redeem: { success: false, error: "Invalid promo code" } }).state, "error");
+  assert.equal(decide({ ...signedIn, redeem: { success: false, error: "Something new" } }).state, "error");
   assert.equal(decide({ ...signedIn, redeem: { success: false } }).state, "error");
   assert.equal(decide({ ...signedIn, redeem: null }).state, "error");
 });
