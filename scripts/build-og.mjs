@@ -21,6 +21,7 @@ const cards = [
   { slug: 'pricing',       eyebrow: 'Early access',            title: 'Free to start. Premium when it earns it.', sub: '7-day trial. No card. Free tier never expires.' },
   { slug: 'story',         eyebrow: 'Our story',               title: 'Why Nishi exists.',                    sub: 'Built for the question GLP-1 leaves behind: what do I eat now?' },
   { slug: 'faq',           eyebrow: 'FAQ',                     title: 'Questions, answered.',                 sub: 'What Nishi is, how privacy works, what Premium unlocks.' },
+  { slug: 'orgs',          eyebrow: 'Nishi for Organizations', title: 'Nishi for the people you serve.',      sub: 'Buy seats, share one link. People join on their own.' },
 ];
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -64,7 +65,11 @@ if (!existsSync(chrome)) { console.error('Chrome not found at', chrome); process
 mkdirSync(outDir, { recursive: true });
 mkdirSync(tmpDir, { recursive: true });
 
-for (const c of cards) {
+// Optional slug filter: `node scripts/build-og.mjs orgs` renders only that card.
+const only = process.argv.slice(2);
+const todo = cards.filter((c) => !only.length || only.includes(c.slug));
+if (!todo.length) { console.error('No card matches', only.join(' ')); process.exit(1); }
+for (const c of todo) {
   const htmlPath = resolve(tmpDir, `${c.slug}.html`);
   const pngPath = resolve(outDir, `${c.slug}.png`);
   writeFileSync(htmlPath, html(c));
@@ -81,4 +86,4 @@ for (const c of cards) {
 }
 
 rmSync(tmpDir, { recursive: true, force: true });
-console.log('done — ' + cards.length + ' cards in assets/og/');
+console.log('done: ' + todo.length + ' card(s) in assets/og/');
