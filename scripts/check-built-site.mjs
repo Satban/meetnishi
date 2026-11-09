@@ -56,6 +56,10 @@ for (const f of walk("_site").filter((f) => f.endsWith(".html"))) {
 }
 must(navPages >= 15, `only ${navPages} pages with a header menu; the scan went vacuous`);
 
+// Founder photo removed from the site at the founder's request (2026-11-09).
+must(!existsSync("_site/assets/founder.jpg"), "founder photo is published");
+must(!/founder\.jpg|class="founder-photo"/.test(read("_site/story.html") || ""), "Story page shows the founder photo");
+
 if (fails.length) {
   for (const f of fails) console.error("::error::" + f);
   process.exit(1);
