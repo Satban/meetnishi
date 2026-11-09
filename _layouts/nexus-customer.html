@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{{ page.customer | escape }} + Nishi</title>
+  <meta name="description" content="Join Nishi Premium through {{ page.customer | escape }}.">
+  <link rel="icon" type="image/png" href="/assets/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/main.css">
+  <style>
+    /* Nexus member page. Site tokens only. */
+    body { background: var(--bg-warm); }
+    .nj-wrap { max-width: 460px; margin: 0 auto; padding: 28px 20px 48px; }
+    .nj-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+    .nj-badge { display: inline-flex; align-items: center; height: 34px; padding: 0 12px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: #fff; font-size: 14px; font-weight: 600; color: var(--text); max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nj-badge img { max-height: 24px; max-width: 140px; display: block; }
+    .nj-plus { color: var(--text-muted); }
+    .nj-brand .nj-nishi { height: 30px; width: auto; display: block; }
+    .nj-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 26px 22px; }
+    .nj-card h1 { font-size: 28px; line-height: 1.15; margin: 0 0 14px; }
+    .nj-card h2 { font-size: 24px; line-height: 1.2; margin: 0 0 10px; }
+    .nj-card p { font-size: 16px; line-height: 1.55; margin: 0 0 12px; }
+    .nj-list { list-style: none; padding: 0; margin: 4px 0 20px; }
+    .nj-list li { padding: 8px 0 8px 26px; position: relative; font-size: 16px; color: var(--text); border-top: 1px solid var(--border); }
+    .nj-list li::before { content: ""; position: absolute; left: 4px; top: 16px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .nj-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; box-sizing: border-box; min-height: 50px; padding: 12px 16px; border-radius: var(--radius); font-size: 16px; font-weight: 600; text-decoration: none; cursor: pointer; margin-bottom: 10px; }
+    .nj-btn svg { width: 20px; height: 20px; flex: 0 0 auto; }
+    .nj-dark { background: var(--text); color: #fff; border: 1px solid var(--text); }
+    .nj-light { background: #fff; color: var(--text); border: 1px solid var(--border-strong); }
+    .nj-btn[disabled] { opacity: 0.6; cursor: progress; }
+    .nj-note { font-size: 14px; color: var(--text-muted); text-align: center; margin: 4px 0 0; }
+    .nj-sep { border: 0; border-top: 1px solid var(--border); margin: 20px 0 16px; }
+    .nj-small { font-size: 14px !important; color: var(--text-soft); }
+    .nj-link { background: none; border: 0; padding: 0; color: var(--accent-dark); font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: underline; }
+    .nj-center { text-align: center; }
+    .nj-check { width: 54px; height: 54px; border-radius: 50%; background: var(--sage-soft); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+    .nj-check svg { width: 28px; height: 28px; stroke: var(--sage); fill: none; stroke-width: 2.5; }
+    .nj-date { font-family: var(--font-serif); font-size: 22px; color: var(--text); margin: 0 0 6px; }
+    .nj-step { margin-top: 22px; }
+    .nj-step-k { font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); margin: 0 0 4px; }
+    .nj-step h3 { font-size: 19px; margin: 0 0 10px; }
+    .nj-fake { pointer-events: none; }
+    .nj-callout { border: 1px solid var(--warning); background: #FFF8EC; border-radius: var(--radius); padding: 14px 16px; margin: 16px 0 4px; }
+    .nj-callout p { margin: 0 0 8px; font-size: 15px; color: var(--text); }
+    .nj-callout p:last-child { margin-bottom: 0; }
+    .nj-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; margin: 20px auto 6px; max-width: 220px; }
+    .nj-bar span { display: block; height: 100%; width: 40%; background: var(--accent); animation: nj-slide 1.2s ease-in-out infinite alternate; }
+    @keyframes nj-slide { from { margin-left: 0; } to { margin-left: 60%; } }
+    @media (prefers-reduced-motion: reduce) { .nj-bar span { animation: none; width: 100%; } }
+    .nj-copy { display: flex; gap: 8px; margin-top: 10px; }
+    .nj-copy input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius); font-size: 14px; background: var(--bg-warm); color: var(--text); }
+    .nj-copy button { padding: 10px 14px; border: 1px solid var(--text); border-radius: var(--radius); background: var(--text); color: #fff; font-weight: 600; cursor: pointer; }
+    .nj-faq { margin-top: 18px; }
+    .nj-faq details { border-top: 1px solid var(--border); padding: 12px 0; }
+    .nj-faq summary { cursor: pointer; font-weight: 600; color: var(--text); font-size: 15px; }
+    .nj-faq details p { margin: 8px 0 0; font-size: 15px; }
+    .nj-foot { text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 22px; }
+    .nj-foot a { color: var(--text-muted); }
+    [data-state][hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main class="nj-wrap" id="nj-root"
+        data-customer="{{ page.customer | escape }}"
+        data-code="{{ page.code | escape }}"
+        data-demo-allowed="{% if page.demo_allowed %}1{% else %}0{% endif %}">
+
+    <div class="nj-brand">
+      {% if page.logo %}<span class="nj-badge"><img src="{{ page.logo | escape }}" alt="{{ page.customer | escape }}"></span>{% else %}<span class="nj-badge">{{ page.customer | escape }}</span>{% endif %}
+      <span class="nj-plus" aria-hidden="true">+</span>
+      <img class="nj-nishi" src="/assets/nishi_wordmark.png" alt="Nishi">
+    </div>
+
+    <div class="nj-card" aria-live="polite">
+
+      <section data-state="loading">
+        <p class="nj-center">Checking your invitation...</p>
+        <div class="nj-bar" aria-hidden="true"><span></span></div>
+      </section>
+
+      <section data-state="open_in_browser" hidden>
+        <h2>Open this in Safari or Chrome</h2>
+        <p>Signing in does not work inside this app's built-in browser. Use the menu or share button to open the page in Safari or Chrome, or copy the link and paste it there.</p>
+        <div class="nj-copy">
+          <input type="text" readonly aria-label="Link to this page" data-bind="url">
+          <button type="button" data-action="copy">Copy</button>
+        </div>
+      </section>
+
+      <section data-state="landing" hidden>
+        <h1><span data-bind="customer"></span> gives you <span data-bind="duration">12 months</span> of Nishi Premium, free.</h1>
+        {% if page.welcome and page.welcome != "" %}<p>{{ page.welcome | escape }}</p>{% endif %}
+        <ul class="nj-list">
+          <li>Log meals by saying them</li>
+          <li>Protein and GLP-1 support</li>
+          <li>Meal plans built for your body</li>
+        </ul>
+        <button type="button" class="nj-btn nj-dark" data-action="apple">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Continue with Apple
+        </button>
+        <button type="button" class="nj-btn nj-light" data-action="google">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
+          Continue with Google
+        </button>
+        <p class="nj-note">Use the same sign-in you will use in the Nishi app.</p>
+        <hr class="nj-sep">
+        <p class="nj-small"><span data-bind="customer"></span> only sees how many people joined. Never your name, what you log, or anything about you.</p>
+        <div class="nj-faq">
+          <details><summary>Do I pay anything?</summary><p>No. <span data-bind="customer"></span> covers it.</p></details>
+          <details><summary>What happens after the free period?</summary><p>Premium ends unless you choose to keep it at the personal price in the app. Nothing renews or charges you automatically.</p></details>
+          <details><summary>I need help</summary><p>Email <a href="mailto:support@meetnishi.com">support@meetnishi.com</a> and we will sort it out.</p></details>
+        </div>
+      </section>
+
+      <section data-state="confirm" hidden>
+        <h2>Activate Premium on this account?</h2>
+        <p>You are signed in as <strong data-bind="email"></strong>.</p>
+        <button type="button" class="nj-btn nj-dark" data-action="activate">Activate Premium</button>
+        <p class="nj-note"><button type="button" class="nj-link" data-action="switch">Use a different account</button></p>
+      </section>
+
+      <section data-state="activating" hidden>
+        <h2 class="nj-center">Turning on your Premium...</h2>
+        <div class="nj-bar" aria-hidden="true"><span></span></div>
+      </section>
+
+      <section data-state="success" hidden data-group="joined">
+        <div class="nj-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h2 class="nj-center">You are all set.</h2>
+        <p class="nj-center nj-small">Premium is on until</p>
+        <p class="nj-center nj-date" data-bind="until"></p>
+        <div data-slot="paying"></div>
+        <div data-slot="steps"></div>
+      </section>
+
+      <section data-state="already_in" hidden data-group="joined">
+        <div class="nj-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <h2 class="nj-center">Your Premium is on until</h2>
+        <p class="nj-center nj-date" data-bind="until"></p>
+        <p class="nj-center nj-small">This program is not taking new members right now. Your access has not changed.</p>
+        <div data-slot="steps"></div>
+      </section>
+
+      <section data-state="other_account" hidden>
+        <h2>Your email already joined on another account</h2>
+        <p>Someone with your email joined through a different Nishi account. Sign in with that account instead. For example, if you used Apple there, use Apple here.</p>
+        <button type="button" class="nj-btn nj-dark" data-action="switch">Use a different account</button>
+        <p class="nj-note">Stuck? Email <a href="mailto:support@meetnishi.com">support@meetnishi.com</a>.</p>
+      </section>
+
+      <section data-state="full" hidden>
+        <h2>All of <span data-bind="customer"></span>'s spots are taken.</h2>
+        <p>Let them know you would like to join, and they can add more.</p>
+        <p class="nj-note">Questions? <a href="mailto:support@meetnishi.com">support@meetnishi.com</a></p>
+      </section>
+
+      <section data-state="ended" hidden>
+        <h2 data-bind="ended-title">This program has ended.</h2>
+        <p>You can keep using Nishi for free, or choose Premium at the personal price in the app.</p>
+        <p class="nj-note">Questions? <a href="mailto:support@meetnishi.com">support@meetnishi.com</a></p>
+      </section>
+
+      <section data-state="invalid" hidden>
+        <h2>This link is not working.</h2>
+        <p>Please check with <span data-bind="customer"></span> for the latest link.</p>
+        <p class="nj-note">Questions? <a href="mailto:support@meetnishi.com">support@meetnishi.com</a></p>
+      </section>
+
+      <section data-state="session_expired" hidden>
+        <h2>Please sign in again.</h2>
+        <p>Your sign-in timed out before we could finish. It only takes a moment.</p>
+        <button type="button" class="nj-btn nj-dark" data-action="restart">Sign in again</button>
+      </section>
+
+      <section data-state="error" hidden>
+        <h2>Something went wrong on our side.</h2>
+        <p>Please try again in a minute. If it keeps happening, email <a href="mailto:support@meetnishi.com">support@meetnishi.com</a> and we will sort it out.</p>
+        <button type="button" class="nj-btn nj-dark" data-action="retry">Try again</button>
+      </section>
+    </div>
+
+    <template id="nj-steps">
+      <p class="nj-center nj-small" style="margin-top:14px">You joined as <strong data-bind="email"></strong></p>
+      <p class="nj-center nj-small" data-bind="relay-note" hidden>That is the private address Apple created for you. It is the same account.</p>
+      <div class="nj-step">
+        <p class="nj-step-k">Step 1</p>
+        <h3>Get the app</h3>
+        <div data-slot="stores"></div>
+      </div>
+      <div class="nj-step">
+        <p class="nj-step-k">Step 2</p>
+        <h3>Sign in the same way</h3>
+        <div class="nj-btn nj-light nj-fake" data-bind="provider-button"></div>
+        <p class="nj-note" data-bind="provider-note"></p>
+      </div>
+    </template>
+
+    <template id="nj-paying-store">
+      <div class="nj-callout">
+        <p><strong>You already pay for Premium yourself.</strong></p>
+        <p>Your Apple or Google subscription keeps billing until you cancel it.</p>
+        <p><a href="https://support.apple.com/en-us/118428" target="_blank" rel="noopener">How to cancel on iPhone</a> · <a href="https://support.google.com/googleplay/answer/7018481" target="_blank" rel="noopener">on Android</a></p>
+      </div>
+    </template>
+    <template id="nj-paying-web">
+      <div class="nj-callout">
+        <p><strong>You already pay for Premium yourself.</strong></p>
+        <p>Your web subscription keeps billing until you cancel it.</p>
+        <p><a href="/account.html">Manage it in your account</a></p>
+      </div>
+    </template>
+
+    <p class="nj-foot">Nishi is a food and wellness companion, not a medical service. <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="/scripts/config.js"></script>
+  <script src="/scripts/auth.js"></script>
+  <script type="module" src="/scripts/nexus-join-dom.js"></script>
+</body>
+</html>

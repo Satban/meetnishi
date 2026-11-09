@@ -40,11 +40,12 @@
     });
   }
 
-  async function signInWithGoogle() {
-    return client.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: REDIRECT_TO }
-    });
+  // opts.selectAccount: force Google's account chooser (Nexus "Use a different
+  // account"); without it Google silently re-picks the browser's signed-in account.
+  async function signInWithGoogle(opts) {
+    const options = { redirectTo: REDIRECT_TO };
+    if (opts && opts.selectAccount) options.queryParams = { prompt: 'select_account' };
+    return client.auth.signInWithOAuth({ provider: 'google', options });
   }
 
   async function signInWithApple() {
