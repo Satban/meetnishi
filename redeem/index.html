@@ -416,6 +416,19 @@
       <button class="btn-primary" onclick="showEnterCode()">Try Another Code</button>
     </div>
 
+    <!-- Email already used this code on a different Nishi account -->
+    <div id="state-other-account" class="state">
+      <div class="error-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      </div>
+      <h2 class="success-title">Already used on another account</h2>
+      <p class="success-message">
+        Your email already used this code on a different Nishi account, so Premium is on that account. Sign in here with that account instead (for example, if you used Apple there, use Apple here).
+      </p>
+      <button class="btn-primary" id="other-account-btn">Sign in with a different account</button>
+      <p class="success-message" style="margin-top:14px;">Stuck? Email <a href="mailto:support@meetnishi.com">support@meetnishi.com</a>.</p>
+    </div>
+
     <!-- Exhausted Code State -->
     <div id="state-exhausted" class="state">
       <div class="error-icon">
@@ -433,6 +446,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/scripts/config.js"></script>
   <script src="/scripts/auth.js"></script>
+  <script type="module">
+    import * as RedeemClassify from "/scripts/redeem-classify.js";
+    window.RedeemClassify = RedeemClassify;
+  </script>
   <script>
     (function () {
       'use strict';
@@ -527,20 +544,26 @@
             .rpc('redeem_promo_code', { p_code: currentCode, p_user_id: session.user.id });
           if (error) throw error;
 
-          if (data.success) {
+          // Success is success === true ONLY. The cross-account email block's text contains
+          // "already redeemed" but grants nothing (scripts/redeem-classify.js, tested).
+          const kind = window.RedeemClassify
+            ? window.RedeemClassify.classifyRedeem(data)
+            : (data && data.success === true ? 'success' : 'invalid');
+          if (kind === 'success') {
             finishSuccess(data.duration_months || codeDuration);
-            return;
-          }
-          const msg = (data.error || '').toLowerCase();
-          if (msg.includes('already redeemed')) {
-            finishSuccess(codeDuration); // already active — same happy end state
-          } else if (msg.includes('expired')) {
+          } else if (kind === 'other_account') {
+            showState('state-other-account');
+          } else if (kind === 'expired') {
             showState('state-expired');
-          } else if (msg.includes('limit') || msg.includes('exhaust')) {
+          } else if (kind === 'exhausted') {
             showState('state-exhausted');
+          } else if (kind === 'signed_out') {
+            document.getElementById('activate-signedin').style.display = 'none';
+            document.getElementById('activate-signedout').style.display = 'block';
+            showState('state-activate');
           } else {
             document.getElementById('invalid-message').textContent =
-              data.error || 'Could not activate this code.';
+              (data && data.error) || 'Could not activate this code.';
             showState('state-invalid');
           }
         } catch (err) {
@@ -567,6 +590,13 @@
         if (!ready()) { setTimeout(boot, 100); return; }
 
         document.getElementById('activate-btn').addEventListener('click', activate);
+        document.getElementById('other-account-btn').addEventListener('click', async () => {
+          // Raw client: NishiAuth.signOut() would also redirect to the homepage.
+          try { await window.NishiAuth.client.auth.signOut(); } catch (_) {}
+          document.getElementById('activate-signedin').style.display = 'none';
+          document.getElementById('activate-signedout').style.display = 'block';
+          showState('state-activate');
+        });
         document.getElementById('signin-apple').addEventListener('click', () => stashAndSignIn('apple'));
         document.getElementById('signin-google').addEventListener('click', () => stashAndSignIn('google'));
 
