@@ -1,7 +1,7 @@
 // Checks the BUILT site (_site/) after `jekyll build`. Run in CI before deploy:
 //   node scripts/check-built-site.mjs
 // Plan: foil-strategy/ORGS_RENAME_PLAN.md v2. Exits non-zero on any miss.
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 
 const fails = [];
 const read = (p) => (existsSync(p) ? readFileSync(p, "utf8") : null);
@@ -30,6 +30,26 @@ if (sitemap) {
   must(!sitemap.includes("/nexus/"), "sitemap lists /nexus/");
   must(!sitemap.includes("/orgs/example-health/"), "sitemap lists a sponsor page");
 }
+
+// The public sales page and its header link (every page whose header lists links).
+const sales = read("_site/orgs/index.html");
+must(sales, "missing _site/orgs/index.html");
+if (sales) {
+  must(sales.includes('<link rel="canonical" href="https://meetnishi.com/orgs/">'), "sales page: canonical");
+  must(!/\$\d/.test(sales.replace(/<script[\s\S]*?<\/script>/g, "")), "sales page: shows a price");
+  must(!/nexus/i.test(sales.replace(/<script[\s\S]*?<\/script>|<!--[\s\S]*?-->|<style[\s\S]*?<\/style>/g, "")), "sales page: says Nexus");
+}
+if (sitemap) must(sitemap.includes("<loc>https://meetnishi.com/orgs/</loc>"), "sitemap: sales page missing");
+const walk = (d) => readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(d + "/" + e.name) : [d + "/" + e.name]);
+let navPages = 0;
+for (const f of walk("_site").filter((f) => f.endsWith(".html"))) {
+  const html = readFileSync(f, "utf8");
+  const nav = (html.match(/<ul class="nav-links">([\s\S]*?)<\/ul>/) || [])[1];
+  if (!nav || !nav.includes("<li")) continue; // app-flow pages have an empty header on purpose
+  navPages++;
+  must(nav.includes('href="/orgs/"'), `${f}: header has no For organizations link`);
+}
+must(navPages >= 15, `only ${navPages} pages with a header menu; the scan went vacuous`);
 
 if (fails.length) {
   for (const f of fails) console.error("::error::" + f);
