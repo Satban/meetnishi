@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nishi Admin · Promo Codes</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    // Pure helpers for the "edit allowance" control (scripts/promo-allowance.js,
+    // unit-tested in scripts/promo-allowance.test.mjs). Deferred like any module;
+    // only used from click handlers, long after the page is interactive.
+    import * as PromoAllowance from "/scripts/promo-allowance.js";
+    window.PromoAllowance = PromoAllowance;
+  </script>
   <style>
     * {
       box-sizing: border-box;
@@ -324,6 +331,35 @@
     .usage-cell {
       font-family: monospace;
       font-size: 13px;
+    }
+
+    .allow-edit {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .allow-input {
+      width: 90px;
+      padding: 4px 6px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .allow-hint {
+      color: #888;
+      font-size: 11px;
+    }
+
+    .usage-cell .btn-icon {
+      margin-left: 6px;
+    }
+
+    .allow-edit .btn-icon {
+      margin-left: 0;
     }
 
     /* Copy link button */
@@ -810,6 +846,10 @@
 
     let currentUser = null;
     let allCodes = [];
+    let editingId = null;      // id of the row whose allowance is being edited (one at a time)
+    let editingDraft = '';     // in-progress input value, preserved across re-renders
+    let editingErr = '';       // inline error for the active editor, preserved across re-renders
+    let savingId = null;       // id of an in-flight save, to block overlapping saves on a row
     let allGrants = [];
     let currentTab = 'codes';
 
@@ -935,7 +975,12 @@
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || 'Unknown error');
+        // Carry error_code + the full payload so callers that branch on the code
+        // (the allowance editor) can; existing callers still read err.message.
+        const err = new Error(data.error || 'Unknown error');
+        err.error_code = data.error_code;
+        err.payload = data;
+        throw err;
       }
 
       return data;
@@ -1027,7 +1072,9 @@
         <tr>
           <td class="code-cell">${code.code}</td>
           <td>${code.duration_months} month${code.duration_months > 1 ? 's' : ''}</td>
-          <td class="usage-cell">${code.usage_display || '0/1'}</td>
+          <td class="usage-cell" id="usage-${code.id}">${editingId === code.id
+            ? allowEditorHtml(code)
+            : `${code.usage_display || '0/1'} <button class="btn-link btn-icon" onclick="editAllowance('${code.id}')" title="Edit allowance">Edit</button>`}</td>
           <td>${code.campaign || '-'}</td>
           <td><span class="badge badge-${code.status}">${code.status}</span></td>
           <td>${new Date(code.created_at).toLocaleDateString()}</td>
@@ -1051,6 +1098,17 @@
           </td>
         </tr>
       `).join('');
+
+      // Restore the active inline editor's draft + error across any re-render
+      // (filter change, background refresh), so in-progress input is never lost.
+      if (editingId) {
+        const inp = document.getElementById('allow-input-' + editingId);
+        if (inp) { inp.value = editingDraft; inp.focus(); }
+        if (editingErr) {
+          const e = document.getElementById('allow-err-' + editingId);
+          if (e) { e.textContent = editingErr; e.style.display = 'block'; }
+        }
+      }
     }
 
     // Filter handlers
@@ -1072,6 +1130,94 @@
         loadCodes();
       } catch (error) {
         alert('Error deleting code: ' + error.message);
+      }
+    }
+
+    // ----- Edit allowance (max_uses) -----
+    // Markup for the inline editor shown in the usage cell of the row being edited.
+    // Only code.id (a uuid) is interpolated; the draft value + error text are set as
+    // DOM properties after render (see renderCodes) so a server/user string can't inject.
+    function allowEditorHtml(code) {
+      const PA = window.PromoAllowance;
+      // Fail closed on the displayed affordance: only an explicit grants_seat===false
+      // offers blank-means-unlimited; if the module isn't loaded, assume fixed-cap.
+      const forbid = PA ? PA.seatForbidsUnlimited(code) : true;
+      const hint = forbid ? 'Seat code: enter a fixed number.' : 'Leave blank for unlimited.';
+      const ph = forbid ? 'seats' : 'blank = unlimited';
+      return `
+        <span class="allow-edit">
+          <input type="text" inputmode="numeric" class="allow-input" id="allow-input-${code.id}"
+                 placeholder="${ph}" oninput="onAllowInput('${code.id}', this.value)"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();saveAllowance('${code.id}');}else if(event.key==='Escape'){cancelAllowance();}">
+          <button class="btn-secondary btn-icon" onclick="saveAllowance('${code.id}')">Save</button>
+          <button class="btn-link btn-icon" onclick="cancelAllowance()">Cancel</button>
+          <span class="allow-hint">${hint}</span>
+          <span class="allow-err error-message" id="allow-err-${code.id}" style="display:none"></span>
+        </span>`;
+    }
+
+    function showAllowErr(id, msg) {
+      editingErr = msg;
+      const el = document.getElementById('allow-err-' + id);
+      if (el) { el.textContent = msg; el.style.display = 'block'; }
+    }
+
+    function editAllowance(id) {
+      const code = allCodes.find(c => c.id === id);
+      if (!code) return;
+      editingId = id;
+      editingDraft = (code.max_uses === null || code.max_uses === undefined) ? '' : String(code.max_uses);
+      editingErr = '';
+      renderCodes();
+    }
+
+    function onAllowInput(id, value) {
+      if (editingId === id) editingDraft = value;
+    }
+
+    function cancelAllowance() {
+      editingId = null;
+      editingDraft = '';
+      editingErr = '';
+      renderCodes();
+    }
+
+    async function saveAllowance(id) {
+      if (savingId) return;                       // one save at a time
+      const PA = window.PromoAllowance;
+      if (!PA) { showAllowErr(id, 'Still loading, please try again in a moment.'); return; }
+      const code = allCodes.find(c => c.id === id);
+      if (!code) { editingId = null; loadCodes(); return; }
+
+      const req = PA.buildUpdateRequest(code, editingDraft);
+      if (!req.ok) { showAllowErr(id, req.message); return; }  // never hits the API
+
+      savingId = id;
+      editingErr = '';
+      try {
+        await apiCall('update_max_uses', 'POST', req.body);
+        // Reload rather than repaint: the write returns the raw row without the list's
+        // computed status/usage_display/stats, and recomputing status here would
+        // duplicate server logic. A full refresh keeps every derived field correct.
+        // Clear THIS editor only if it is still the active one — the admin may have
+        // opened another row while this save was in flight (responses can interleave);
+        // then refresh the list regardless (renderCodes preserves any active editor).
+        if (editingId === id) { editingId = null; editingDraft = ''; editingErr = ''; }
+        loadCodes();
+      } catch (err) {
+        const info = PA.classifyAllowanceError(err.payload || { error_code: null, error: err && err.message });
+        if (info.internal) console.error('update_max_uses failed:', err && err.error_code, err && err.message);
+        if (info.reloadList) {
+          // current_uses_changed (redeemed mid-edit) / code_not_found: a modal survives
+          // the table rebuild, then the list refreshes with the true counts.
+          alert(info.message);
+          if (editingId === id) { editingId = null; editingDraft = ''; editingErr = ''; }
+          loadCodes();
+        } else if (editingId === id) {
+          showAllowErr(id, info.message);          // inline; only if this row is still the active editor
+        }
+      } finally {
+        savingId = null;
       }
     }
 
