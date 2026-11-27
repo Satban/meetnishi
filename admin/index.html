@@ -362,6 +362,17 @@
       margin-left: 0;
     }
 
+    /* Save stays grey until the value differs from what's on file, then lights up
+       coral so it's clear the edit registered. */
+    .allow-save.is-dirty {
+      background: #DD6C59;
+      color: white;
+    }
+
+    .allow-save.is-dirty:hover {
+      background: #b34a00;
+    }
+
     /* Copy link button */
     .btn-link {
       background: #e3f2fd;
@@ -848,6 +859,7 @@
     let allCodes = [];
     let editingId = null;      // id of the row whose allowance is being edited (one at a time)
     let editingDraft = '';     // in-progress input value, preserved across re-renders
+    let editingOrig = '';      // the value the editor opened with, to tell "changed" from "unchanged"
     let editingErr = '';       // inline error for the active editor, preserved across re-renders
     let savingId = null;       // id of an in-flight save, to block overlapping saves on a row
     let allGrants = [];
@@ -1104,6 +1116,7 @@
       if (editingId) {
         const inp = document.getElementById('allow-input-' + editingId);
         if (inp) { inp.value = editingDraft; inp.focus(); }
+        refreshAllowSaveState(editingId);   // keep Save lit/grey correctly after a rebuild
         if (editingErr) {
           const e = document.getElementById('allow-err-' + editingId);
           if (e) { e.textContent = editingErr; e.style.display = 'block'; }
@@ -1149,7 +1162,7 @@
           <input type="text" inputmode="numeric" class="allow-input" id="allow-input-${code.id}"
                  placeholder="${ph}" oninput="onAllowInput('${code.id}', this.value)"
                  onkeydown="if(event.key==='Enter'){event.preventDefault();saveAllowance('${code.id}');}else if(event.key==='Escape'){cancelAllowance();}">
-          <button class="btn-secondary btn-icon" onclick="saveAllowance('${code.id}')">Save</button>
+          <button class="btn-secondary btn-icon allow-save" id="allow-save-${code.id}" onclick="saveAllowance('${code.id}')">Save</button>
           <button class="btn-link btn-icon" onclick="cancelAllowance()">Cancel</button>
           <span class="allow-hint">${hint}</span>
           <span class="allow-err error-message" id="allow-err-${code.id}" style="display:none"></span>
@@ -1167,17 +1180,29 @@
       if (!code) return;
       editingId = id;
       editingDraft = (code.max_uses === null || code.max_uses === undefined) ? '' : String(code.max_uses);
+      editingOrig = editingDraft;   // nothing changed yet -> Save starts grey
       editingErr = '';
       renderCodes();
     }
 
+    // The value counts as "changed" when the trimmed input differs from what the
+    // editor opened with. Toggle the Save button's lit-up state to match, so it is
+    // obvious the edit registered (and grey again if you type the original back).
+    function refreshAllowSaveState(id) {
+      const btn = document.getElementById('allow-save-' + id);
+      if (btn) btn.classList.toggle('is-dirty', editingDraft.trim() !== editingOrig);
+    }
+
     function onAllowInput(id, value) {
-      if (editingId === id) editingDraft = value;
+      if (editingId !== id) return;
+      editingDraft = value;
+      refreshAllowSaveState(id);
     }
 
     function cancelAllowance() {
       editingId = null;
       editingDraft = '';
+      editingOrig = '';
       editingErr = '';
       renderCodes();
     }
@@ -1202,7 +1227,7 @@
         // Clear THIS editor only if it is still the active one — the admin may have
         // opened another row while this save was in flight (responses can interleave);
         // then refresh the list regardless (renderCodes preserves any active editor).
-        if (editingId === id) { editingId = null; editingDraft = ''; editingErr = ''; }
+        if (editingId === id) { editingId = null; editingDraft = ''; editingOrig = ''; editingErr = ''; }
         loadCodes();
       } catch (err) {
         const info = PA.classifyAllowanceError(err.payload || { error_code: null, error: err && err.message });
@@ -1211,7 +1236,7 @@
           // current_uses_changed (redeemed mid-edit) / code_not_found: a modal survives
           // the table rebuild, then the list refreshes with the true counts.
           alert(info.message);
-          if (editingId === id) { editingId = null; editingDraft = ''; editingErr = ''; }
+          if (editingId === id) { editingId = null; editingDraft = ''; editingOrig = ''; editingErr = ''; }
           loadCodes();
         } else if (editingId === id) {
           showAllowErr(id, info.message);          // inline; only if this row is still the active editor
