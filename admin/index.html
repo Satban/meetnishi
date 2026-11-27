@@ -1102,7 +1102,7 @@
                 ${code.current_uses}x
               </button>
             ` : ''}
-            ${code.status === 'available' && code.current_uses === 0 ? `
+            ${code.status === 'available' && !code.current_uses ? `
               <button class="btn-danger btn-icon" onclick="deleteCode('${code.id}')" title="Delete">
                 Del
               </button>
